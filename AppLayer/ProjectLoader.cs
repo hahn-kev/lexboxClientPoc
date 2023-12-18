@@ -1,29 +1,43 @@
-﻿using SIL.LCModel;
-using StructureMap;
+﻿using System.Buffers;
+using System.Globalization;
+using SIL.LCModel;
+using SIL.LCModel.Core.WritingSystems;
+using SIL.LCModel.Utils;
+using SIL.WritingSystems;
+using YYClass;
 
 namespace AppLayer;
 
 public class ProjectLoader
 {
-    private const string ProjectFolder = "/Projects";
-    private const string TemplatesFolder = "/Templates";
+    private const string ProjectFolder = "/lexbox-client/Projects";
+    private const string TemplatesFolder = "/lexbox-client/Templates";
 
     static ProjectLoader()
     {
         Directory.CreateDirectory(ProjectFolder);
         Directory.CreateDirectory(TemplatesFolder);
+        Directory.CreateDirectory(Path.Combine(GlobalWritingSystemRepository.DefaultBasePath, LdmlDataMapper.CurrentLdmlLibraryVersion.ToString()));
+        Icu.Wrapper.Init();
+        Sldr.Initialize();
     }
 
     public static async Task<FlexProject> LoadProject(Stream projectFile, string fileName)
     {
+        var writingSystemRepository = new CoreGlobalWritingSystemRepository();
+        Console.WriteLine("Writing system count: " + writingSystemRepository.Count);
         fileName = Path.GetFileName(fileName);
         var projectFilePath = Path.Combine(ProjectFolder, Path.GetFileNameWithoutExtension(fileName), fileName);
         Directory.CreateDirectory(Path.GetDirectoryName(projectFilePath));
         var localFileCopy = File.Create(projectFilePath);
-        await projectFile.CopyToAsync(localFileCopy);
+        Console.WriteLine("Copying file");
+        await Copy(projectFile, localFileCopy, 81920, new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
         localFileCopy.Flush();
+        localFileCopy.Close();
+        Console.WriteLine("Done copying file");
         var lcmDirectories = new LcmDirectories(ProjectFolder, TemplatesFolder);
         var progress = new LcmThreadedProgress();
+        Console.WriteLine("Creating cache");
         var cache = LcmCache.CreateCacheFromExistingData(
             new LcmProjectIdentifier(lcmDirectories, Path.GetFileNameWithoutExtension(fileName)),
             null,
@@ -35,9 +49,32 @@ public class ProjectLoader
         Console.WriteLine("Done creating cache");
         var entries = cache.ServiceLocator.GetInstance<IRepository<ILexEntry>>()
             .AllInstances()
-            .Select(e => new Entry(e.LexemeFormOA.Form.VernacularDefaultWritingSystem.Text));
+            .Select(e => new Entry(e.LexemeFormOA.Form.VernacularDefaultWritingSystem.Text))
+            .ToArray();
+        var first = entries.First();
         Console.WriteLine("Done loading project");
-        return new FlexProject(entries.ToArray());
+        Console.WriteLine($"First entry: {first.LexemeForm}");
+        return new FlexProject(entries);
+    }
+
+    private static async Task Copy(Stream source,
+        Stream destination,
+        int bufferSize,
+        CancellationToken cancellationToken)
+    {
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
+        try
+        {
+            int bytesRead;
+            while ((bytesRead = await source.ReadAsync(buffer, cancellationToken)) != 0)
+            {
+                await destination.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, bytesRead), cancellationToken);
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
     }
 }
 

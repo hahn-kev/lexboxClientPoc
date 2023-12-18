@@ -1,8 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lexboxClientPoc", "lexboxClientPoc\lexboxClientPoc.csproj", "{A0389D2B-E0DA-40AB-8D8F-B808C4AA14C5}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lexboxClientPoc", "lexboxClientPoc\lexboxClientPoc.csproj", "{A0389D2B-E0DA-40AB-8D8F-B808C4AA14C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppLayer", "AppLayer\AppLayer.csproj", "{48ABE217-43E7-4CC1-A37B-7A31DFA1F243}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppLayer", "AppLayer\AppLayer.csproj", "{48ABE217-43E7-4CC1-A37B-7A31DFA1F243}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "hybridApp", "hybridApp\hybridApp.csproj", "{9F228CF5-684E-4A59-85C3-38FF84B452C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsApp1", "WinFormsApp1\WinFormsApp1.csproj", "{72BFD4FD-A0AD-4C9D-B414-826831295665}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +25,20 @@ Global
 		{48ABE217-43E7-4CC1-A37B-7A31DFA1F243}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48ABE217-43E7-4CC1-A37B-7A31DFA1F243}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48ABE217-43E7-4CC1-A37B-7A31DFA1F243}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F228CF5-684E-4A59-85C3-38FF84B452C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F228CF5-684E-4A59-85C3-38FF84B452C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F228CF5-684E-4A59-85C3-38FF84B452C8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{9F228CF5-684E-4A59-85C3-38FF84B452C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F228CF5-684E-4A59-85C3-38FF84B452C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72BFD4FD-A0AD-4C9D-B414-826831295665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72BFD4FD-A0AD-4C9D-B414-826831295665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72BFD4FD-A0AD-4C9D-B414-826831295665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72BFD4FD-A0AD-4C9D-B414-826831295665}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DE1FF11-3D5C-4825-BF0F-A43BDD3DA6FE}
 	EndGlobalSection
 EndGlobal
