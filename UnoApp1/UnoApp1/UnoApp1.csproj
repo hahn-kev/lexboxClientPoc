@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" />
     <PackageReference Include="Uno.WinUI" />
     <PackageReference Include="Uno.Resizetizer" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
@@ -55,5 +56,9 @@
   <ItemGroup>
     <UnoImage Include="Assets\**\*.svg" />
     <UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AppLayer\AppLayer.csproj" />
   </ItemGroup>
 </Project>

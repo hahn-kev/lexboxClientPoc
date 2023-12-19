@@ -4,26 +4,36 @@ using SIL.LCModel;
 using SIL.LCModel.Core.WritingSystems;
 using SIL.LCModel.Utils;
 using SIL.WritingSystems;
-using YYClass;
 
 namespace AppLayer;
 
 public class ProjectLoader
 {
-    private const string ProjectFolder = "/lexbox-client/Projects";
-    private const string TemplatesFolder = "/lexbox-client/Templates";
+    private static string _basePath = "/lexbox-client";
+    private static string ProjectFolder => Path.Join(_basePath, "Projects");
+    private static string TemplatesFolder => Path.Join(_basePath, "Templates");
+    private static bool _init;
 
-    static ProjectLoader()
+    public static void Init(string basePath = "/lexbox-client")
     {
+        if (_init)
+        {
+            return;
+        }
+
+        _basePath = basePath;
+
         Directory.CreateDirectory(ProjectFolder);
         Directory.CreateDirectory(TemplatesFolder);
         Directory.CreateDirectory(Path.Combine(GlobalWritingSystemRepository.DefaultBasePath, LdmlDataMapper.CurrentLdmlLibraryVersion.ToString()));
         Icu.Wrapper.Init();
         Sldr.Initialize();
+        _init = true;
     }
 
     public static async Task<FlexProject> LoadProject(Stream projectFile, string fileName)
     {
+        Init();
         var writingSystemRepository = new CoreGlobalWritingSystemRepository();
         Console.WriteLine("Writing system count: " + writingSystemRepository.Count);
         fileName = Path.GetFileName(fileName);

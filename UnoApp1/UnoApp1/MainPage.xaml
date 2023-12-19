@@ -3,10 +3,16 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:UnoApp1"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  <Page.DataContext>
+    <local:MainViewModel/>
+  </Page.DataContext>
   <StackPanel
-    Padding="4">
+        VerticalAlignment="Center">
     <TextBlock AutomationProperties.AutomationId="HelloTextBlock"
           Text="Hello Uno Platform"
           HorizontalAlignment="Center" />
+    <Button Command="{Binding OpenProjectCommand}">Open Project</Button>
+    <TextBlock Text="{Binding File}"/>
+    <TextBlock Text="{Binding FirstEntry}"/>
   </StackPanel>
 </Page>
