@@ -1,10 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Linq.Expressions;
+using System.Text.Json;
 using SystemTextJsonPatch;
 
 namespace lexboxClientContracts;
 
 public interface ILexboxApi
 {
+    Task<WritingSystem[]> GetWritingSystems();
     Task<string[]> GetExemplars();
     Task<Entry[]> GetEntries(string exemplar, QueryOptions? options = null);
     Task<Entry[]> GetEntries(QueryOptions? options = null);
@@ -27,7 +29,8 @@ public interface ILexboxApi
 public record QueryOptions(string Order, int Count = 1000, int Offset = 0);
 
 //todo what should this be?
-public class UpdateObjectInput<T> where T : class
+//alternatively this could be an interface, which the implementation is created via a builder.
+public interface UpdateObjectInput<T> where T : class
 {
     //could be a list of kvps of field changes, what does this mean for a multi string?
     public Dictionary<string, object> Updates { get; set; }
@@ -45,4 +48,13 @@ public class UpdateObjectInput<T> where T : class
     
     public Commands Command { get; set; }
     public JsonElement CommandData { get; set; }
+}
+
+//this would work well for multiple implementations where the consumer is either in memory or on a server.
+//the in memory version wouldn't need to do any serialization, but the server version would. Where as one of the options
+//above would require the in memory version to do serialization.
+public interface UpdateBuilder<T> where T : class
+{
+    UpdateBuilder<T> Set<T_Val>(Expression<Func<T, T_Val>> field, T_Val value);
+    UpdateObjectInput<T> Build();
 }
