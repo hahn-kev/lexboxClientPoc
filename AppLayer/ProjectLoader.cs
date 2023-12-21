@@ -31,11 +31,9 @@ public class ProjectLoader
         _init = true;
     }
 
-    public static async Task<FlexProject> LoadProject(Stream projectFile, string fileName)
+    public static async Task<LcmCache> LoadCache(Stream projectFile, string fileName)
     {
         Init();
-        var writingSystemRepository = new CoreGlobalWritingSystemRepository();
-        Console.WriteLine("Writing system count: " + writingSystemRepository.Count);
         fileName = Path.GetFileName(fileName);
         var projectFilePath = Path.Combine(ProjectFolder, Path.GetFileNameWithoutExtension(fileName), fileName);
         Directory.CreateDirectory(Path.GetDirectoryName(projectFilePath));
@@ -57,6 +55,12 @@ public class ProjectLoader
             progress
         );
         Console.WriteLine("Done creating cache");
+        return cache;
+    }
+
+    public static async Task<FlexProject> LoadProject(Stream projectFile, string fileName)
+    {
+        var cache = await LoadCache(projectFile, fileName);
         var entries = cache.ServiceLocator.GetInstance<IRepository<ILexEntry>>()
             .AllInstances()
             .Select(e => new Entry(e.LexemeFormOA.Form.VernacularDefaultWritingSystem.Text))

@@ -1,15 +1,34 @@
-﻿using FluentAssertions;
+﻿using AppLayer.Api;
+using FluentAssertions;
 using lexboxClientContracts;
 
 namespace lexboxContractTests;
 
 public class BasicApiTests
 {
-    private readonly ILexboxApi _api;
+    // set this to false to run against Lcm
+    private const bool inMemory = true;
+    private static ILexboxApi _api = null!;
 
     public BasicApiTests()
     {
-        _api = new InMemoryApi();
+        if (inMemory)
+            _api = new InMemoryApi();
+    }
+
+    [OneTimeSetUp]
+    public static async Task Setup()
+    {
+        if (!inMemory)
+            _api = await LexboxLcmApiFactory.CreateApi(@"C:\ProgramData\SIL\FieldWorks\Projects\sena-3\sena-3.fwdata",
+                false);
+    }
+
+    [OneTimeTearDown]
+    public static async Task TearDown()
+    {
+        (_api as IDisposable)?.Dispose();
+        await ((_api as IAsyncDisposable)?.DisposeAsync() ?? ValueTask.CompletedTask);
     }
 
     [Test]
@@ -36,7 +55,7 @@ public class BasicApiTests
     [Test]
     public async Task GetEntriesWithOptions()
     {
-        var entries = await _api.GetEntries("a", new QueryOptions("lexemeForm"));
+        var entries = await _api.GetEntries(new QueryOptions("lexemeForm"));
         entries.Should().NotBeEmpty();
     }
 
@@ -45,6 +64,8 @@ public class BasicApiTests
     {
         var entries = await _api.GetEntries();
         entries.Should().NotBeEmpty();
+        var entry = entries.First();
+        entry.LexemeForm.Values.Should().NotBeEmpty();
     }
 
     [Test]
@@ -57,29 +78,68 @@ public class BasicApiTests
     [Test]
     public async Task GetEntry()
     {
-        var entries = await _api.GetEntries("a");
+        var entries = await _api.GetEntries();
         var entry = await _api.GetEntry(entries.First().Id);
         entry.Should().NotBeNull();
+        entry.LexemeForm.Values.Should().NotBeEmpty();
+        var sense = entry.Senses.Should()
+            .NotBeEmpty($"because '{entry.LexemeForm.Values.First().Value}' should have a sense").And.Subject.First();
+        sense.Gloss.Values.Should().NotBeEmpty();
     }
 
     [Test]
     public async Task CreateEntry()
     {
-        var id = Guid.NewGuid();
-        await _api.CreateEntry(new Entry
+        var entry = await _api.CreateEntry(new Entry
         {
-            Id = id,
             LexemeForm = new MultiString
             {
                 Values = new Dictionary<WritingSystemId, string>
                 {
-                    { "en", "test" }
+                    { "en", "Kevin" }
                 }
-            }
+            },
+            Note =
+            {
+                Values =
+                {
+                    { "en", "this is a test note from Kevin" }
+                }
+            },
+            Senses =
+            [
+                new()
+                {
+                    Gloss =
+                    {
+                        Values =
+                        {
+                            { "en", "Kevin" }
+                        }
+                    },
+                    ExampleSentences =
+                    [
+                        new()
+                        {
+                            Sentence =
+                            {
+                                Values =
+                                {
+                                    { "en", "Kevin is a good guy" }
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
         });
-        var entry = await _api.GetEntry(id);
         entry.Should().NotBeNull();
-        entry.LexemeForm.Values["en"].Should().Be("test");
+        entry.LexemeForm.Values["en"].Should().Be("Kevin");
+        entry.Note.Values["en"].Should().Be("this is a test note from Kevin");
+        var sense = entry.Senses.Should().ContainSingle().Subject;
+        sense.Gloss.Values["en"].Should().Be("Kevin");
+        var example = sense.ExampleSentences.Should().ContainSingle().Subject;
+        example.Sentence.Values["en"].Should().Be("Kevin is a good guy");
     }
 
     [Test]
@@ -179,5 +239,24 @@ public class BasicApiTests
                 .Set(e => e.Senses[0].ExampleSentences[0].Sentence.Values["en"], "updated")
                 .Build());
         updatedEntry.Senses[0].ExampleSentences[0].Sentence.Values["en"].Should().Be("updated");
+    }
+
+    [Test]
+    public async Task DeleteEntry()
+    {
+        var entry = await _api.CreateEntry(new Entry
+        {
+            LexemeForm = new MultiString
+            {
+                Values = new Dictionary<WritingSystemId, string>
+                {
+                    { "en", "test" }
+                }
+            }
+        });
+        await _api.DeleteEntry(entry.Id);
+
+        var entries = await _api.GetEntries();
+        entries.Should().NotContain(e => e.Id == entry.Id);
     }
 }

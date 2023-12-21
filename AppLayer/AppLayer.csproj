@@ -17,4 +17,8 @@
       <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\lexboxClientContracts\lexboxClientContracts.csproj" />
+    </ItemGroup>
+
 </Project>

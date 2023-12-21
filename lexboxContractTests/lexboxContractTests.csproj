@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\AppLayer\AppLayer.csproj" />
       <ProjectReference Include="..\lexboxClientContracts\lexboxClientContracts.csproj" />
     </ItemGroup>
 
