@@ -96,12 +96,14 @@ public class InMemoryApi : ILexboxApi
 
     public Task<Entry> CreateEntry(Entry entry)
     {
+        if (entry.Id == default) entry.Id = Guid.NewGuid();
         _entries.Add(entry);
         return Task.FromResult(entry);
     }
 
     public Task<ExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, ExampleSentence exampleSentence)
     {
+        if (exampleSentence.Id == default) exampleSentence.Id = Guid.NewGuid();
         var entry = _entries.Single(e => e.Id == entryId);
         var sense = entry.Senses.Single(s => s.Id == senseId);
         sense.ExampleSentences.Add(exampleSentence);
@@ -110,6 +112,7 @@ public class InMemoryApi : ILexboxApi
 
     public Task<Sense> CreateSense(Guid entryId, Sense sense)
     {
+        if (sense.Id == default) sense.Id = Guid.NewGuid();
         var entry = _entries.Single(e => e.Id == entryId);
         entry.Senses.Add(sense);
         return Task.FromResult(sense);
