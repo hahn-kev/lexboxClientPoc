@@ -108,7 +108,7 @@ public class BasicApiTests
             },
             Senses =
             [
-                new()
+                new Sense
                 {
                     Gloss =
                     {
@@ -119,7 +119,7 @@ public class BasicApiTests
                     },
                     ExampleSentences =
                     [
-                        new()
+                        new ExampleSentence
                         {
                             Sentence =
                             {
@@ -156,7 +156,7 @@ public class BasicApiTests
             }
         });
         var updatedEntry = await _api.UpdateEntry(entry.Id,
-            _api.CreateUpdateBuilder<Entry>()
+            _api.CreateUpdateBuilder<IEntry>()
                 .Set(e => e.LexemeForm.Values["en"], "updated")
                 .Build());
         updatedEntry.LexemeForm.Values["en"].Should().Be("updated");
@@ -174,9 +174,9 @@ public class BasicApiTests
                     { "en", "test" }
                 }
             },
-            Senses = new List<Sense>
+            Senses = new List<ISense>
             {
-                new()
+                new Sense()
                 {
                     Definition = new MultiString
                     {
@@ -188,11 +188,12 @@ public class BasicApiTests
                 }
             }
         });
-        var updatedEntry = await _api.UpdateEntry(entry.Id,
-            _api.CreateUpdateBuilder<Entry>()
-                .Set(e => e.Senses[0].Definition.Values["en"], "updated")
+        var updatedSense = await _api.UpdateSense(entry.Id,
+            entry.Senses[0].Id,
+            _api.CreateUpdateBuilder<ISense>()
+                .Set(e => e.Definition.Values["en"], "updated")
                 .Build());
-        updatedEntry.Senses[0].Definition.Values["en"].Should().Be("updated");
+        updatedSense.Definition.Values["en"].Should().Be("updated");
     }
 
     [Test]
@@ -207,9 +208,9 @@ public class BasicApiTests
                     { "en", "test" }
                 }
             },
-            Senses = new List<Sense>
+            Senses = new List<ISense>
             {
-                new()
+                new Sense()
                 {
                     Definition = new MultiString
                     {
@@ -218,9 +219,9 @@ public class BasicApiTests
                             { "en", "test" }
                         }
                     },
-                    ExampleSentences = new List<ExampleSentence>
+                    ExampleSentences = new List<IExampleSentence>
                     {
-                        new()
+                        new ExampleSentence()
                         {
                             Sentence = new MultiString
                             {
@@ -234,11 +235,13 @@ public class BasicApiTests
                 }
             }
         });
-        var updatedEntry = await _api.UpdateEntry(entry.Id,
-            _api.CreateUpdateBuilder<Entry>()
-                .Set(e => e.Senses[0].ExampleSentences[0].Sentence.Values["en"], "updated")
+        var updatedExample = await _api.UpdateExampleSentence(entry.Id,
+            entry.Senses[0].Id,
+            entry.Senses[0].ExampleSentences[0].Id,
+            _api.CreateUpdateBuilder<IExampleSentence>()
+                .Set(e => e.Sentence.Values["en"], "updated")
                 .Build());
-        updatedEntry.Senses[0].ExampleSentences[0].Sentence.Values["en"].Should().Be("updated");
+        updatedExample.Sentence.Values["en"].Should().Be("updated");
     }
 
     [Test]

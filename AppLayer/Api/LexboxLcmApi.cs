@@ -4,6 +4,7 @@ using SIL.LCModel.Core.KernelInterfaces;
 using SIL.LCModel.Core.Text;
 using SIL.LCModel.DomainServices;
 using SIL.LCModel.Infrastructure;
+using IMultiString = lexboxClientContracts.IMultiString;
 
 namespace AppLayer.Api;
 
@@ -60,12 +61,12 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         return null;
     }
 
-    public Task<lexboxClientContracts.Entry[]> GetEntries(string exemplar, QueryOptions? options = null)
+    public Task<IEntry[]> GetEntries(string exemplar, QueryOptions? options = null)
     {
         return null;
     }
 
-    private lexboxClientContracts.Entry FromLexEntry(ILexEntry entry)
+    private IEntry FromLexEntry(ILexEntry entry)
     {
         return new lexboxClientContracts.Entry
         {
@@ -78,9 +79,9 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         };
     }
 
-    private Sense FromLexSense(ILexSense sense)
+    private ISense FromLexSense(ILexSense sense)
     {
-        return new()
+        return new Sense
         {
             Id = sense.Guid,
             Gloss = FromLcmMultiString(sense.Gloss),
@@ -91,9 +92,9 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         };
     }
 
-    private ExampleSentence FromLexExampleSentence(ILexExampleSentence sentence)
+    private IExampleSentence FromLexExampleSentence(ILexExampleSentence sentence)
     {
-        return new()
+        return new ExampleSentence
         {
             Id = sentence.Guid,
             Sentence = FromLcmMultiString(sentence.Example),
@@ -113,23 +114,23 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         return result;
     }
 
-    public Task<lexboxClientContracts.Entry[]> GetEntries(QueryOptions? options = null)
+    public Task<IEntry[]> GetEntries(QueryOptions? options = null)
     {
         return Task.FromResult(_entriesRepository.AllInstances().Select(FromLexEntry).ToArray());
     }
 
-    public async Task<lexboxClientContracts.Entry[]> SearchEntries(string query, QueryOptions? options = null)
+    public async Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null)
     {
         var entries = await GetEntries(options);
         return entries.Where(e => e.LexemeForm.Values.Values.Any(v => v.Contains(query))).ToArray();
     }
 
-    public Task<lexboxClientContracts.Entry> GetEntry(Guid id)
+    public Task<IEntry> GetEntry(Guid id)
     {
         return Task.FromResult(FromLexEntry(_entriesRepository.GetObject(id)));
     }
 
-    public async Task<lexboxClientContracts.Entry> CreateEntry(lexboxClientContracts.Entry entry)
+    public async Task<IEntry> CreateEntry(IEntry entry)
     {
         if (entry.Id != default) throw new NotSupportedException("Id must be empty");
         Guid entryId = default;
@@ -157,7 +158,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         return await GetEntry(entryId);
     }
 
-    private IList<ITsString> MultiStringToTsStrings(MultiString? multiString)
+    private IList<ITsString> MultiStringToTsStrings(IMultiString? multiString)
     {
         if (multiString is null) return [];
         var result = new List<ITsString>(multiString.Values.Count);
@@ -169,7 +170,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         return result;
     }
 
-    private void UpdateLcmMultiString(ITsMultiString multiString, MultiString newMultiString)
+    private void UpdateLcmMultiString(ITsMultiString multiString, IMultiString newMultiString)
     {
         foreach (var (ws, value) in newMultiString.Values)
         {
@@ -178,7 +179,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         }
     }
 
-    public Task<lexboxClientContracts.Entry> UpdateEntry(Guid id, UpdateObjectInput<lexboxClientContracts.Entry> entry)
+    public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> entry)
     {
         return null;
     }
@@ -188,12 +189,12 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         return null;
     }
 
-    public Task<Sense> CreateSense(Guid entryId, Sense sense)
+    public Task<ISense> CreateSense(Guid entryId, ISense sense)
     {
         return null;
     }
 
-    public Task<Sense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<Sense> sense)
+    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> sense)
     {
         return null;
     }
@@ -203,15 +204,15 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         return null;
     }
 
-    public Task<ExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, ExampleSentence exampleSentence)
+    public Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence)
     {
         return null;
     }
 
-    public Task<ExampleSentence> UpdateExampleSentence(Guid entryId,
+    public Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
         Guid senseId,
         Guid exampleSentenceId,
-        UpdateObjectInput<ExampleSentence> exampleSentence)
+        UpdateObjectInput<IExampleSentence> exampleSentence)
     {
         return null;
     }

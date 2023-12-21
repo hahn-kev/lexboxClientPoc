@@ -1,37 +1,21 @@
 ﻿namespace lexboxClientContracts;
 
-public class Entry
+public interface IEntry
 {
-    public Guid Id { get; set; }
-    public MultiString LexemeForm { get; set; } = new();
-    public MultiString CitationForm { get; set; } = new();
-    public MultiString LiteralMeaning { get; set; } = new();
-    public List<Sense> Senses { get; set; } = [];
-    public MultiString Note { get; set; } = new();
+    Guid Id { get; set; }
+    IMultiString LexemeForm { get; set; }
+    IMultiString CitationForm { get; set; }
+    IMultiString LiteralMeaning { get; set; }
+    IList<ISense> Senses { get; set; }
+    IMultiString Note { get; set; }
 }
 
-public class Sense
+public class Entry : IEntry
 {
     public Guid Id { get; set; }
-    public MultiString Definition { get; set; } = new();
-    public MultiString Gloss { get; set; } = new();
-    public string PartOfSpeech { get; set; } = string.Empty;
-    public List<string> SemanticDomain { get; set; } = [];
-    public List<ExampleSentence> ExampleSentences { get; set; } = [];
-}
-
-public class ExampleSentence
-{
-    public Guid Id { get; set; }
-    public MultiString Sentence { get; set; } = new();
-    public MultiString Translation { get; set; } = new();
-    public string Reference { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// map like object with writing system as key and string as value
-/// </summary>
-public class MultiString
-{
-    public Dictionary<WritingSystemId, string> Values { get; set; } = new();
+    public IMultiString LexemeForm { get; set; } = new MultiString();
+    public IMultiString CitationForm { get; set; } = new MultiString();
+    public IMultiString LiteralMeaning { get; set; } = new MultiString();
+    public IList<ISense> Senses { get; set; } = [];
+    public IMultiString Note { get; set; } = new MultiString();
 }

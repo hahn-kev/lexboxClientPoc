@@ -5,12 +5,12 @@ namespace lexboxClientContracts;
 
 public class InMemoryApi : ILexboxApi
 {
-    private readonly List<Entry> _entries =
+    private readonly List<IEntry> _entries =
     [
         new Entry
         {
             Id = Guid.NewGuid(),
-            LexemeForm = new()
+            LexemeForm = new MultiString
             {
                 Values =
                 {
@@ -19,10 +19,17 @@ public class InMemoryApi : ILexboxApi
             },
             Senses =
             [
-                new()
+                new Sense
                 {
                     Id = Guid.NewGuid(),
-                    Definition = new()
+                    Gloss = new MultiString
+                    {
+                        Values =
+                        {
+                            {"en", "fruit"}
+                        }
+                    },
+                    Definition = new MultiString
                     {
                         Values =
                         {
@@ -34,7 +41,7 @@ public class InMemoryApi : ILexboxApi
                         new ExampleSentence
                         {
                             Id = Guid.NewGuid(),
-                            Sentence = new()
+                            Sentence = new MultiString
                             {
                                 Values =
                                 {
@@ -49,7 +56,7 @@ public class InMemoryApi : ILexboxApi
         new Entry
         {
             Id = Guid.NewGuid(),
-            LexemeForm = new()
+            LexemeForm = new MultiString
             {
                 Values =
                 {
@@ -58,10 +65,17 @@ public class InMemoryApi : ILexboxApi
             },
             Senses =
             [
-                new()
+                new Sense
                 {
                     Id = Guid.NewGuid(),
-                    Definition = new()
+                    Gloss = new MultiString
+                    {
+                        Values =
+                        {
+                            { "en", "fruit" }
+                        }
+                    },
+                    Definition = new MultiString
                     {
                         Values =
                         {
@@ -73,7 +87,7 @@ public class InMemoryApi : ILexboxApi
                         new ExampleSentence
                         {
                             Id = Guid.NewGuid(),
-                            Sentence = new()
+                            Sentence = new MultiString
                             {
                                 Values =
                                 {
@@ -94,14 +108,14 @@ public class InMemoryApi : ILexboxApi
 
     private readonly string[] _exemplars = Enumerable.Range('a', 'z').Select(c => ((char)c).ToString()).ToArray();
 
-    public Task<Entry> CreateEntry(Entry entry)
+    public Task<IEntry> CreateEntry(IEntry entry)
     {
         if (entry.Id == default) entry.Id = Guid.NewGuid();
         _entries.Add(entry);
         return Task.FromResult(entry);
     }
 
-    public Task<ExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, ExampleSentence exampleSentence)
+    public Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence)
     {
         if (exampleSentence.Id == default) exampleSentence.Id = Guid.NewGuid();
         var entry = _entries.Single(e => e.Id == entryId);
@@ -110,7 +124,7 @@ public class InMemoryApi : ILexboxApi
         return Task.FromResult(exampleSentence);
     }
 
-    public Task<Sense> CreateSense(Guid entryId, Sense sense)
+    public Task<ISense> CreateSense(Guid entryId, ISense sense)
     {
         if (sense.Id == default) sense.Id = Guid.NewGuid();
         var entry = _entries.Single(e => e.Id == entryId);
@@ -140,21 +154,21 @@ public class InMemoryApi : ILexboxApi
         return Task.CompletedTask;
     }
 
-    public Task<Entry[]> GetEntries(string exemplar, QueryOptions? options = null)
+    public Task<IEntry[]> GetEntries(string exemplar, QueryOptions? options = null)
     {
-        var entries = _entries.Where(e => e.LexemeForm.Values["en"].StartsWith(exemplar)).ToArray();
+        var entries = _entries.Where(e => e.LexemeForm.Values["en"].StartsWith(exemplar)).OfType<IEntry>().ToArray();
         return Task.FromResult(entries);
     }
 
-    public Task<Entry[]> GetEntries(QueryOptions? options = null)
+    public Task<IEntry[]> GetEntries(QueryOptions? options = null)
     {
-        return Task.FromResult(_entries.ToArray());
+        return Task.FromResult(_entries.OfType<IEntry>().ToArray());
     }
 
-    public Task<Entry> GetEntry(Guid id)
+    public Task<IEntry> GetEntry(Guid id)
     {
         var entry = _entries.Single(e => e.Id == id);
-        return Task.FromResult(entry);
+        return Task.FromResult(entry as IEntry);
     }
 
     public Task<string[]> GetExemplars()
@@ -167,9 +181,9 @@ public class InMemoryApi : ILexboxApi
         return Task.FromResult(_writingSystems.ToArray());
     }
 
-    public Task<Entry[]> SearchEntries(string query, QueryOptions? options = null)
+    public Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null)
     {
-        var entries = _entries.Where(e => e.LexemeForm.Values["en"].Contains(query)).ToArray();
+        var entries = _entries.Where(e => e.LexemeForm.Values["en"].Contains(query)).OfType<IEntry>().ToArray();
         return Task.FromResult(entries);
     }
 
@@ -181,6 +195,7 @@ public class InMemoryApi : ILexboxApi
     private class InMemoryUpdateBuilder<T> : UpdateBuilder<T> where T : class
     {
         private readonly JsonPatchDocument<T> _patchDocument = new();
+
         public UpdateObjectInput<T> Build()
         {
             return new InMemoryUpdateObjectInput<T>(_patchDocument);
@@ -202,17 +217,17 @@ public class InMemoryApi : ILexboxApi
         }
     }
 
-    public Task<Entry> UpdateEntry(Guid id, UpdateObjectInput<Entry> update)
+    public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)
     {
         var entry = _entries.Single(e => e.Id == id);
         update.Apply(entry);
-        return Task.FromResult(entry);
+        return Task.FromResult(entry as IEntry);
     }
 
-    public Task<ExampleSentence> UpdateExampleSentence(Guid entryId,
+    public Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
         Guid senseId,
         Guid exampleSentenceId,
-        UpdateObjectInput<ExampleSentence> exampleSentence)
+        UpdateObjectInput<IExampleSentence> exampleSentence)
     {
         var entry = _entries.Single(e => e.Id == entryId);
         var sense = entry.Senses.Single(s => s.Id == senseId);
@@ -221,11 +236,25 @@ public class InMemoryApi : ILexboxApi
         return Task.FromResult(es);
     }
 
-    public Task<Sense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<Sense> sense)
+    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> sense)
     {
         var entry = _entries.Single(e => e.Id == entryId);
         var s = entry.Senses.Single(s => s.Id == senseId);
         sense.Apply(s);
         return Task.FromResult(s);
+    }
+}
+
+internal static class Helpers
+{
+    public static void RemoveAll<T>(this IList<T> list, Func<T, bool> predicate)
+    {
+        for (var i = list.Count - 1; i >= 0; i--)
+        {
+            if (predicate(list[i]))
+            {
+                list.RemoveAt(i);
+            }
+        }
     }
 }
