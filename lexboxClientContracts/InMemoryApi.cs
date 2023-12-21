@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using SystemTextJsonPatch;
+﻿using SystemTextJsonPatch;
 
 namespace lexboxClientContracts;
 
@@ -189,32 +188,7 @@ public class InMemoryApi : ILexboxApi
 
     public UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class
     {
-        return new InMemoryUpdateBuilder<T>();
-    }
-
-    private class InMemoryUpdateBuilder<T> : UpdateBuilder<T> where T : class
-    {
-        private readonly JsonPatchDocument<T> _patchDocument = new();
-
-        public UpdateObjectInput<T> Build()
-        {
-            return new InMemoryUpdateObjectInput<T>(_patchDocument);
-        }
-
-        public UpdateBuilder<T> Set<T_Val>(Expression<Func<T, T_Val>> field, T_Val value)
-        {
-            _patchDocument.Replace(field, value);
-            return this;
-        }
-    }
-
-    internal class InMemoryUpdateObjectInput<T>(JsonPatchDocument<T> patchDocument) : UpdateObjectInput<T>
-        where T : class
-    {
-        public void Apply(T obj)
-        {
-            patchDocument.ApplyTo(obj);
-        }
+        return new JsonPatchUpdateBuilder<T>();
     }
 
     public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)

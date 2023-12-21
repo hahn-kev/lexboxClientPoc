@@ -1,4 +1,5 @@
-﻿using lexboxClientContracts;
+﻿using AppLayer.Api.UpdateProxy;
+using lexboxClientContracts;
 using SIL.LCModel;
 using SIL.LCModel.Core.KernelInterfaces;
 using SIL.LCModel.Core.Text;
@@ -35,12 +36,12 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         cache.Dispose();
     }
 
-    private WritingSystemId GetWritingSystemId(int ws)
+    internal WritingSystemId GetWritingSystemId(int ws)
     {
         return cache.ServiceLocator.WritingSystemManager.Get(ws).Id;
     }
 
-    private int GetWritingSystemHandle(WritingSystemId ws)
+    internal int GetWritingSystemHandle(WritingSystemId ws)
     {
         return cache.ServiceLocator.WritingSystemManager.Get(ws.Code).Handle;
     }
@@ -136,7 +137,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         Guid entryId = default;
         UndoableUnitOfWorkHelper.Do("Create Entry",
             "Remove entry",
-            cache.ServiceLocator.GetInstance<IActionHandler>(),
+            cache.ServiceLocator.ActionHandler,
             () =>
             {
                 var rootMorphType = _morphTypeRepository.GetObject(MoMorphTypeTags.kguidMorphRoot);
@@ -181,32 +182,42 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
 
     public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> entry)
     {
-        return null;
+        
+        var lcmEntry = _entriesRepository.GetObject(id);
+        UndoableUnitOfWorkHelper.Do("Update Entry",
+            "Revert entry",
+            cache.ServiceLocator.ActionHandler,
+            () =>
+            {
+                var updateProxy = new UpdateEntryProxy(lcmEntry, this);
+                entry.Apply(updateProxy);
+            });
+        return Task.FromResult(FromLexEntry(lcmEntry));
     }
 
     public Task DeleteEntry(Guid id)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public Task<ISense> CreateSense(Guid entryId, ISense sense)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> sense)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public Task DeleteSense(Guid entryId, Guid senseId)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
@@ -214,16 +225,16 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         Guid exampleSentenceId,
         UpdateObjectInput<IExampleSentence> exampleSentence)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public Task DeleteExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class
     {
-        return null;
+        return new JsonPatchUpdateBuilder<T>();
     }
 }

@@ -7,7 +7,7 @@ namespace lexboxContractTests;
 public class BasicApiTests
 {
     // set this to false to run against Lcm
-    private const bool inMemory = true;
+    private const bool inMemory = false;
     private static ILexboxApi _api = null!;
 
     public BasicApiTests()
@@ -160,6 +160,26 @@ public class BasicApiTests
                 .Set(e => e.LexemeForm.Values["en"], "updated")
                 .Build());
         updatedEntry.LexemeForm.Values["en"].Should().Be("updated");
+    }
+
+    [Test]
+    public async Task UpdateEntryNote()
+    {
+        var entry = await _api.CreateEntry(new Entry
+        {
+            LexemeForm = new MultiString
+            {
+                Values = new Dictionary<WritingSystemId, string>
+                {
+                    { "en", "test" }
+                }
+            }
+        });
+        var updatedEntry = await _api.UpdateEntry(entry.Id,
+            _api.CreateUpdateBuilder<IEntry>()
+                .Set(e => e.Note.Values["en"], "updated")
+                .Build());
+        updatedEntry.Note.Values["en"].Should().Be("updated");
     }
 
     [Test]
