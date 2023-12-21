@@ -33,5 +33,5 @@ public class ExampleSentence
 /// </summary>
 public class MultiString
 {
-    public Dictionary<WritingSystemId, string> Values { get; set; }
+    public Dictionary<WritingSystemId, string> Values { get; set; } = new();
 }
