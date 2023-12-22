@@ -203,7 +203,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         }
     }
 
-    public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> entry)
+    public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)
     {
         var lexEntry = _entriesRepository.GetObject(id);
         UndoableUnitOfWorkHelper.Do("Update Entry",
@@ -212,7 +212,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
             () =>
             {
                 var updateProxy = new UpdateEntryProxy(lexEntry, this);
-                entry.Apply(updateProxy);
+                update.Apply(updateProxy);
             });
         return Task.FromResult(FromLexEntry(lexEntry));
     }
@@ -257,7 +257,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         return Task.FromResult(FromLexSense(_senseRepository.GetObject(sense.Id)));
     }
 
-    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> sense)
+    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update)
     {
         var lexSense = _senseRepository.GetObject(senseId);
         if (lexSense.Owner.Guid != entryId) throw new InvalidOperationException("Sense does not belong to entry");
@@ -267,7 +267,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
             () =>
             {
                 var updateProxy = new UpdateSenseProxy(lexSense, this);
-                sense.Apply(updateProxy);
+                update.Apply(updateProxy);
             });
         return Task.FromResult(FromLexSense(lexSense));
     }
@@ -306,7 +306,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
     public Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
         Guid senseId,
         Guid exampleSentenceId,
-        UpdateObjectInput<IExampleSentence> exampleSentence)
+        UpdateObjectInput<IExampleSentence> update)
     {
         var lexExampleSentence = _exampleSentenceRepository.GetObject(exampleSentenceId);
         if (lexExampleSentence.Owner.Guid != senseId)
@@ -319,7 +319,7 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
             () =>
             {
                 var updateProxy = new UpdateExampleSentenceProxy(lexExampleSentence, this);
-                exampleSentence.Apply(updateProxy);
+                update.Apply(updateProxy);
             });
         return Task.FromResult(FromLexExampleSentence(lexExampleSentence));
     }

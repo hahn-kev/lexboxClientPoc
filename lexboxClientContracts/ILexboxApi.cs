@@ -14,15 +14,15 @@ public interface ILexboxApi
     Task<IEntry> GetEntry(Guid id);
 
     Task<IEntry> CreateEntry(IEntry entry);
-    Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> entry);
+    Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update);
     Task DeleteEntry(Guid id);
 
     Task<ISense> CreateSense(Guid entryId, ISense sense);
-    Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> sense);
+    Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update);
     Task DeleteSense(Guid entryId, Guid senseId);
 
     Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence);
-    Task<IExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, UpdateObjectInput<IExampleSentence> exampleSentence);
+    Task<IExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, UpdateObjectInput<IExampleSentence> update);
     Task DeleteExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId);
     
     UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class;

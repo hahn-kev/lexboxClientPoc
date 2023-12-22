@@ -242,6 +242,79 @@ public class BasicApiTests
     }
 
     [Test]
+    public async Task UpdateSensePartOfSpeech()
+    {
+        var entry = await _api.CreateEntry(new Entry
+        {
+            LexemeForm = new MultiString
+            {
+                Values = new Dictionary<WritingSystemId, string>
+                {
+                    { "en", "test" }
+                }
+            },
+            Senses = new List<ISense>
+            {
+                new Sense()
+                {
+                    PartOfSpeech = "test",
+                    Definition = new MultiString
+                    {
+                        Values = new Dictionary<WritingSystemId, string>
+                        {
+                            { "en", "test" }
+                        }
+                    }
+                }
+            }
+        });
+        var updatedSense = await _api.UpdateSense(entry.Id,
+            entry.Senses[0].Id,
+            _api.CreateUpdateBuilder<ISense>()
+                .Set(e => e.PartOfSpeech, "updated")
+                .Build());
+        updatedSense.PartOfSpeech.Should().Be("updated");
+    }
+
+    [Test]
+    public async Task UpdateSenseSemanticDomain()
+    {
+        var entry = await _api.CreateEntry(new Entry
+        {
+            LexemeForm = new MultiString
+            {
+                Values = new Dictionary<WritingSystemId, string>
+                {
+                    { "en", "test" }
+                }
+            },
+            Senses = new List<ISense>
+            {
+                new Sense()
+                {
+                    SemanticDomain =
+                    [
+                        "test"
+                    ],
+                    Definition = new MultiString
+                    {
+                        Values = new Dictionary<WritingSystemId, string>
+                        {
+                            { "en", "test" }
+                        }
+                    }
+                }
+            }
+        });
+        var updatedSense = await _api.UpdateSense(entry.Id,
+            entry.Senses[0].Id,
+            _api.CreateUpdateBuilder<ISense>()
+                .Set(e => e.SemanticDomain[0], "updated")
+                .Build());
+        updatedSense.SemanticDomain.Should().Contain("updated");
+    }
+
+    [Test]
     public async Task UpdateExampleSentence()
     {
         var entry = await _api.CreateEntry(new Entry
@@ -288,6 +361,62 @@ public class BasicApiTests
                 .Set(e => e.Sentence.Values["en"], "updated")
                 .Build());
         updatedExample.Sentence.Values["en"].Should().Be("updated");
+    }
+
+    [Test]
+    public async Task UpdateExampleSentenceTranslation()
+    {
+        var entry = await _api.CreateEntry(new Entry
+        {
+            LexemeForm = new MultiString
+            {
+                Values = new Dictionary<WritingSystemId, string>
+                {
+                    { "en", "test" }
+                }
+            },
+            Senses = new List<ISense>
+            {
+                new Sense()
+                {
+                    Definition = new MultiString
+                    {
+                        Values = new Dictionary<WritingSystemId, string>
+                        {
+                            { "en", "test" }
+                        }
+                    },
+                    ExampleSentences = new List<IExampleSentence>
+                    {
+                        new ExampleSentence()
+                        {
+                            Sentence = new MultiString
+                            {
+                                Values = new Dictionary<WritingSystemId, string>
+                                {
+                                    { "en", "test" }
+                                }
+                            },
+                            Translation =
+                            {
+                                Values =
+                                {
+                                    { "en", "test" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        entry.Senses.Should().ContainSingle().Which.ExampleSentences.Should().ContainSingle();
+        var updatedExample = await _api.UpdateExampleSentence(entry.Id,
+            entry.Senses[0].Id,
+            entry.Senses[0].ExampleSentences[0].Id,
+            _api.CreateUpdateBuilder<IExampleSentence>()
+                .Set(e => e.Translation.Values["en"], "updated")
+                .Build());
+        updatedExample.Translation.Values["en"].Should().Be("updated");
     }
 
     [Test]

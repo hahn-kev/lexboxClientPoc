@@ -201,20 +201,20 @@ public class InMemoryApi : ILexboxApi
     public Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
         Guid senseId,
         Guid exampleSentenceId,
-        UpdateObjectInput<IExampleSentence> exampleSentence)
+        UpdateObjectInput<IExampleSentence> update)
     {
         var entry = _entries.Single(e => e.Id == entryId);
         var sense = entry.Senses.Single(s => s.Id == senseId);
         var es = sense.ExampleSentences.Single(es => es.Id == exampleSentenceId);
-        exampleSentence.Apply(es);
+        update.Apply(es);
         return Task.FromResult(es);
     }
 
-    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> sense)
+    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update)
     {
         var entry = _entries.Single(e => e.Id == entryId);
         var s = entry.Senses.Single(s => s.Id == senseId);
-        sense.Apply(s);
+        update.Apply(s);
         return Task.FromResult(s);
     }
 }
