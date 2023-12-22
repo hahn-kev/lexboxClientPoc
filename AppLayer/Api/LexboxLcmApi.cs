@@ -24,7 +24,17 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
     private readonly IRepository<ILexEntry> _entriesRepository =
         cache.ServiceLocator.GetInstance<IRepository<ILexEntry>>();
 
+    private readonly IRepository<ILexSense> _senseRepository =
+        cache.ServiceLocator.GetInstance<IRepository<ILexSense>>();
+
+    private readonly IRepository<ILexExampleSentence> _exampleSentenceRepository =
+        cache.ServiceLocator.GetInstance<IRepository<ILexExampleSentence>>();
+
     private readonly ILexEntryFactory _lexEntryFactory = cache.ServiceLocator.GetInstance<ILexEntryFactory>();
+    private readonly ILexSenseFactory _lexSenseFactory = cache.ServiceLocator.GetInstance<ILexSenseFactory>();
+
+    private readonly ILexExampleSentenceFactory _lexExampleSentenceFactory =
+        cache.ServiceLocator.GetInstance<ILexExampleSentenceFactory>();
 
     private readonly IMoMorphTypeRepository _morphTypeRepository =
         cache.ServiceLocator.GetInstance<IMoMorphTypeRepository>();
@@ -59,12 +69,12 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
 
     public Task<string[]> GetExemplars()
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public Task<IEntry[]> GetEntries(string exemplar, QueryOptions? options = null)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     private IEntry FromLexEntry(ILexEntry entry)
@@ -141,17 +151,30 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
             () =>
             {
                 var rootMorphType = _morphTypeRepository.GetObject(MoMorphTypeTags.kguidMorphRoot);
+                var firstSense = entry.Senses.FirstOrDefault();
                 var lexEntry = _lexEntryFactory.Create(new LexEntryComponents
                 {
                     MorphType = rootMorphType,
                     LexemeFormAlternatives = MultiStringToTsStrings(entry.LexemeForm),
-                    GlossAlternatives = MultiStringToTsStrings(entry.Senses.FirstOrDefault()?.Gloss),
+                    GlossAlternatives = MultiStringToTsStrings(firstSense?.Gloss),
                     GlossFeatures = [],
                     MSA = null
                 });
                 UpdateLcmMultiString(lexEntry.CitationForm, entry.CitationForm);
                 UpdateLcmMultiString(lexEntry.LiteralMeaning, entry.LiteralMeaning);
                 UpdateLcmMultiString(lexEntry.Comment, entry.Note);
+                if (firstSense is not null)
+                {
+                    var lexSense = lexEntry.SensesOS.First();
+                    ApplySenseToLexSense(firstSense, lexSense);
+                }
+
+                //first sense is already created
+                foreach (var sense in entry.Senses.Skip(1))
+                {
+                    CreateSense(lexEntry, sense);
+                }
+
                 entryId = lexEntry.Guid;
             });
         if (entryId == default) throw new InvalidOperationException("Entry was not created");
@@ -182,42 +205,102 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
 
     public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> entry)
     {
-        
-        var lcmEntry = _entriesRepository.GetObject(id);
+        var lexEntry = _entriesRepository.GetObject(id);
         UndoableUnitOfWorkHelper.Do("Update Entry",
             "Revert entry",
             cache.ServiceLocator.ActionHandler,
             () =>
             {
-                var updateProxy = new UpdateEntryProxy(lcmEntry, this);
+                var updateProxy = new UpdateEntryProxy(lexEntry, this);
                 entry.Apply(updateProxy);
             });
-        return Task.FromResult(FromLexEntry(lcmEntry));
+        return Task.FromResult(FromLexEntry(lexEntry));
     }
 
     public Task DeleteEntry(Guid id)
     {
-        throw new NotImplementedException();
+        UndoableUnitOfWorkHelper.Do("Delete Entry",
+            "Revert delete",
+            cache.ServiceLocator.ActionHandler,
+            () =>
+            {
+                _entriesRepository.GetObject(id).Delete();
+            });
+        return Task.CompletedTask;
+    }
+
+    internal void CreateSense(ILexEntry lexEntry, ISense sense)
+    {
+        var lexSense = _lexSenseFactory.Create(sense.Id, lexEntry);
+        ApplySenseToLexSense(sense, lexSense);
+    }
+
+    private void ApplySenseToLexSense(ISense sense, ILexSense lexSense)
+    {
+        UpdateLcmMultiString(lexSense.Gloss, sense.Gloss);
+        UpdateLcmMultiString(lexSense.Definition, sense.Definition);
+        foreach (var exampleSentence in sense.ExampleSentences)
+        {
+            CreateExampleSentence(lexSense, exampleSentence);
+        }
     }
 
     public Task<ISense> CreateSense(Guid entryId, ISense sense)
     {
-        throw new NotImplementedException();
+        if (sense.Id != default) sense.Id = Guid.NewGuid();
+        if (!_entriesRepository.TryGetObject(entryId, out var lexEntry))
+            throw new InvalidOperationException("Entry not found");
+        UndoableUnitOfWorkHelper.Do("Create Sense",
+            "Remove sense",
+            cache.ServiceLocator.ActionHandler,
+            () => CreateSense(lexEntry, sense));
+        return Task.FromResult(FromLexSense(_senseRepository.GetObject(sense.Id)));
     }
 
     public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> sense)
     {
-        throw new NotImplementedException();
+        var lexSense = _senseRepository.GetObject(senseId);
+        if (lexSense.Owner.Guid != entryId) throw new InvalidOperationException("Sense does not belong to entry");
+        UndoableUnitOfWorkHelper.Do("Update Sense",
+            "Revert sense",
+            cache.ServiceLocator.ActionHandler,
+            () =>
+            {
+                var updateProxy = new UpdateSenseProxy(lexSense, this);
+                sense.Apply(updateProxy);
+            });
+        return Task.FromResult(FromLexSense(lexSense));
     }
 
     public Task DeleteSense(Guid entryId, Guid senseId)
     {
-        throw new NotImplementedException();
+        var lexSense = _senseRepository.GetObject(senseId);
+        if (lexSense.Owner.Guid != entryId) throw new InvalidOperationException("Sense does not belong to entry");
+        UndoableUnitOfWorkHelper.Do("Delete Sense",
+            "Revert delete",
+            cache.ServiceLocator.ActionHandler,
+            () => lexSense.Delete());
+        return Task.CompletedTask;
+    }
+
+    internal void CreateExampleSentence(ILexSense lexSense, IExampleSentence exampleSentence)
+    {
+        var lexExampleSentence = _lexExampleSentenceFactory.Create(exampleSentence.Id, lexSense);
+        UpdateLcmMultiString(lexExampleSentence.Example, exampleSentence.Sentence);
+        lexExampleSentence.Reference = TsStringUtils.MakeString(exampleSentence.Reference,
+            lexExampleSentence.Reference.get_WritingSystem(0));
     }
 
     public Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence)
     {
-        throw new NotImplementedException();
+        if (exampleSentence.Id != default) exampleSentence.Id = Guid.NewGuid();
+        if (!_senseRepository.TryGetObject(senseId, out var lexSense))
+            throw new InvalidOperationException("Sense not found");
+        UndoableUnitOfWorkHelper.Do("Create Example Sentence",
+            "Remove example sentence",
+            cache.ServiceLocator.ActionHandler,
+            () => CreateExampleSentence(lexSense, exampleSentence));
+        return Task.FromResult(FromLexExampleSentence(_exampleSentenceRepository.GetObject(exampleSentence.Id)));
     }
 
     public Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
@@ -225,12 +308,34 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         Guid exampleSentenceId,
         UpdateObjectInput<IExampleSentence> exampleSentence)
     {
-        throw new NotImplementedException();
+        var lexExampleSentence = _exampleSentenceRepository.GetObject(exampleSentenceId);
+        if (lexExampleSentence.Owner.Guid != senseId)
+            throw new InvalidOperationException("Example sentence does not belong to sense");
+        if (lexExampleSentence.Owner.Owner.Guid != entryId)
+            throw new InvalidOperationException("Example sentence does not belong to entry");
+        UndoableUnitOfWorkHelper.Do("Update Example Sentence",
+            "Revert example sentence",
+            cache.ServiceLocator.ActionHandler,
+            () =>
+            {
+                var updateProxy = new UpdateExampleSentenceProxy(lexExampleSentence, this);
+                exampleSentence.Apply(updateProxy);
+            });
+        return Task.FromResult(FromLexExampleSentence(lexExampleSentence));
     }
 
     public Task DeleteExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId)
     {
-        throw new NotImplementedException();
+        var lexExampleSentence = _exampleSentenceRepository.GetObject(exampleSentenceId);
+        if (lexExampleSentence.Owner.Guid != senseId)
+            throw new InvalidOperationException("Example sentence does not belong to sense");
+        if (lexExampleSentence.Owner.Owner.Guid != entryId)
+            throw new InvalidOperationException("Example sentence does not belong to entry");
+        UndoableUnitOfWorkHelper.Do("Delete Example Sentence",
+            "Revert delete",
+            cache.ServiceLocator.ActionHandler,
+            () => lexExampleSentence.Delete());
+        return Task.CompletedTask;
     }
 
     public UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class

@@ -4,6 +4,7 @@ using lexboxClientContracts;
 
 namespace lexboxContractTests;
 
+[Parallelizable(ParallelScope.None)]
 public class BasicApiTests
 {
     // set this to false to run against Lcm
@@ -92,9 +93,9 @@ public class BasicApiTests
     {
         var entry = await _api.CreateEntry(new Entry
         {
-            LexemeForm = new MultiString
+            LexemeForm =
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values =
                 {
                     { "en", "Kevin" }
                 }
@@ -106,11 +107,32 @@ public class BasicApiTests
                     { "en", "this is a test note from Kevin" }
                 }
             },
+            CitationForm =
+            {
+                Values =
+                {
+                    { "en", "Kevin" }
+                }
+            },
+            LiteralMeaning =
+            {
+                Values =
+                {
+                    { "en", "Kevin" }
+                }
+            },
             Senses =
             [
                 new Sense
                 {
                     Gloss =
+                    {
+                        Values =
+                        {
+                            { "en", "Kevin" }
+                        }
+                    },
+                    Definition =
                     {
                         Values =
                         {
@@ -135,9 +157,12 @@ public class BasicApiTests
         });
         entry.Should().NotBeNull();
         entry.LexemeForm.Values["en"].Should().Be("Kevin");
+        entry.LiteralMeaning.Values["en"].Should().Be("Kevin");
+        entry.CitationForm.Values["en"].Should().Be("Kevin");
         entry.Note.Values["en"].Should().Be("this is a test note from Kevin");
         var sense = entry.Senses.Should().ContainSingle().Subject;
         sense.Gloss.Values["en"].Should().Be("Kevin");
+        sense.Definition.Values["en"].Should().Be("Kevin");
         var example = sense.ExampleSentences.Should().ContainSingle().Subject;
         example.Sentence.Values["en"].Should().Be("Kevin is a good guy");
     }
@@ -255,6 +280,7 @@ public class BasicApiTests
                 }
             }
         });
+        entry.Senses.Should().ContainSingle().Which.ExampleSentences.Should().ContainSingle();
         var updatedExample = await _api.UpdateExampleSentence(entry.Id,
             entry.Senses[0].Id,
             entry.Senses[0].ExampleSentences[0].Id,

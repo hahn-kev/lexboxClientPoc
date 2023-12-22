@@ -9,7 +9,7 @@ public class UpdateEntryProxy(ILexEntry lcmEntry, LexboxLcmApi lexboxLcmApi) : I
 {
     public Guid Id
     {
-        get => default;
+        get => lcmEntry.Guid;
         set => throw new NotImplementedException();
     }
 
@@ -33,7 +33,12 @@ public class UpdateEntryProxy(ILexEntry lcmEntry, LexboxLcmApi lexboxLcmApi) : I
 
     public IList<ISense> Senses
     {
-        get => throw new NotImplementedException();
+        get =>
+            new UpdateListProxy<ISense>(
+                sense => lexboxLcmApi.CreateSense(lcmEntry, sense),
+                sense => lexboxLcmApi.DeleteSense(Id, sense.Id),
+                i => new UpdateSenseProxy(lcmEntry.SensesOS[i], lexboxLcmApi)
+            );
         set => throw new NotImplementedException();
     }
 
