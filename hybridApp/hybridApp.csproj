@@ -72,4 +72,8 @@
       <ProjectReference Include="..\AppLayer\AppLayer.csproj" />
     </ItemGroup> -->
 
+    <ItemGroup>
+      <ProjectReference Include="..\RazorClassLibrary1\RazorClassLibrary1.csproj" />
+    </ItemGroup>
+
 </Project>

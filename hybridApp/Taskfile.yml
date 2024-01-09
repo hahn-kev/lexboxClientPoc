@@ -4,11 +4,10 @@ version: '3'
 
 tasks:
   run-android:
-    deps: [build]
-    cmd: dotnet build -f net8.0-android -t:Run
+    cmds:
+      - dotnet build -f net8.0-android
+      - dotnet build -f net8.0-android -t:Run
   run-windows:
-    deps: [build]
-    cmd: dotnet build -f net8.0-windows10.0.19041.0 -t:Run
-
-  build:
-    cmd: dotnet build
+    cmds:
+      - dotnet build -f net8.0-windows10.0.19041.0
+      - dotnet build -f net8.0-windows10.0.19041.0 -t:Run

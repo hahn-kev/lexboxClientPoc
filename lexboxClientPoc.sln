@@ -9,37 +9,41 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppLayer", "AppLayer\AppLay
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "hybridApp", "hybridApp\hybridApp.csproj", "{9F228CF5-684E-4A59-85C3-38FF84B452C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsApp1", "WinFormsApp1\WinFormsApp1.csproj", "{72BFD4FD-A0AD-4C9D-B414-826831295665}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsApp1", "WinFormsApp1\WinFormsApp1.csproj", "{72BFD4FD-A0AD-4C9D-B414-826831295665}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication1", "AvaloniaApplication1\AvaloniaApplication1\AvaloniaApplication1.csproj", "{264EEC1B-AD6E-46CF-BC9A-30A668D36665}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaApplication1", "AvaloniaApplication1\AvaloniaApplication1\AvaloniaApplication1.csproj", "{264EEC1B-AD6E-46CF-BC9A-30A668D36665}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication1.Android", "AvaloniaApplication1\AvaloniaApplication1.Android\AvaloniaApplication1.Android.csproj", "{1E1A42BD-176B-483E-B0DB-A94F7383217E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaApplication1.Android", "AvaloniaApplication1\AvaloniaApplication1.Android\AvaloniaApplication1.Android.csproj", "{1E1A42BD-176B-483E-B0DB-A94F7383217E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication1.Desktop", "AvaloniaApplication1\AvaloniaApplication1.Desktop\AvaloniaApplication1.Desktop.csproj", "{ADA591A8-E217-4818-9C16-633F9876C926}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaApplication1.Desktop", "AvaloniaApplication1\AvaloniaApplication1.Desktop\AvaloniaApplication1.Desktop.csproj", "{ADA591A8-E217-4818-9C16-633F9876C926}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication1.iOS", "AvaloniaApplication1\AvaloniaApplication1.iOS\AvaloniaApplication1.iOS.csproj", "{B58DEAEC-0911-47B7-BA03-AFFF608D5DBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaApplication1.iOS", "AvaloniaApplication1\AvaloniaApplication1.iOS\AvaloniaApplication1.iOS.csproj", "{B58DEAEC-0911-47B7-BA03-AFFF608D5DBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication1.Browser", "AvaloniaApplication1\AvaloniaApplication1.Browser\AvaloniaApplication1.Browser.csproj", "{8DF0B578-33C6-4DC9-ADC3-D800518971BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaApplication1.Browser", "AvaloniaApplication1\AvaloniaApplication1.Browser\AvaloniaApplication1.Browser.csproj", "{8DF0B578-33C6-4DC9-ADC3-D800518971BA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp1.Windows", "UnoApp1\UnoApp1.Windows\UnoApp1.Windows.csproj", "{E5B67E3F-2BCE-4E0B-86F9-0E204A2F61FA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnoApp", "UnoApp", "{DD4BAB5F-8CFB-4D3F-A552-D8967A92E29C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoApp1.Shared", "UnoApp1\UnoApp1.Shared\UnoApp1.Shared.csproj", "{CA3DCF7C-9420-4794-97AA-9BE55CCC666C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp1.Shared", "UnoApp1\UnoApp1.Shared\UnoApp1.Shared.csproj", "{CA3DCF7C-9420-4794-97AA-9BE55CCC666C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoApp1", "UnoApp1\UnoApp1\UnoApp1.csproj", "{503E6B3B-80A5-4C5D-B9ED-2BC024F6764C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp1", "UnoApp1\UnoApp1\UnoApp1.csproj", "{503E6B3B-80A5-4C5D-B9ED-2BC024F6764C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoApp1.Mobile", "UnoApp1\UnoApp1.Mobile\UnoApp1.Mobile.csproj", "{6680E57B-D529-4DD8-AE3C-B4E163E52040}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp1.Mobile", "UnoApp1\UnoApp1.Mobile\UnoApp1.Mobile.csproj", "{6680E57B-D529-4DD8-AE3C-B4E163E52040}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoApp1.Skia.Gtk", "UnoApp1\UnoApp1.Skia.Gtk\UnoApp1.Skia.Gtk.csproj", "{41346E49-39BB-43C3-A022-3BF2C576F70F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp1.Skia.Gtk", "UnoApp1\UnoApp1.Skia.Gtk\UnoApp1.Skia.Gtk.csproj", "{41346E49-39BB-43C3-A022-3BF2C576F70F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoApp1.Wasm", "UnoApp1\UnoApp1.Wasm\UnoApp1.Wasm.csproj", "{69D73E61-72C8-4BDA-9A62-87C525D3DE7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp1.Wasm", "UnoApp1\UnoApp1.Wasm\UnoApp1.Wasm.csproj", "{69D73E61-72C8-4BDA-9A62-87C525D3DE7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lexboxClientContracts", "lexboxClientContracts\lexboxClientContracts.csproj", "{41E073EC-BF86-47BE-A699-E0277CDAD702}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lexboxClientContracts", "lexboxClientContracts\lexboxClientContracts.csproj", "{41E073EC-BF86-47BE-A699-E0277CDAD702}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Avalonia", "Avalonia", "{7A009BB3-37ED-4B03-9920-54CFA7201DD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lexboxContractTests", "lexboxContractTests\lexboxContractTests.csproj", "{D83AD353-895B-46E8-8DE5-4C38F2D7B75A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lexboxContractTests", "lexboxContractTests\lexboxContractTests.csproj", "{D83AD353-895B-46E8-8DE5-4C38F2D7B75A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RazorClassLibrary1", "RazorClassLibrary1\RazorClassLibrary1.csproj", "{E564ACC5-9892-491C-AC74-CB75AEB24581}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorClassLibrary2", "RazorClassLibrary2\RazorClassLibrary2.csproj", "{40C142E2-97AF-4537-A5E5-54503929F918}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,24 +120,32 @@ Global
 		{D83AD353-895B-46E8-8DE5-4C38F2D7B75A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D83AD353-895B-46E8-8DE5-4C38F2D7B75A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D83AD353-895B-46E8-8DE5-4C38F2D7B75A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E564ACC5-9892-491C-AC74-CB75AEB24581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E564ACC5-9892-491C-AC74-CB75AEB24581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E564ACC5-9892-491C-AC74-CB75AEB24581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E564ACC5-9892-491C-AC74-CB75AEB24581}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40C142E2-97AF-4537-A5E5-54503929F918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40C142E2-97AF-4537-A5E5-54503929F918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40C142E2-97AF-4537-A5E5-54503929F918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40C142E2-97AF-4537-A5E5-54503929F918}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6DE1FF11-3D5C-4825-BF0F-A43BDD3DA6FE}
-	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{264EEC1B-AD6E-46CF-BC9A-30A668D36665} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
+		{1E1A42BD-176B-483E-B0DB-A94F7383217E} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
+		{ADA591A8-E217-4818-9C16-633F9876C926} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
+		{B58DEAEC-0911-47B7-BA03-AFFF608D5DBF} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
+		{8DF0B578-33C6-4DC9-ADC3-D800518971BA} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
 		{E5B67E3F-2BCE-4E0B-86F9-0E204A2F61FA} = {DD4BAB5F-8CFB-4D3F-A552-D8967A92E29C}
 		{CA3DCF7C-9420-4794-97AA-9BE55CCC666C} = {DD4BAB5F-8CFB-4D3F-A552-D8967A92E29C}
 		{503E6B3B-80A5-4C5D-B9ED-2BC024F6764C} = {DD4BAB5F-8CFB-4D3F-A552-D8967A92E29C}
 		{6680E57B-D529-4DD8-AE3C-B4E163E52040} = {DD4BAB5F-8CFB-4D3F-A552-D8967A92E29C}
 		{41346E49-39BB-43C3-A022-3BF2C576F70F} = {DD4BAB5F-8CFB-4D3F-A552-D8967A92E29C}
 		{69D73E61-72C8-4BDA-9A62-87C525D3DE7A} = {DD4BAB5F-8CFB-4D3F-A552-D8967A92E29C}
-		{264EEC1B-AD6E-46CF-BC9A-30A668D36665} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
-		{1E1A42BD-176B-483E-B0DB-A94F7383217E} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
-		{8DF0B578-33C6-4DC9-ADC3-D800518971BA} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
-		{ADA591A8-E217-4818-9C16-633F9876C926} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
-		{B58DEAEC-0911-47B7-BA03-AFFF608D5DBF} = {7A009BB3-37ED-4B03-9920-54CFA7201DD1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DE1FF11-3D5C-4825-BF0F-A43BDD3DA6FE}
 	EndGlobalSection
 EndGlobal
