@@ -1,4 +1,28 @@
+using System.Text.Json.Serialization;
+using System.Text.Json;
+
 namespace lexboxClientContracts;
+
+public class WritingSystemIdJsonConverter : JsonConverter<WritingSystemId>
+{
+    public override WritingSystemId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return WritingSystemId.Parse(reader.GetString(), null);
+    }
+
+    public override void Write(Utf8JsonWriter writer, WritingSystemId value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+
+    public override WritingSystemId ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => WritingSystemId.Parse(reader.GetString(), null);
+
+    public override void WriteAsPropertyName(Utf8JsonWriter writer, WritingSystemId value, JsonSerializerOptions options)
+    {
+        writer.WritePropertyName(value.ToString());
+    }
+}
 
 public record WritingSystem
 {
@@ -9,6 +33,7 @@ public record WritingSystem
     //todo probably need more stuff here, see wesay for ideas
 }
 
+[JsonConverter(typeof(WritingSystemIdJsonConverter))]
 public readonly record struct WritingSystemId(string Code): ISpanFormattable, ISpanParsable<WritingSystemId>
 {
     public static implicit operator string(WritingSystemId ws) => ws.Code;

@@ -1,6 +1,4 @@
-﻿using SystemTextJsonPatch;
-
-namespace lexboxClientContracts;
+﻿namespace lexboxClientContracts;
 
 public class InMemoryApi : ILexboxApi
 {

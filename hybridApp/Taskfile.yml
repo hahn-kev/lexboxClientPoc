@@ -4,10 +4,17 @@ version: '3'
 
 tasks:
   run-android:
-    cmds:
-      - dotnet build -f net8.0-android
-      - dotnet build -f net8.0-android -t:Run
+    cmd: dotnet build -f net8.0-android -t:"Build;Run" /p:CLIBuild=true
+  run-android-full:
+    deps: [build-svelte]
+    cmd: task run-android
+
   run-windows:
     cmds:
-      - dotnet build -f net8.0-windows10.0.19041.0
-      - dotnet build -f net8.0-windows10.0.19041.0 -t:Run
+      - dotnet build -f net8.0-windows10.0.19041.0 -t:"Build;Run" /p:CLIBuild=true
+  run-windows-full:
+    deps: [build-svelte]
+    cmd: task run-windows
+
+  build-svelte:
+    cmd: dotnet build ../LexboxRazor -t:"BuildNpm"

@@ -38,9 +38,12 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+    </PropertyGroup>
 
-        <!-- Lets us run on Windows 🤷 - https://stackoverflow.com/a/73729413/2301416 -->
-		<WindowsPackageType>None</WindowsPackageType>
+    <PropertyGroup Condition="'$(CLIBuild)' == true">
+        <!-- Lets us build and run on Windows from the cli (VS uses publish, which is perhaps what we should do from the cli as well/instead)
+          https://stackoverflow.com/a/73729413/2301416 -->
+		    <WindowsPackageType>None</WindowsPackageType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -73,7 +76,7 @@
     </ItemGroup> -->
 
     <ItemGroup>
-      <ProjectReference Include="..\RazorClassLibrary1\RazorClassLibrary1.csproj" />
+      <ProjectReference Include="..\LexboxRazor\LexboxRazor.csproj" />
     </ItemGroup>
 
 </Project>

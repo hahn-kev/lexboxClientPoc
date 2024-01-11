@@ -1,0 +1,55 @@
+﻿@using Components.JsInterop;
+@using lexboxClientContracts;
+
+@inherits LayoutComponentBase
+
+@implements IDisposable
+
+@inject IJSRuntime JS
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @if (!initialized)
+            {
+                <p>Initializing...</p>
+            }
+            else
+            {
+                @Body
+            }
+        </article>
+    </main>
+</div>
+
+@code {
+
+    private DotNetObjectReference<ILexboxApi>? lexboxApiRef;
+
+    private bool initialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        var lexboxApi = new JsInvokableLexboxApi(new InMemoryApi());
+        lexboxApiRef = DotNetObjectReference.Create<ILexboxApi>(lexboxApi);
+        await JS.InvokeAsync<IJSObjectReference>("import", "./_content/LexboxRazor/index.js");
+        await JS.InvokeVoidAsync("lexbox.DotNetServiceProvider.setService", "LexboxApi", lexboxApiRef);
+        initialized = true;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        lexboxApiRef?.Dispose();
+    }
+}

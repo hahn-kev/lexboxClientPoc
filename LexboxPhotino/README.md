@@ -1,0 +1,1 @@
+I needed: `sudo apt install libwebkit2gtk-4.0-37 libnotify4`

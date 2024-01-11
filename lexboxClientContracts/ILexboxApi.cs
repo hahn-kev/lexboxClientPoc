@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using SystemTextJsonPatch;
 
 namespace lexboxClientContracts;
@@ -30,6 +31,8 @@ public interface ILexboxApi
 
 public record QueryOptions(string Order, int Count = 1000, int Offset = 0);
 
+// [JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor, IgnoreUnrecognizedTypeDiscriminators = true)]
+// [JsonDerivedType(typeof(JsonPatchUpdateObjectInput<IEntry>), "json-entry-update")]
 public interface UpdateObjectInput<T> where T : class
 {
     void Apply(T obj);
