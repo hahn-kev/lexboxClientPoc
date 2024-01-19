@@ -1,5 +1,8 @@
-﻿namespace lexboxClientContracts;
+﻿using System.Text.Json.Serialization;
 
+namespace lexboxClientContracts;
+
+[JsonDerivedType(typeof(Sense), "sense")]
 public interface ISense
 {
     Guid Id { get; set; }
