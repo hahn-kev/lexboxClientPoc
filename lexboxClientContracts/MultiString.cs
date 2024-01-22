@@ -7,6 +7,7 @@ namespace lexboxClientContracts;
 public interface IMultiString
 {
     IDictionary<WritingSystemId, string> Values { get; }
+    IMultiString Copy();
 }
 
 /// <summary>
@@ -23,6 +24,14 @@ public class MultiString : IMultiString
     public MultiString(IDictionary<WritingSystemId, string> values)
     {
         Values = new MultiStringDict(values);
+    }
+    IMultiString IMultiString.Copy()
+    {
+        return Copy();
+    }
+    public MultiString Copy()
+    {
+        return new(Values);
     }
 
     public IDictionary<WritingSystemId, string> Values { get; }
