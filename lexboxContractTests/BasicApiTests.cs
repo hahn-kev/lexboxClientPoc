@@ -174,7 +174,7 @@ public class BasicApiTests
         {
             LexemeForm = new MultiString
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values = 
                 {
                     { "en", "test" }
                 }
@@ -194,7 +194,7 @@ public class BasicApiTests
         {
             LexemeForm = new MultiString
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values = 
                 {
                     { "en", "test" }
                 }
@@ -214,7 +214,7 @@ public class BasicApiTests
         {
             LexemeForm = new MultiString
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values = 
                 {
                     { "en", "test" }
                 }
@@ -225,7 +225,7 @@ public class BasicApiTests
                 {
                     Definition = new MultiString
                     {
-                        Values = new Dictionary<WritingSystemId, string>
+                        Values = 
                         {
                             { "en", "test" }
                         }
@@ -248,7 +248,7 @@ public class BasicApiTests
         {
             LexemeForm = new MultiString
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values = 
                 {
                     { "en", "test" }
                 }
@@ -260,7 +260,7 @@ public class BasicApiTests
                     PartOfSpeech = "test",
                     Definition = new MultiString
                     {
-                        Values = new Dictionary<WritingSystemId, string>
+                        Values = 
                         {
                             { "en", "test" }
                         }
@@ -283,7 +283,7 @@ public class BasicApiTests
         {
             LexemeForm = new MultiString
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values = 
                 {
                     { "en", "test" }
                 }
@@ -298,7 +298,7 @@ public class BasicApiTests
                     ],
                     Definition = new MultiString
                     {
-                        Values = new Dictionary<WritingSystemId, string>
+                        Values = 
                         {
                             { "en", "test" }
                         }
@@ -321,7 +321,7 @@ public class BasicApiTests
         {
             LexemeForm = new MultiString
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values = 
                 {
                     { "en", "test" }
                 }
@@ -332,7 +332,7 @@ public class BasicApiTests
                 {
                     Definition = new MultiString
                     {
-                        Values = new Dictionary<WritingSystemId, string>
+                        Values = 
                         {
                             { "en", "test" }
                         }
@@ -343,7 +343,7 @@ public class BasicApiTests
                         {
                             Sentence = new MultiString
                             {
-                                Values = new Dictionary<WritingSystemId, string>
+                                Values = 
                                 {
                                     { "en", "test" }
                                 }
@@ -370,7 +370,7 @@ public class BasicApiTests
         {
             LexemeForm = new MultiString
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values = 
                 {
                     { "en", "test" }
                 }
@@ -381,7 +381,7 @@ public class BasicApiTests
                 {
                     Definition = new MultiString
                     {
-                        Values = new Dictionary<WritingSystemId, string>
+                        Values = 
                         {
                             { "en", "test" }
                         }
@@ -392,7 +392,7 @@ public class BasicApiTests
                         {
                             Sentence = new MultiString
                             {
-                                Values = new Dictionary<WritingSystemId, string>
+                                Values = 
                                 {
                                     { "en", "test" }
                                 }
@@ -426,7 +426,7 @@ public class BasicApiTests
         {
             LexemeForm = new MultiString
             {
-                Values = new Dictionary<WritingSystemId, string>
+                Values = 
                 {
                     { "en", "test" }
                 }
