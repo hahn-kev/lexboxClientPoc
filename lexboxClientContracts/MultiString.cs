@@ -25,10 +25,12 @@ public class MultiString : IMultiString
     {
         Values = new MultiStringDict(values);
     }
+
     IMultiString IMultiString.Copy()
     {
         return Copy();
     }
+
     public MultiString Copy()
     {
         return new(Values);
@@ -36,7 +38,9 @@ public class MultiString : IMultiString
 
     public IDictionary<WritingSystemId, string> Values { get; }
 
-    private class MultiStringDict : Dictionary<WritingSystemId, string>, IDictionary
+    private class MultiStringDict : Dictionary<WritingSystemId, string>,
+        IDictionary<WritingSystemId, string>,
+        IDictionary
     {
         public MultiStringDict()
         {
@@ -44,6 +48,12 @@ public class MultiString : IMultiString
 
         public MultiStringDict(IDictionary<WritingSystemId, string> dictionary) : base(dictionary)
         {
+        }
+
+        string IDictionary<WritingSystemId, string>.this[WritingSystemId key]
+        {
+            get => TryGetValue(key, out var value) ? value : string.Empty;
+            set => base[key] = value;
         }
 
         // this method gets called by json patch when applying to an object.
