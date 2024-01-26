@@ -7,28 +7,39 @@
 
 @inject IJSRuntime JS
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<script>
+    // getting "process is not defined" error
+    globalThis.process = {
+        env: {
+            NODE_ENV: "production"
+        }
+    };
+</script>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+<link rel="stylesheet" href="./_content/LexboxRazor/style.css" />
 
-        <article class="content px-4">
-            @if (!initialized)
-            {
+@* <div class="sidebar">
+<NavMenu />
+</div> *@
+
+@* <div class="top-row px-4">
+<a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+</div> *@
+
+@if (initialized)
+{
+    @Body
+}
+else
+{
+    <div class="page">
+        <main>
+            <article class="content px-4">
                 <p>Initializing...</p>
-            }
-            else
-            {
-                @Body
-            }
-        </article>
-    </main>
-</div>
+            </article>
+        </main>
+    </div>
+}
 
 @code {
 
@@ -42,7 +53,7 @@
 
         var lexboxApi = new JsInvokableLexboxApi(new InMemoryApi());
         lexboxApiRef = DotNetObjectReference.Create<ILexboxApi>(lexboxApi);
-        await JS.InvokeAsync<IJSObjectReference>("import", "./_content/LexboxRazor/index.js");
+        await JS.InvokeAsync<IJSObjectReference>("import", "./_content/LexboxRazor/lexbox-svelte.js");
         await JS.InvokeVoidAsync("lexbox.DotNetServiceProvider.setService", "LexboxApi", lexboxApiRef);
         initialized = true;
         StateHasChanged();

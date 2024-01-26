@@ -11,10 +11,31 @@
   } from "svelte-ux";
   import { mdiMagnify, mdiCog } from "@mdi/js";
   import Editor from "./lib/Editor.svelte";
-  import { entries } from "./lib/entry-data";
   import { firstDefVal, firstVal } from "./lib/utils";
   import { allFields } from "./lib/config-data";
   import { i18n } from "./lib/i18n";
+  import { LexboxServiceProvider, LexboxServices } from "./lib/services/service-provider";
+  import type { LexboxApi } from "./lib/services/lexbox-api";
+  import { entries as mockEntries, writingSystems as mockWritingSystems } from "./lib/entry-data";
+  import type { IEntry, WritingSystems } from "./lib/mini-lcm";
+  import { setContext } from "svelte";
+  import { writable } from "svelte/store";
+
+  const lexboxApi = LexboxServiceProvider.getService<LexboxApi>(LexboxServices.LexboxApi);
+
+  const entriesPromise: Promise<IEntry[]> = lexboxApi?.GetEntries(undefined) ?? Promise.resolve(mockEntries);
+  let wsPromise: Promise<WritingSystems> = lexboxApi?.GetWritingSystems() ?? Promise.resolve(mockWritingSystems);
+  
+    const writingSystems = writable<WritingSystems>();
+  setContext("writingSystems", writingSystems);
+  wsPromise.then((ws) => writingSystems.set(ws));
+
+  entriesPromise.then((entries) => {
+    console.log(entries);
+  });
+  wsPromise.then((ws) => {
+    console.log(ws);
+  });
 
   let showSearchDialog = false;
   let showConfigDialog = false;
@@ -42,7 +63,7 @@
   <main class="p-8 flex-grow flex flex-col">
     <div
       class="grid flex-grow"
-      style="grid-template-columns: 1fr 4fr 1fr; grid-template-rows: auto 1fr;"
+      style="grid-template-columns: 2fr 4fr 1fr; grid-template-rows: auto 1fr;"
     >
       <h2 class="flex text-2xl font-semibold col-span-2">
         Welcome to LexBox Svelte
@@ -59,7 +80,11 @@
       <div
         class="my-4 h-full grid grid-cols-subgrid flex-grow row-start-2 col-span-3"
       >
-        <Editor />
+        {#await Promise.all([entriesPromise, wsPromise])}
+          Loading...
+        {:then [entries]} 
+          <Editor {entries} />
+        {/await}
       </div>
     </div>
   </main>
@@ -75,14 +100,18 @@
     />
   </div>
   <div>
-    {#each entries as entry}
-      <ListItem
-        title={firstVal(entry.lexemeForm)}
-        subheading={firstDefVal(entry)}
-        class={cls("cursor-pointer", "hover:bg-accent-50")}
-        noShadow
-      />
-    {/each}
+    {#await Promise.all([entriesPromise, wsPromise])}
+      Loading entries...
+    {:then [entries]} 
+      {#each entries as entry}
+        <ListItem
+          title={firstVal(entry.lexemeForm)}
+          subheading={firstDefVal(entry)}
+          class={cls("cursor-pointer", "hover:bg-accent-50")}
+          noShadow
+        />
+      {/each}
+    {/await}
   </div>
   <div class="flex-grow"></div>
   <div slot="actions">actions</div>

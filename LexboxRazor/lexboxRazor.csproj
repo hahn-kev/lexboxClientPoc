@@ -18,8 +18,20 @@
     <ProjectReference Include="..\lexboxClientContracts\lexboxClientContracts.csproj" />
   </ItemGroup>
 
-  <Target Name="BuildNpm">
-    <Exec Command="npm run build:Debug" WorkingDirectory="assets" />
-  </Target>
+  <PropertyGroup>
+    <ClientAssetsDirectory Condition="'$(ClientAssetsDirectory)' == ''">..\lexboxSvelte\</ClientAssetsDirectory>
+    <!-- <ClientAssetsRestoreInputs Condition="'$(ClientAssetsRestoreInputs)' == ''">$(ClientAssetsDirectory)package-lock.json;$(ClientAssetsDirectory)package.json</ClientAssetsRestoreInputs> -->
+    <!-- <ClientAssetsRestoreOutputs Condition="'$(ClientAssetsRestoreOutputs)' == ''">$(ClientAssetsDirectory)node_modules\.package-lock.json</ClientAssetsRestoreOutputs> -->
+    <ClientAssetsRestoreCommand Condition="'$(ClientAssetsRestoreCommand)' == ''">pnpm install</ClientAssetsRestoreCommand>
+    <ClientAssetsBuildCommand Condition="'$(ClientAssetsBuildCommand)' == ''">echo Drop the '--', because it doesn't work for pnpm</ClientAssetsBuildCommand>
+    <ClientAssetsBuildOutputParameter Condition="'$(ClientAssetsBuildOutputParameter)' == ''">...and jump to a new line...;
+    pnpm run build:web-component --emptyOutDir --outDir</ClientAssetsBuildOutputParameter>
+    <!-- <ClientAssetsRestoreInputs>$(MSBuildProjectFile);$(ShouldRunClientAssetsBuild)</ClientAssetsRestoreInputs> -->
+
+    <!-- Run restore only once for multi targeting builds -->
+    <!-- <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == ''">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets> -->
+    <!-- Allow multitargeting projects to choose the target framework in which they run by setting this value to true only for a given target framework -->
+    <!-- <ShouldRunClientAssetsBuild Condition="'$(ShouldRunClientAssetsBuild)' == ''">true</ShouldRunClientAssetsBuild> -->
+  </PropertyGroup>
 
 </Project>

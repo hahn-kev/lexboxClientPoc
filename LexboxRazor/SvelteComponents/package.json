@@ -1,9 +1,9 @@
 {
-  "name": "lexbox-svelte",
+  "name": "lexbox-svelte-components",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/lexbox-svelte.js",
+  "main": "dist/lexbox-svelte-components.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

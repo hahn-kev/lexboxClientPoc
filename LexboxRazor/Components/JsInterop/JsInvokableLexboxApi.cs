@@ -15,16 +15,15 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
     [JSInvokable]
     public Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence)
     {
-        throw new NotImplementedException();
+        return implementation.CreateExampleSentence(entryId, senseId, exampleSentence);
     }
 
     [JSInvokable]
     public Task<ISense> CreateSense(Guid entryId, ISense sense)
     {
-        throw new NotImplementedException();
+        return implementation.CreateSense(entryId, sense);
     }
 
-    [JSInvokable]
     public UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class
     {
         throw new NotImplementedException();
@@ -33,25 +32,25 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
     [JSInvokable]
     public Task DeleteEntry(Guid id)
     {
-        throw new NotImplementedException();
+        return implementation.DeleteEntry(id);
     }
 
     [JSInvokable]
     public Task DeleteExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId)
     {
-        throw new NotImplementedException();
+        return implementation.DeleteExampleSentence(entryId, senseId, exampleSentenceId);
     }
 
     [JSInvokable]
     public Task DeleteSense(Guid entryId, Guid senseId)
     {
-        throw new NotImplementedException();
+        return implementation.DeleteSense(entryId, senseId);
     }
 
     [JSInvokable("GetEntriesForExemplar")]
     public Task<IEntry[]> GetEntries(string exemplar, QueryOptions? options = null)
     {
-        throw new NotImplementedException();
+        return implementation.GetEntries(exemplar, options);
     }
 
     [JSInvokable]
@@ -63,25 +62,25 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
     [JSInvokable]
     public Task<IEntry> GetEntry(Guid id)
     {
-        throw new NotImplementedException();
+        return implementation.GetEntry(id);
     }
 
     [JSInvokable]
     public Task<string[]> GetExemplars()
     {
-        throw new NotImplementedException();
+        return implementation.GetExemplars();
     }
 
     [JSInvokable]
-    public Task<WritingSystem[]> GetWritingSystems()
+    public Task<WritingSystems> GetWritingSystems()
     {
-        throw new NotImplementedException();
+        return implementation.GetWritingSystems();
     }
 
     [JSInvokable]
     public Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null)
     {
-        throw new NotImplementedException();
+        return implementation.SearchEntries(query, options);
     }
 
     public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)
@@ -95,15 +94,25 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
         return UpdateEntry(id, new JsonPatchUpdateObjectInput<IEntry>(patchDocument));
     }
 
-    [JSInvokable]
     public Task<IExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, UpdateObjectInput<IExampleSentence> update)
     {
-        throw new NotImplementedException();
+        return implementation.UpdateExampleSentence(entryId, senseId, exampleSentenceId, update);
     }
 
     [JSInvokable]
+    public Task<IExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, JsonPatchDocument<IExampleSentence> patchDocument)
+    {
+        return UpdateExampleSentence(entryId, senseId, exampleSentenceId, new JsonPatchUpdateObjectInput<IExampleSentence>(patchDocument));
+    }
+
     public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update)
     {
-        throw new NotImplementedException();
+        return implementation.UpdateSense(entryId, senseId, update);
+    }
+
+    [JSInvokable]
+    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, JsonPatchDocument<ISense> update)
+    {
+        return UpdateSense(entryId, senseId, new JsonPatchUpdateObjectInput<ISense>(update));
     }
 }

@@ -9,7 +9,13 @@ public class TypeScriptGenerationSpec : GenerationSpec
     {
         args.GeneratorOptions.BaseOutputDirectory = "../lexboxSvelte/src/lib/mini-lcm";
         args.GeneratorOptions.CustomTypeMappings.Add(typeof(WritingSystemId).FullName, "string");
-        AddInterface<Entry>();
+        AddClass<Entry>();
+        AddClass<Sense>();
+        AddClass<ExampleSentence>();
+        AddClass<MultiString>();
+        AddInterface<WritingSystem>();
+        AddInterface<QueryOptions>();
+        AddInterface<WritingSystems>();
     }
 
     public override void OnBeforeBarrelGeneration(OnBeforeBarrelGenerationArgs args)

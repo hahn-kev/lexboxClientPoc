@@ -1,9 +1,28 @@
-import type { IEntry } from "./mini-lcm";
-import type { WritingSystemType } from "./types";
+import type { IEntry, WritingSystems } from "./mini-lcm";
 
-export const writingSystems: Record<WritingSystemType, string[]> = {
-  vernacular: ["Ipa", "Tha"],
-  analysis: ["Sen", "Tha"],
+export const writingSystems: WritingSystems = {
+  vernacular: [{
+    id: 'Ipa',
+    name: 'Ipa',
+    abbreviation: 'Ipa',
+    font: 'Ipa',
+  }, {
+    id: 'Tha',
+    name: 'Tha',
+    abbreviation: 'Tha',
+    font: 'Tha',
+  }],
+  analysis: [{
+    id: 'Sen',
+    name: 'Sen',
+    abbreviation: 'Sen',
+    font: 'Sen',
+  }, {
+    id: 'Tha',
+    name: 'Tha',
+    abbreviation: 'Tha',
+    font: 'Tha',
+  }],
 };
 
 export const entries: IEntry[] = [

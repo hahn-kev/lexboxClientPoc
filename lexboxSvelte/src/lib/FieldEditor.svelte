@@ -1,13 +1,16 @@
 <script lang="ts">
+  import type { Readable } from "svelte/store";
+
+  import type { WritingSystems } from "./mini-lcm";
+
   import { i18n } from "./i18n";
 
   import { TextField } from "svelte-ux";
   import { getContext } from "svelte";
   import type { EntityFieldConfig } from "./types";
   import { pickWritingSystems } from "./utils";
-  import { writingSystems as ws } from "./entry-data";
 
-  const writingSystems = getContext<typeof ws>("writingSystems");
+  const writingSystems = getContext<Readable<WritingSystems>>("writingSystems");
 
   type T = $$Generic<{}>;
 
@@ -20,12 +23,12 @@
   <div class="multi-field field">
     <span class="name w-32" title={field.id}>{i18n[field.id]}</span>
     <div class="fields">
-      {#each pickWritingSystems(field.ws, writingSystems) as ws}
+      {#each pickWritingSystems(field.ws, $writingSystems) as ws}
         <TextField
           on:change
           class="ws-field"
-          bind:value={entity[field.id].values[ws]}
-          label={ws}
+          bind:value={entity[field.id].values[ws.id]}
+          label={ws.abbreviation}
           labelPlacement="left"
         />
       {/each}

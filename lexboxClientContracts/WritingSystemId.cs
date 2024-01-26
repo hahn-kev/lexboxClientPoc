@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Runtime.Serialization;
 
 namespace lexboxClientContracts;
 
@@ -31,6 +32,12 @@ public record WritingSystem
     public string Abbreviation { get; set; }
     public string Font { get; set; }
     //todo probably need more stuff here, see wesay for ideas
+}
+
+public record WritingSystems
+{
+    public WritingSystem[] Analysis { get; set; }
+    public WritingSystem[] Vernacular { get; set; }
 }
 
 [JsonConverter(typeof(WritingSystemIdJsonConverter))]

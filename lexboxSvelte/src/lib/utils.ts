@@ -1,4 +1,4 @@
-import type { IEntry, IMultiString } from "./mini-lcm";
+import type { IEntry, IMultiString, WritingSystem, WritingSystems } from "./mini-lcm";
 import type { WritingSystemSelection, WritingSystemType } from "./types";
 
 export function firstVal(multi: IMultiString): string | undefined {
@@ -12,8 +12,8 @@ export function firstDefVal(entry: IEntry): string | undefined {
 
 export function pickWritingSystems(
   ws: WritingSystemSelection,
-  allWs: Record<WritingSystemType, string[]>,
-): string[] {
+  allWs: WritingSystems,
+): WritingSystem[] {
   switch (ws) {
     case "vernacular-analysis":
       return [...new Set([...allWs.vernacular, ...allWs.analysis].sort())];

@@ -1,0 +1,10 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  generate-typescript:
+    aliases: [gt]
+    cmds:
+      - dotnet build
+      - dotnet-typegen generate

@@ -7,11 +7,11 @@ import { IEntry } from "./i-entry";
 import { IMultiString } from "./i-multi-string";
 import { ISense } from "./i-sense";
 
-export interface Entry extends IEntry {
+export class Entry implements IEntry {
     id: string;
-    lexemeForm: IMultiString;
-    citationForm: IMultiString;
-    literalMeaning: IMultiString;
-    senses: ISense[];
-    note: IMultiString;
+    lexemeForm: IMultiString = {"values":{}};
+    citationForm: IMultiString = {"values":{}};
+    literalMeaning: IMultiString = {"values":{}};
+    senses: ISense[] = [];
+    note: IMultiString = {"values":{}};
 }

@@ -98,10 +98,16 @@ public class InMemoryApi : ILexboxApi
         },
     ];
 
-    private readonly List<WritingSystem> _writingSystems =
-    [
-        new WritingSystem { Id = "en", Name = "English", Abbreviation = "en", Font = "Arial" },
-    ];
+    private readonly WritingSystems _writingSystems = new WritingSystems{
+        Analysis =
+        [
+            new WritingSystem { Id = "en", Name = "English", Abbreviation = "en", Font = "Arial" },
+        ],
+        Vernacular =
+        [
+            new WritingSystem { Id = "en", Name = "English", Abbreviation = "en", Font = "Arial" },
+        ]
+    };
 
     private readonly string[] _exemplars = Enumerable.Range('a', 'z').Select(c => ((char)c).ToString()).ToArray();
 
@@ -173,9 +179,9 @@ public class InMemoryApi : ILexboxApi
         return Task.FromResult(_exemplars);
     }
 
-    public Task<WritingSystem[]> GetWritingSystems()
+    public Task<WritingSystems> GetWritingSystems()
     {
-        return Task.FromResult(_writingSystems.ToArray());
+        return Task.FromResult(_writingSystems);
     }
 
     public Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null)

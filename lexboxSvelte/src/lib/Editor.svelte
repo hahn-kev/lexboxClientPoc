@@ -1,17 +1,13 @@
 <script lang="ts">
   import { ListItem, cls } from "svelte-ux";
   import EntryEditor from "./EntryEditor.svelte";
-  import type { IEntry, IMultiString } from "./mini-lcm";
-  import { setContext } from "svelte";
-  import { entries, writingSystems as ws } from "./entry-data";
+  import type { IEntry, WritingSystems } from "./mini-lcm";
+  import { getContext, setContext } from "svelte";
   import { firstDefVal, firstVal } from "./utils";
 
-  const writingSystems = ws;
-  setContext("writingSystems", writingSystems);
+  export let entries: IEntry[];
 
   let selectedEntry: IEntry | undefined = entries[0];
-
-  
 </script>
 
 <div class="grid grid-cols-subgrid col-span-3 flex-grow gap-8">
@@ -52,7 +48,7 @@
   {/if}
 </div>
 
-<style>
+<style lang="postcss">
   .toc-item {
     padding: 4px 8px;
     &:hover {

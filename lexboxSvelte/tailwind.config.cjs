@@ -15,7 +15,7 @@ module.exports = {
     }),
     svelte_ux,
     createThemes({
-      dark: {
+      light: {
         "primary": "#FF865B",
         "secondary": "#FD6F9C",
         "accent": colors.blue,
@@ -28,6 +28,8 @@ module.exports = {
         "warning": "#f1c891",
         "error": "#ffbbbd",
       },
+    }, {
+      defaultTheme: 'light',
     }),
   ],
 };

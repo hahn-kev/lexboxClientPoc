@@ -4,7 +4,13 @@
  */
 
 export * from './entry';
+export * from './example-sentence';
 export * from './i-entry';
 export * from './i-example-sentence';
 export * from './i-multi-string';
 export * from './i-sense';
+export * from './multi-string';
+export * from './query-options';
+export * from './sense';
+export * from './writing-system';
+export * from './writing-systems';
