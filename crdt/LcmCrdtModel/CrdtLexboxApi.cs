@@ -15,9 +15,9 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
     //todo persist somewhere
     Guid ClientId = Guid.NewGuid();
 
-    public Task<WritingSystem[]> GetWritingSystems()
+    public Task<WritingSystems> GetWritingSystems()
     {
-        return Task.FromResult(Array.Empty<WritingSystem>());
+        return Task.FromResult(new WritingSystems());
     }
 
     public Task<string[]> GetExemplars()
@@ -73,8 +73,7 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
 
     public async Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)
     {
-        var jsonPatch = ((CrdtUpdateBuilder<IEntry>)update).PatchChange;
-        var patchChange = new JsonPatchChange<Entry>(id, jsonPatch, jsonOptions);
+        var patchChange = new JsonPatchChange<Entry>(id, update.Patch, jsonOptions);
         await dataModel.Add(new Commit
         {
             ClientId = ClientId,
@@ -109,8 +108,7 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
 
     public async Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update)
     {
-        var jsonPatch = ((CrdtUpdateBuilder<ISense>)update).PatchChange;
-        var patchChange = new JsonPatchChange<Sense>(senseId, jsonPatch, jsonOptions);
+        var patchChange = new JsonPatchChange<Sense>(senseId, update.Patch, jsonOptions);
         await dataModel.Add(new Commit(Guid.NewGuid())
         {
             ClientId = ClientId,
@@ -148,7 +146,7 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         Guid exampleSentenceId,
         UpdateObjectInput<IExampleSentence> update)
     {
-        var jsonPatch = ((CrdtUpdateBuilder<IExampleSentence>)update).PatchChange;
+        var jsonPatch = update.Patch;
         var patchChange = new JsonPatchChange<ExampleSentence>(exampleSentenceId, jsonPatch, jsonOptions);
         await dataModel.Add(new Commit(Guid.NewGuid())
         {
@@ -169,27 +167,6 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
 
     public UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class
     {
-        return new CrdtUpdateBuilder<T>();
-    }
-
-    private class CrdtUpdateBuilder<T> : UpdateBuilder<T>, UpdateObjectInput<T> where T : class
-    {
-        public JsonPatchDocument<T> PatchChange { get; } = new();
-
-        public UpdateBuilder<T> Set<T_Val>(Expression<Func<T, T_Val>> field, T_Val value)
-        {
-            PatchChange.Replace(field, value);
-            return this;
-        }
-
-        public UpdateObjectInput<T> Build()
-        {
-            return this;
-        }
-
-        public void Apply(T obj)
-        {
-            PatchChange.ApplyTo(obj);
-        }
+        return new UpdateBuilder<T>();
     }
 }

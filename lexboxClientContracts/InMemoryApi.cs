@@ -192,7 +192,7 @@ public class InMemoryApi : ILexboxApi
 
     public UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class
     {
-        return new JsonPatchUpdateBuilder<T>();
+        return new UpdateBuilder<T>();
     }
 
     public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)

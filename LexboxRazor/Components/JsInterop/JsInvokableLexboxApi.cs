@@ -91,7 +91,7 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
     [JSInvokable]
     public Task<IEntry> UpdateEntry(Guid id, JsonPatchDocument<IEntry> patchDocument)
     {
-        return UpdateEntry(id, new JsonPatchUpdateObjectInput<IEntry>(patchDocument));
+        return UpdateEntry(id, new JsonPatchUpdateInput<IEntry>(patchDocument));
     }
 
     public Task<IExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, UpdateObjectInput<IExampleSentence> update)
@@ -102,7 +102,7 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
     [JSInvokable]
     public Task<IExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, JsonPatchDocument<IExampleSentence> patchDocument)
     {
-        return UpdateExampleSentence(entryId, senseId, exampleSentenceId, new JsonPatchUpdateObjectInput<IExampleSentence>(patchDocument));
+        return UpdateExampleSentence(entryId, senseId, exampleSentenceId, new JsonPatchUpdateInput<IExampleSentence>(patchDocument));
     }
 
     public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update)
@@ -113,6 +113,6 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
     [JSInvokable]
     public Task<ISense> UpdateSense(Guid entryId, Guid senseId, JsonPatchDocument<ISense> update)
     {
-        return UpdateSense(entryId, senseId, new JsonPatchUpdateObjectInput<ISense>(update));
+        return UpdateSense(entryId, senseId, new JsonPatchUpdateInput<ISense>(update));
     }
 }

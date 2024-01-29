@@ -340,6 +340,6 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
 
     public UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class
     {
-        return new JsonPatchUpdateBuilder<T>();
+        return new UpdateBuilder<T>();
     }
 }

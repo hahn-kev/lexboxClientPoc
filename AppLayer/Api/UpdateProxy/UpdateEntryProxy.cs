@@ -56,4 +56,9 @@ public class UpdateMultiStringProxy(ITsMultiString multiString, LexboxLcmApi lex
         get => new UpdateDictionaryProxy(multiString, lexboxLcmApi);
         set => throw new NotImplementedException();
     }
+
+    public IMultiString Copy()
+    {
+        return new UpdateMultiStringProxy(multiString, lexboxLcmApi);
+    }
 }
