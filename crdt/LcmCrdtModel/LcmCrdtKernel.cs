@@ -9,7 +9,7 @@ namespace LcmCrdtModel;
 
 public static class LcmCrdtKernel
 {
-    public static (CrdtKernel.ChangeTypeListBuilder changeTypes, CrdtKernel.ObjectTypeListBuilder objectTypes)
+    public static (CrdtKernel.ChangeTypeListBuilder changeTypes, CrdtKernel.ObjectTypeListBuilder objectTypes, CrdtKernel.ComplexTypeListBuilder complexTypes)
         PolyTypeListBuilder()
     {
         var objectTypes = new CrdtKernel.ObjectTypeListBuilder()
@@ -26,16 +26,19 @@ public static class LcmCrdtKernel
             .Add<CreateEntryChange>()
             .Add<CreateSenseChange>()
             .Add<CreateExampleSentenceChange>();
-        return (changeTypes, objectTypes);
+        var complexTypes = new CrdtKernel.ComplexTypeListBuilder()
+            .Add<IMultiString, MultiString>();
+        return (changeTypes, objectTypes, complexTypes);
     }
 
     public static IServiceCollection AddLcmCrdtClient(this IServiceCollection services, string dbPath)
     {
-        var (changeTypes, objectTypes) = PolyTypeListBuilder();
+        var (changeTypes, objectTypes, complexTypes) = PolyTypeListBuilder();
         services.AddCrdtData(
             builder => builder.UseSqlite($"Data Source={dbPath}"),
             changeTypes,
-            objectTypes
+            objectTypes,
+            complexTypes
         );
         services.AddSingleton<ILexboxApi, CrdtLexboxApi>();
         return services;

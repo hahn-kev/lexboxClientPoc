@@ -14,7 +14,8 @@ public static class CrdtKernel
     public static IServiceCollection AddCrdtData(this IServiceCollection services,
         Action<DbContextOptionsBuilder> configureOptions,
         ChangeTypeListBuilder changeTypes,
-        ObjectTypeListBuilder objectTypes)
+        ObjectTypeListBuilder objectTypes,
+        ComplexTypeListBuilder complexTypes)
     {
         services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.General)
         {
@@ -22,7 +23,7 @@ public static class CrdtKernel
             {
                 Modifiers =
                 {
-                    MakeModifier(changeTypes, objectTypes)
+                    MakeModifier(changeTypes, objectTypes, complexTypes)
                 }
             }
         });
@@ -41,14 +42,15 @@ public static class CrdtKernel
     }
 
     public static Action<JsonTypeInfo> MakeModifier(
-        this (ChangeTypeListBuilder changeTypes, ObjectTypeListBuilder objectTypes) types)
+        this (ChangeTypeListBuilder changeTypes, ObjectTypeListBuilder objectTypes, ComplexTypeListBuilder complexTypes) types)
     {
-        return MakeModifier(types.changeTypes, types.objectTypes);
+        return MakeModifier(types.changeTypes, types.objectTypes, types.complexTypes);
     }
 
     public static Action<JsonTypeInfo> MakeModifier(
         ChangeTypeListBuilder changeTypes,
-        ObjectTypeListBuilder objectTypes)
+        ObjectTypeListBuilder objectTypes,
+        ComplexTypeListBuilder complexTypes)
     {
         return typeInfo =>
         {
@@ -61,6 +63,8 @@ public static class CrdtKernel
             {
                 objectTypes.AddTypes(typeInfo.PolymorphismOptions!);
             }
+
+            complexTypes.SetCreateObject(typeInfo);
         };
     }
 
@@ -98,6 +102,25 @@ public static class CrdtKernel
             foreach (var type in _types)
             {
                 options.DerivedTypes.Add(type);
+            }
+        }
+    }
+
+    public class ComplexTypeListBuilder
+    {
+        private readonly Dictionary<Type, Type> _types = [];
+
+        public ComplexTypeListBuilder Add<T, TImpl>() where TImpl : T
+        {
+            _types.Add(typeof(T), typeof(TImpl));
+            return this;
+        }
+
+        internal void SetCreateObject(JsonTypeInfo typeInfo)
+        {
+            if (_types.TryGetValue(typeInfo.Type, out var impl))
+            {
+                typeInfo.CreateObject = () =>  Activator.CreateInstance(impl);
             }
         }
     }

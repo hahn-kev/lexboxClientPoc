@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using CrdtLib.Db;
 using CrdtLib.Entities;
+using lexboxClientContracts;
 
 namespace LcmCrdtModel.Objects;
 
@@ -28,6 +30,21 @@ public class ExampleSentence : lexboxClientContracts.ExampleSentence, IObjectBas
 
     public IObjectBase Copy()
     {
-        return JsonSerializer.Deserialize<ExampleSentence>(JsonSerializer.Serialize(this))!;
+        return JsonSerializer.Deserialize<ExampleSentence>(JsonSerializer.Serialize(this), new JsonSerializerOptions
+        {
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver
+            {
+                Modifiers =
+                {
+                    static typeInfo =>
+                    {
+                        if (typeInfo.Type == typeof(IMultiString))
+                        {
+                                typeInfo.CreateObject = () => new MultiString();
+                        }
+                    }
+                }
+            }
+        })!;
     }
 }
