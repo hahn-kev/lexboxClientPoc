@@ -1,8 +1,10 @@
 ﻿using System.Text.Json.Serialization;
+using Tapper;
 
 namespace lexboxClientContracts;
 
 [JsonDerivedType(typeof(ExampleSentence), "exampleSentence")]
+[TranspilationSource]
 public interface IExampleSentence
 {
     Guid Id { get; set; }
@@ -11,6 +13,7 @@ public interface IExampleSentence
     string Reference { get; set; }
 }
 
+[TranspilationSource]
 public class ExampleSentence : IExampleSentence
 {
     public Guid Id { get; set; }

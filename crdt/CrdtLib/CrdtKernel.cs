@@ -41,7 +41,7 @@ public static class CrdtKernel
     }
 
     public static Action<JsonTypeInfo> MakeModifier(
-        (ChangeTypeListBuilder changeTypes, ObjectTypeListBuilder objectTypes) types)
+        this (ChangeTypeListBuilder changeTypes, ObjectTypeListBuilder objectTypes) types)
     {
         return MakeModifier(types.changeTypes, types.objectTypes);
     }
@@ -82,6 +82,7 @@ public static class CrdtKernel
             }
         }
     }
+
     public class ObjectTypeListBuilder
     {
         private readonly List<JsonDerivedType> _types = [];

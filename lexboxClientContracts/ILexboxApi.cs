@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SystemTextJsonPatch;
+using Tapper;
 
 namespace lexboxClientContracts;
 
@@ -34,11 +35,13 @@ public interface ILexboxApi
     UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class;
 }
 
+[TranspilationSource]
 public record QueryOptions(string Order, int Count = 1000, int Offset = 0);
 
 public interface UpdateObjectInput<T> where T : class
 {
     void Apply(T obj);
+    [JsonIgnore]
     JsonPatchDocument<T> Patch { get; }
 }
 

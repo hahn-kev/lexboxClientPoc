@@ -1,0 +1,6 @@
+version: '3'
+tasks:
+  signalr-client:
+    cmds:
+      - dotnet tool restore
+      - dotnet tsrts -asm -p Lexbox.ClientServer/Lexbox.ClientServer.csproj --method none -o lexboxSvelte/src/lib/generated-signalr-client/

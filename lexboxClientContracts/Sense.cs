@@ -1,8 +1,10 @@
 ﻿using System.Text.Json.Serialization;
+using Tapper;
 
 namespace lexboxClientContracts;
 
 [JsonDerivedType(typeof(Sense), "sense")]
+[TranspilationSource]
 public interface ISense
 {
     Guid Id { get; set; }
@@ -13,6 +15,7 @@ public interface ISense
     IList<IExampleSentence> ExampleSentences { get; set; }
 }
 
+[TranspilationSource]
 public class Sense : ISense
 {
     public Guid Id { get; set; }

@@ -1,0 +1,6 @@
+﻿@Lexbox.ClientServer_HostAddress = http://localhost:5276
+
+GET {{Lexbox.ClientServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

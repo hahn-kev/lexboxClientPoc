@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Tapper;
 using System.Runtime.Serialization;
 
 namespace lexboxClientContracts;
@@ -25,6 +26,7 @@ public class WritingSystemIdJsonConverter : JsonConverter<WritingSystemId>
     }
 }
 
+[TranspilationSource]
 public record WritingSystem
 {
     public WritingSystemId Id { get; set; }
@@ -34,6 +36,7 @@ public record WritingSystem
     //todo probably need more stuff here, see wesay for ideas
 }
 
+[TranspilationSource]
 public record WritingSystems
 {
     public WritingSystem[] Analysis { get; set; }
@@ -41,6 +44,7 @@ public record WritingSystems
 }
 
 [JsonConverter(typeof(WritingSystemIdJsonConverter))]
+[TranspilationSource]
 public readonly record struct WritingSystemId(string Code): ISpanFormattable, ISpanParsable<WritingSystemId>
 {
     public static implicit operator string(WritingSystemId ws) => ws.Code;

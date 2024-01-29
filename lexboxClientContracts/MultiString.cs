@@ -1,11 +1,16 @@
 ﻿using System.Collections;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using Tapper;
 
 namespace lexboxClientContracts;
 
-[JsonDerivedType(typeof(MultiString), "ms")]
+
+[TranspilationSource]
+[JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
 public interface IMultiString
 {
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     IDictionary<WritingSystemId, string> Values { get; }
     IMultiString Copy();
 }
