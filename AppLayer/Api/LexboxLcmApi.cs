@@ -56,15 +56,25 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
         return cache.ServiceLocator.WritingSystemManager.Get(ws.Code).Handle;
     }
 
-    public Task<WritingSystem[]> GetWritingSystems()
+    public Task<WritingSystems> GetWritingSystems()
     {
-        return Task.FromResult(cache.ServiceLocator.WritingSystems.AllWritingSystems.Select(ws => new WritingSystem
+        return Task.FromResult(new WritingSystems
         {
-            Id = ws.Id,
-            Name = ws.LanguageTag,
-            Abbreviation = ws.Abbreviation,
-            Font = ws.DefaultFontName
-        }).ToArray());
+            Vernacular = cache.ServiceLocator.WritingSystems.VernacularWritingSystems.Select(ws => new WritingSystem
+            {
+                Id = ws.Id,
+                Name = ws.LanguageTag,
+                Abbreviation = ws.Abbreviation,
+                Font = ws.DefaultFontName
+            }).ToArray(),
+            Analysis = cache.ServiceLocator.WritingSystems.AnalysisWritingSystems.Select(ws => new WritingSystem
+            {
+                Id = ws.Id,
+                Name = ws.LanguageTag,
+                Abbreviation = ws.Abbreviation,
+                Font = ws.DefaultFontName
+            }).ToArray()
+        });
     }
 
     public Task<string[]> GetExemplars()
