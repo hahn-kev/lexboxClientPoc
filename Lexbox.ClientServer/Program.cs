@@ -39,7 +39,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapHub<LexboxApiHub>("/api/project/{ProjectId}");
+app.MapHub<LexboxApiHub>("/api/hub/project");
 
 await app.Services.GetRequiredService<CrdtDbContext>().Database.EnsureCreatedAsync();
 app.Run();

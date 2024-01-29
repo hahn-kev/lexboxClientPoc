@@ -22,5 +22,14 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [svelte()],
+    server: {
+      proxy: {
+        '/api': {
+          target: 'https://localhost:7211',
+          secure: false,
+          ws: true
+        }
+      }
+    }
   }
 });

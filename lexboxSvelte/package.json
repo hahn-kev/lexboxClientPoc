@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@microsoft/dotnet-js-interop": "^8.0.0",
+    "@microsoft/signalr": "^8.0.0",
     "autoprefixer": "^10.4.17",
     "fast-json-patch": "^3.1.1",
     "postcss": "^8.4.33",

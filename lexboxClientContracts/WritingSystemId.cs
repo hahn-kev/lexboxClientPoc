@@ -39,8 +39,8 @@ public record WritingSystem
 [TranspilationSource]
 public record WritingSystems
 {
-    public WritingSystem[] Analysis { get; set; }
-    public WritingSystem[] Vernacular { get; set; }
+    public WritingSystem[] Analysis { get; set; } = [];
+    public WritingSystem[] Vernacular { get; set; } = [];
 }
 
 [JsonConverter(typeof(WritingSystemIdJsonConverter))]

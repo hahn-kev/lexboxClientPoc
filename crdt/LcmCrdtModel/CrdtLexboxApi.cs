@@ -17,7 +17,17 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
 
     public Task<WritingSystems> GetWritingSystems()
     {
-        return Task.FromResult(new WritingSystems());
+        return Task.FromResult(new WritingSystems()
+        {
+            Analysis =
+            [
+                new WritingSystem { Id = "en", Name = "English", Abbreviation = "en", Font = "Arial" },
+            ],
+            Vernacular =
+            [
+                new WritingSystem { Id = "en", Name = "English", Abbreviation = "en", Font = "Arial" },
+            ]
+        });
     }
 
     public Task<string[]> GetExemplars()
@@ -32,7 +42,24 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
 
     public async Task<IEntry[]> GetEntries(QueryOptions? options = null)
     {
-        return await dataModel.GetLatestObjects<Entry>().OfType<IEntry>().ToArrayAsync();
+        var entries = await dataModel
+            .GetLatestObjects<Entry>()
+            .OfType<IEntry>()
+            .ToArrayAsync();
+        //todo very ugly n+1 query
+        foreach (var entry in entries)
+        {
+            entry.Senses = await dataModel.GetLatestObjects<Sense>(snapshot => snapshot.References.Contains(entry.Id))
+                .ToArrayAsync();
+            foreach (var sense in entry.Senses)
+            {
+                sense.ExampleSentences = await dataModel
+                    .GetLatestObjects<ExampleSentence>(snapshot => snapshot.References.Contains(sense.Id))
+                    .ToArrayAsync();
+            }
+        }
+
+        return entries;
     }
 
     public Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null)
@@ -43,14 +70,18 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
     public async Task<IEntry> GetEntry(Guid id)
     {
         var entry = await dataModel.GetLatest<Entry>(id);
-        var senses = await dataModel.GetLatestObjects<Sense>(snapshot => snapshot.References.Contains(id)).ToArrayAsync();
-        var exampleSentences = await dataModel.GetLatestObjects<ExampleSentence>(snapshot => snapshot.References.Intersect(senses.Select(s => s.Id)).Any())
+        var senses = await dataModel.GetLatestObjects<Sense>(snapshot => snapshot.References.Contains(id))
+            .ToArrayAsync();
+        var exampleSentences = await dataModel
+            .GetLatestObjects<ExampleSentence>(
+                snapshot => snapshot.References.Intersect(senses.Select(s => s.Id)).Any())
             .ToArrayAsync();
         entry.Senses = senses;
         foreach (var sense in senses)
         {
             sense.ExampleSentences = exampleSentences.Where(s => s.SenseId == sense.Id).ToArray();
         }
+
         return entry;
     }
 

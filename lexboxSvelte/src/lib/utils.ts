@@ -6,6 +6,7 @@ export function firstVal(multi: IMultiString): string | undefined {
 }
 
 export function firstDefVal(entry: IEntry): string | undefined {
+  if (entry.senses.length == 0) return undefined;
   const multi = entry.senses[0].definition;
   return Object.values(multi.values).find(value => !!value);
 }
