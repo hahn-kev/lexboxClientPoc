@@ -35,16 +35,16 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return null;
     }
 
-    public Task<IEntry[]> GetEntries(string exemplar, QueryOptions? options = null)
+    public Task<lexboxClientContracts.Entry[]> GetEntries(string exemplar, QueryOptions? options = null)
     {
         return null;
     }
 
-    public async Task<IEntry[]> GetEntries(QueryOptions? options = null)
+    public async Task<lexboxClientContracts.Entry[]> GetEntries(QueryOptions? options = null)
     {
         var entries = await dataModel
             .GetLatestObjects<Entry>()
-            .OfType<IEntry>()
+            .OfType<lexboxClientContracts.Entry>()
             .ToArrayAsync();
         //todo very ugly n+1 query
         foreach (var entry in entries)
@@ -62,12 +62,12 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return entries;
     }
 
-    public Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null)
+    public Task<lexboxClientContracts.Entry[]> SearchEntries(string query, QueryOptions? options = null)
     {
         return null;
     }
 
-    public async Task<IEntry> GetEntry(Guid id)
+    public async Task<lexboxClientContracts.Entry> GetEntry(Guid id)
     {
         var entry = await dataModel.GetLatest<Entry>(id);
         var senses = await dataModel.GetLatestObjects<Sense>(snapshot => snapshot.References.Contains(id))
@@ -85,7 +85,7 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return entry;
     }
 
-    public async Task<IEntry> CreateEntry(IEntry entry)
+    public async Task<lexboxClientContracts.Entry> CreateEntry(lexboxClientContracts.Entry entry)
     {
         var changeEntity = new ChangeEntity(new CreateEntryChange(entry));
         await dataModel.Add(new Commit
@@ -102,7 +102,7 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return await GetEntry(entry.Id);
     }
 
-    public async Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)
+    public async Task<lexboxClientContracts.Entry> UpdateEntry(Guid id, UpdateObjectInput<lexboxClientContracts.Entry> update)
     {
         var patchChange = new JsonPatchChange<Entry>(id, update.Patch, jsonOptions);
         await dataModel.Add(new Commit
@@ -122,7 +122,7 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         });
     }
 
-    public async Task<ISense> CreateSense(Guid entryId, ISense sense)
+    public async Task<lexboxClientContracts.Sense> CreateSense(Guid entryId, lexboxClientContracts.Sense sense)
     {
         await dataModel.Add(new Commit
         {
@@ -137,7 +137,7 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return await dataModel.GetLatest<Sense>(sense.Id);
     }
 
-    public async Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update)
+    public async Task<lexboxClientContracts.Sense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<lexboxClientContracts.Sense> update)
     {
         var patchChange = new JsonPatchChange<Sense>(senseId, update.Patch, jsonOptions);
         await dataModel.Add(new Commit(Guid.NewGuid())
@@ -157,9 +157,9 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         });
     }
 
-    public async Task<IExampleSentence> CreateExampleSentence(Guid entryId,
+    public async Task<lexboxClientContracts.ExampleSentence> CreateExampleSentence(Guid entryId,
         Guid senseId,
-        IExampleSentence exampleSentence)
+        lexboxClientContracts.ExampleSentence exampleSentence)
     {
         await dataModel.Add(new Commit
         {
@@ -172,10 +172,10 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return await dataModel.GetLatest<ExampleSentence>(exampleSentence.Id);
     }
 
-    public async Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
+    public async Task<lexboxClientContracts.ExampleSentence> UpdateExampleSentence(Guid entryId,
         Guid senseId,
         Guid exampleSentenceId,
-        UpdateObjectInput<IExampleSentence> update)
+        UpdateObjectInput<lexboxClientContracts.ExampleSentence> update)
     {
         var jsonPatch = update.Patch;
         var patchChange = new JsonPatchChange<ExampleSentence>(exampleSentenceId, jsonPatch, jsonOptions);

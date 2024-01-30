@@ -36,7 +36,7 @@ public class BasicApiTests
     public async Task GetWritingSystems()
     {
         var writingSystems = await _api.GetWritingSystems();
-        writingSystems.Should().NotBeEmpty();
+        writingSystems.Analysis.Should().NotBeEmpty();
     }
 
     [Test]
@@ -181,7 +181,7 @@ public class BasicApiTests
             }
         });
         var updatedEntry = await _api.UpdateEntry(entry.Id,
-            _api.CreateUpdateBuilder<IEntry>()
+            _api.CreateUpdateBuilder<Entry>()
                 .Set(e => e.LexemeForm.Values["en"], "updated")
                 .Build());
         updatedEntry.LexemeForm.Values["en"].Should().Be("updated");
@@ -201,7 +201,7 @@ public class BasicApiTests
             }
         });
         var updatedEntry = await _api.UpdateEntry(entry.Id,
-            _api.CreateUpdateBuilder<IEntry>()
+            _api.CreateUpdateBuilder<Entry>()
                 .Set(e => e.Note.Values["en"], "updated")
                 .Build());
         updatedEntry.Note.Values["en"].Should().Be("updated");
@@ -219,7 +219,7 @@ public class BasicApiTests
                     { "en", "test" }
                 }
             },
-            Senses = new List<ISense>
+            Senses = new List<Sense>
             {
                 new Sense()
                 {
@@ -235,7 +235,7 @@ public class BasicApiTests
         });
         var updatedSense = await _api.UpdateSense(entry.Id,
             entry.Senses[0].Id,
-            _api.CreateUpdateBuilder<ISense>()
+            _api.CreateUpdateBuilder<Sense>()
                 .Set(e => e.Definition.Values["en"], "updated")
                 .Build());
         updatedSense.Definition.Values["en"].Should().Be("updated");
@@ -253,7 +253,7 @@ public class BasicApiTests
                     { "en", "test" }
                 }
             },
-            Senses = new List<ISense>
+            Senses = new List<Sense>
             {
                 new Sense()
                 {
@@ -270,7 +270,7 @@ public class BasicApiTests
         });
         var updatedSense = await _api.UpdateSense(entry.Id,
             entry.Senses[0].Id,
-            _api.CreateUpdateBuilder<ISense>()
+            _api.CreateUpdateBuilder<Sense>()
                 .Set(e => e.PartOfSpeech, "updated")
                 .Build());
         updatedSense.PartOfSpeech.Should().Be("updated");
@@ -288,7 +288,7 @@ public class BasicApiTests
                     { "en", "test" }
                 }
             },
-            Senses = new List<ISense>
+            Senses = new List<Sense>
             {
                 new Sense()
                 {
@@ -308,7 +308,7 @@ public class BasicApiTests
         });
         var updatedSense = await _api.UpdateSense(entry.Id,
             entry.Senses[0].Id,
-            _api.CreateUpdateBuilder<ISense>()
+            _api.CreateUpdateBuilder<Sense>()
                 .Set(e => e.SemanticDomain[0], "updated")
                 .Build());
         updatedSense.SemanticDomain.Should().Contain("updated");
@@ -326,7 +326,7 @@ public class BasicApiTests
                     { "en", "test" }
                 }
             },
-            Senses = new List<ISense>
+            Senses = new List<Sense>
             {
                 new Sense()
                 {
@@ -337,7 +337,7 @@ public class BasicApiTests
                             { "en", "test" }
                         }
                     },
-                    ExampleSentences = new List<IExampleSentence>
+                    ExampleSentences = new List<ExampleSentence>
                     {
                         new ExampleSentence()
                         {
@@ -357,7 +357,7 @@ public class BasicApiTests
         var updatedExample = await _api.UpdateExampleSentence(entry.Id,
             entry.Senses[0].Id,
             entry.Senses[0].ExampleSentences[0].Id,
-            _api.CreateUpdateBuilder<IExampleSentence>()
+            _api.CreateUpdateBuilder<ExampleSentence>()
                 .Set(e => e.Sentence.Values["en"], "updated")
                 .Build());
         updatedExample.Sentence.Values["en"].Should().Be("updated");
@@ -375,7 +375,7 @@ public class BasicApiTests
                     { "en", "test" }
                 }
             },
-            Senses = new List<ISense>
+            Senses = new List<Sense>
             {
                 new Sense()
                 {
@@ -386,7 +386,7 @@ public class BasicApiTests
                             { "en", "test" }
                         }
                     },
-                    ExampleSentences = new List<IExampleSentence>
+                    ExampleSentences = new List<ExampleSentence>
                     {
                         new ExampleSentence()
                         {
@@ -413,7 +413,7 @@ public class BasicApiTests
         var updatedExample = await _api.UpdateExampleSentence(entry.Id,
             entry.Senses[0].Id,
             entry.Senses[0].ExampleSentences[0].Id,
-            _api.CreateUpdateBuilder<IExampleSentence>()
+            _api.CreateUpdateBuilder<ExampleSentence>()
                 .Set(e => e.Translation.Values["en"], "updated")
                 .Build());
         updatedExample.Translation.Values["en"].Should().Be("updated");

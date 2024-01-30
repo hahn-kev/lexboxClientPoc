@@ -8,7 +8,7 @@ namespace LcmCrdtModel.Changes;
 
 public class CreateExampleSentenceChange: Change<ExampleSentence>, ISelfNamedType<CreateExampleSentenceChange>
 {
-    public CreateExampleSentenceChange(IExampleSentence exampleSentence, Guid senseId) 
+    public CreateExampleSentenceChange(lexboxClientContracts.ExampleSentence exampleSentence, Guid senseId) 
         : base(exampleSentence.Id == Guid.Empty ? Guid.NewGuid() : exampleSentence.Id)
     {
         exampleSentence.Id = EntityId;
@@ -25,8 +25,8 @@ public class CreateExampleSentenceChange: Change<ExampleSentence>, ISelfNamedTyp
     }
 
     public Guid SenseId { get; init; }
-    public IMultiString? Sentence { get; set; }
-    public IMultiString? Translation { get; set; }
+    public MultiString? Sentence { get; set; }
+    public MultiString? Translation { get; set; }
     public string? Reference { get; set; }
 
     public override IObjectBase NewEntity(Commit commit)

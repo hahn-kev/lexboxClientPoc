@@ -1,23 +1,12 @@
-﻿using System.Text.Json.Serialization;
-using Tapper;
+﻿using Tapper;
 
 namespace lexboxClientContracts;
 
-[JsonDerivedType(typeof(ExampleSentence), "exampleSentence")]
 [TranspilationSource]
-public interface IExampleSentence
+public class ExampleSentence
 {
-    Guid Id { get; set; }
-    IMultiString Sentence { get; set; }
-    IMultiString Translation { get; set; }
-    string Reference { get; set; }
-}
-
-[TranspilationSource]
-public class ExampleSentence : IExampleSentence
-{
-    public Guid Id { get; set; }
-    public IMultiString Sentence { get; set; } = new MultiString();
-    public IMultiString Translation { get; set; } = new MultiString();
-    public string Reference { get; set; } = string.Empty;
+    public virtual Guid Id { get; set; }
+    public virtual MultiString Sentence { get; set; } = new();
+    public virtual MultiString Translation { get; set; } = new();
+    public virtual string Reference { get; set; } = string.Empty;
 }

@@ -7,19 +7,19 @@ namespace LexboxRazor.Components.JsInterop;
 public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
 {
     [JSInvokable]
-    public Task<IEntry> CreateEntry(IEntry entry)
+    public Task<Entry> CreateEntry(Entry entry)
     {
         return implementation.CreateEntry(entry);
     }
 
     [JSInvokable]
-    public Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence)
+    public Task<ExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, ExampleSentence exampleSentence)
     {
         return implementation.CreateExampleSentence(entryId, senseId, exampleSentence);
     }
 
     [JSInvokable]
-    public Task<ISense> CreateSense(Guid entryId, ISense sense)
+    public Task<Sense> CreateSense(Guid entryId, Sense sense)
     {
         return implementation.CreateSense(entryId, sense);
     }
@@ -48,19 +48,19 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
     }
 
     [JSInvokable("GetEntriesForExemplar")]
-    public Task<IEntry[]> GetEntries(string exemplar, QueryOptions? options = null)
+    public Task<Entry[]> GetEntries(string exemplar, QueryOptions? options = null)
     {
         return implementation.GetEntries(exemplar, options);
     }
 
     [JSInvokable]
-    public Task<IEntry[]> GetEntries(QueryOptions? options = null)
+    public Task<Entry[]> GetEntries(QueryOptions? options = null)
     {
         return implementation.GetEntries(options);
     }
 
     [JSInvokable]
-    public Task<IEntry> GetEntry(Guid id)
+    public Task<Entry> GetEntry(Guid id)
     {
         return implementation.GetEntry(id);
     }
@@ -78,41 +78,41 @@ public class JsInvokableLexboxApi(ILexboxApi implementation) : ILexboxApi
     }
 
     [JSInvokable]
-    public Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null)
+    public Task<Entry[]> SearchEntries(string query, QueryOptions? options = null)
     {
         return implementation.SearchEntries(query, options);
     }
 
-    public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)
+    public Task<Entry> UpdateEntry(Guid id, UpdateObjectInput<Entry> update)
     {
         return implementation.UpdateEntry(id, update);
     }
 
     [JSInvokable]
-    public Task<IEntry> UpdateEntry(Guid id, JsonPatchDocument<IEntry> patchDocument)
+    public Task<Entry> UpdateEntry(Guid id, JsonPatchDocument<Entry> patchDocument)
     {
-        return UpdateEntry(id, new JsonPatchUpdateInput<IEntry>(patchDocument));
+        return UpdateEntry(id, new JsonPatchUpdateInput<Entry>(patchDocument));
     }
 
-    public Task<IExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, UpdateObjectInput<IExampleSentence> update)
+    public Task<ExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, UpdateObjectInput<ExampleSentence> update)
     {
         return implementation.UpdateExampleSentence(entryId, senseId, exampleSentenceId, update);
     }
 
     [JSInvokable]
-    public Task<IExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, JsonPatchDocument<IExampleSentence> patchDocument)
+    public Task<ExampleSentence> UpdateExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId, JsonPatchDocument<ExampleSentence> patchDocument)
     {
-        return UpdateExampleSentence(entryId, senseId, exampleSentenceId, new JsonPatchUpdateInput<IExampleSentence>(patchDocument));
+        return UpdateExampleSentence(entryId, senseId, exampleSentenceId, new JsonPatchUpdateInput<ExampleSentence>(patchDocument));
     }
 
-    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update)
+    public Task<Sense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<Sense> update)
     {
         return implementation.UpdateSense(entryId, senseId, update);
     }
 
     [JSInvokable]
-    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, JsonPatchDocument<ISense> update)
+    public Task<Sense> UpdateSense(Guid entryId, Guid senseId, JsonPatchDocument<Sense> update)
     {
-        return UpdateSense(entryId, senseId, new JsonPatchUpdateInput<ISense>(update));
+        return UpdateSense(entryId, senseId, new JsonPatchUpdateInput<Sense>(update));
     }
 }

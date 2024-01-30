@@ -2,32 +2,18 @@
 using Tapper;
 
 namespace lexboxClientContracts;
-[TranspilationSource]
-public interface IEntry
-{
-    Guid Id { get; set; }
-    IMultiString LexemeForm { get; set; }
-    IMultiString CitationForm { get; set; }
-    IMultiString LiteralMeaning { get; set; }
-    IList<ISense> Senses { get; set; }
-    IMultiString Note { get; set; }
-}
 
 [TranspilationSource]
-public class Entry : IEntry
+public class Entry
 {
-    public Guid Id { get; set; }
+    public virtual Guid Id { get; set; }
 
-    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public IMultiString LexemeForm { get; set; } = new MultiString();
+    public virtual MultiString LexemeForm { get; set; } = new();
 
-    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public IMultiString CitationForm { get; set; } = new MultiString();
+    public virtual MultiString CitationForm { get; set; } = new();
 
-    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public IMultiString LiteralMeaning { get; set; } = new MultiString();
-    public IList<ISense> Senses { get; set; } = [];
+    public virtual MultiString LiteralMeaning { get; set; } = new();
+    public virtual IList<Sense> Senses { get; set; } = [];
 
-    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public IMultiString Note { get; set; } = new MultiString();
+    public virtual MultiString Note { get; set; } = new();
 }

@@ -1,27 +1,14 @@
-﻿using System.Text.Json.Serialization;
-using Tapper;
+﻿using Tapper;
 
 namespace lexboxClientContracts;
 
-[JsonDerivedType(typeof(Sense), "sense")]
 [TranspilationSource]
-public interface ISense
+public class Sense
 {
-    Guid Id { get; set; }
-    IMultiString Definition { get; set; }
-    IMultiString Gloss { get; set; }
-    string PartOfSpeech { get; set; }
-    IList<string> SemanticDomain { get; set; }
-    IList<IExampleSentence> ExampleSentences { get; set; }
-}
-
-[TranspilationSource]
-public class Sense : ISense
-{
-    public Guid Id { get; set; }
-    public IMultiString Definition { get; set; } = new MultiString();
-    public IMultiString Gloss { get; set; } = new MultiString();
-    public string PartOfSpeech { get; set; } = string.Empty;
-    public IList<string> SemanticDomain { get; set; } = [];
-    public IList<IExampleSentence> ExampleSentences { get; set; } = [];
+    public virtual Guid Id { get; set; }
+    public virtual MultiString Definition { get; set; } = new();
+    public virtual MultiString Gloss { get; set; } = new();
+    public virtual string PartOfSpeech { get; set; } = string.Empty;
+    public virtual IList<string> SemanticDomain { get; set; } = [];
+    public virtual IList<ExampleSentence> ExampleSentences { get; set; } = [];
 }

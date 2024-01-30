@@ -2,58 +2,30 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** Transpiled from lexboxClientContracts.IEntry */
-export type IEntry = {
-    /** Transpiled from System.Guid */
-    id: string;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    lexemeForm: IMultiString;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    citationForm: IMultiString;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    literalMeaning: IMultiString;
-    /** Transpiled from System.Collections.Generic.IList<lexboxClientContracts.ISense> */
-    senses: ISense[];
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    note: IMultiString;
-}
-
 /** Transpiled from lexboxClientContracts.Entry */
 export type Entry = {
     /** Transpiled from System.Guid */
     id: string;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    lexemeForm: IMultiString;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    citationForm: IMultiString;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    literalMeaning: IMultiString;
-    /** Transpiled from System.Collections.Generic.IList<lexboxClientContracts.ISense> */
-    senses: ISense[];
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    note: IMultiString;
-}
-
-/** Transpiled from lexboxClientContracts.IExampleSentence */
-export type IExampleSentence = {
-    /** Transpiled from System.Guid */
-    id: string;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    sentence: IMultiString;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    translation: IMultiString;
-    /** Transpiled from string */
-    reference: string;
+    /** Transpiled from lexboxClientContracts.MultiString */
+    lexemeForm: MultiString;
+    /** Transpiled from lexboxClientContracts.MultiString */
+    citationForm: MultiString;
+    /** Transpiled from lexboxClientContracts.MultiString */
+    literalMeaning: MultiString;
+    /** Transpiled from System.Collections.Generic.IList<lexboxClientContracts.Sense> */
+    senses: Sense[];
+    /** Transpiled from lexboxClientContracts.MultiString */
+    note: MultiString;
 }
 
 /** Transpiled from lexboxClientContracts.ExampleSentence */
 export type ExampleSentence = {
     /** Transpiled from System.Guid */
     id: string;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    sentence: IMultiString;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    translation: IMultiString;
+    /** Transpiled from lexboxClientContracts.MultiString */
+    sentence: MultiString;
+    /** Transpiled from lexboxClientContracts.MultiString */
+    translation: MultiString;
     /** Transpiled from string */
     reference: string;
 }
@@ -68,42 +40,26 @@ export type QueryOptions = {
     offset: number;
 }
 
-/** Transpiled from lexboxClientContracts.IMultiString */
-export type IMultiString = {
+/** Transpiled from lexboxClientContracts.MultiString */
+export type MultiString = {
     /** Transpiled from System.Collections.Generic.IDictionary<lexboxClientContracts.WritingSystemId, string> */
     values: { [key: WritingSystemId]: string };
-}
-
-/** Transpiled from lexboxClientContracts.ISense */
-export type ISense = {
-    /** Transpiled from System.Guid */
-    id: string;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    definition: IMultiString;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    gloss: IMultiString;
-    /** Transpiled from string */
-    partOfSpeech: string;
-    /** Transpiled from System.Collections.Generic.IList<string> */
-    semanticDomain: string[];
-    /** Transpiled from System.Collections.Generic.IList<lexboxClientContracts.IExampleSentence> */
-    exampleSentences: IExampleSentence[];
 }
 
 /** Transpiled from lexboxClientContracts.Sense */
 export type Sense = {
     /** Transpiled from System.Guid */
     id: string;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    definition: IMultiString;
-    /** Transpiled from lexboxClientContracts.IMultiString */
-    gloss: IMultiString;
+    /** Transpiled from lexboxClientContracts.MultiString */
+    definition: MultiString;
+    /** Transpiled from lexboxClientContracts.MultiString */
+    gloss: MultiString;
     /** Transpiled from string */
     partOfSpeech: string;
     /** Transpiled from System.Collections.Generic.IList<string> */
     semanticDomain: string[];
-    /** Transpiled from System.Collections.Generic.IList<lexboxClientContracts.IExampleSentence> */
-    exampleSentences: IExampleSentence[];
+    /** Transpiled from System.Collections.Generic.IList<lexboxClientContracts.ExampleSentence> */
+    exampleSentences: ExampleSentence[];
 }
 
 /** Transpiled from lexboxClientContracts.WritingSystem */

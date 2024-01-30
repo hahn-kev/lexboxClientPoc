@@ -3,9 +3,9 @@
 /* tslint:disable */
 
 import { HubConnection, type IStreamResult, Subject } from '@microsoft/signalr';
-import type { ILexboxApiHub, ILexboxClient, JsonOperation } from './Lexbox.ClientServer.Hubs';
-import type { WritingSystems, QueryOptions, IEntry, Entry, Sense, ISense, ExampleSentence, IExampleSentence } from '../lexboxClientContracts';
-
+import type { ILexboxApiHub, ILexboxClient } from './Lexbox.ClientServer.Hubs';
+import type { WritingSystems, QueryOptions, Entry, Sense, ExampleSentence } from '../lexboxClientContracts';
+import type { JsonOperation } from '../Lexbox.ClientServer.Hubs';
 
 
 // components
@@ -89,27 +89,27 @@ class ILexboxApiHub_HubProxy implements ILexboxApiHub {
         return await this.connection.invoke("GetExemplars");
     }
 
-    public readonly GetEntriesForExemplar = async (exemplar: string, options: QueryOptions): Promise<IEntry[]> => {
+    public readonly GetEntriesForExemplar = async (exemplar: string, options: QueryOptions): Promise<Entry[]> => {
         return await this.connection.invoke("GetEntriesForExemplar", exemplar, options);
     }
 
-    public readonly GetEntries = async (options: QueryOptions): Promise<IEntry[]> => {
+    public readonly GetEntries = async (options: QueryOptions): Promise<Entry[]> => {
         return await this.connection.invoke("GetEntries", options);
     }
 
-    public readonly SearchEntries = async (query: string, options: QueryOptions): Promise<IEntry[]> => {
+    public readonly SearchEntries = async (query: string, options: QueryOptions): Promise<Entry[]> => {
         return await this.connection.invoke("SearchEntries", query, options);
     }
 
-    public readonly GetEntry = async (id: string): Promise<IEntry> => {
+    public readonly GetEntry = async (id: string): Promise<Entry> => {
         return await this.connection.invoke("GetEntry", id);
     }
 
-    public readonly CreateEntry = async (entry: Entry): Promise<IEntry> => {
+    public readonly CreateEntry = async (entry: Entry): Promise<Entry> => {
         return await this.connection.invoke("CreateEntry", entry);
     }
 
-    public readonly UpdateEntry = async (id: string, update: JsonOperation[]): Promise<IEntry> => {
+    public readonly UpdateEntry = async (id: string, update: JsonOperation[]): Promise<Entry> => {
         return await this.connection.invoke("UpdateEntry", id, update);
     }
 
@@ -117,11 +117,11 @@ class ILexboxApiHub_HubProxy implements ILexboxApiHub {
         return await this.connection.invoke("DeleteEntry", id);
     }
 
-    public readonly CreateSense = async (entryId: string, sense: Sense): Promise<ISense> => {
+    public readonly CreateSense = async (entryId: string, sense: Sense): Promise<Sense> => {
         return await this.connection.invoke("CreateSense", entryId, sense);
     }
 
-    public readonly UpdateSense = async (entryId: string, senseId: string, update: JsonOperation[]): Promise<ISense> => {
+    public readonly UpdateSense = async (entryId: string, senseId: string, update: JsonOperation[]): Promise<Sense> => {
         return await this.connection.invoke("UpdateSense", entryId, senseId, update);
     }
 
@@ -129,11 +129,11 @@ class ILexboxApiHub_HubProxy implements ILexboxApiHub {
         return await this.connection.invoke("DeleteSense", entryId, senseId);
     }
 
-    public readonly CreateExampleSentence = async (entryId: string, senseId: string, exampleSentence: ExampleSentence): Promise<IExampleSentence> => {
+    public readonly CreateExampleSentence = async (entryId: string, senseId: string, exampleSentence: ExampleSentence): Promise<ExampleSentence> => {
         return await this.connection.invoke("CreateExampleSentence", entryId, senseId, exampleSentence);
     }
 
-    public readonly UpdateExampleSentence = async (entryId: string, senseId: string, exampleSentenceId: string, update: JsonOperation[]): Promise<IExampleSentence> => {
+    public readonly UpdateExampleSentence = async (entryId: string, senseId: string, exampleSentenceId: string, update: JsonOperation[]): Promise<ExampleSentence> => {
         return await this.connection.invoke("UpdateExampleSentence", entryId, senseId, exampleSentenceId, update);
     }
 
@@ -154,7 +154,7 @@ class ILexboxClient_Binder implements ReceiverRegister<ILexboxClient> {
 
     public readonly register = (connection: HubConnection, receiver: ILexboxClient): Disposable => {
 
-        const __onEntryUpdated = (...args: [IEntry]) => receiver.OnEntryUpdated(...args);
+        const __onEntryUpdated = (...args: [Entry]) => receiver.OnEntryUpdated(...args);
 
         connection.on("OnEntryUpdated", __onEntryUpdated);
 

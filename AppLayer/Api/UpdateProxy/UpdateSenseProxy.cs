@@ -1,45 +1,44 @@
 ﻿using lexboxClientContracts;
 using SIL.LCModel;
-using IMultiString = lexboxClientContracts.IMultiString;
 
 namespace AppLayer.Api.UpdateProxy;
 
-public class UpdateSenseProxy(ILexSense sense, LexboxLcmApi lexboxLcmApi) : ISense
+public class UpdateSenseProxy(ILexSense sense, LexboxLcmApi lexboxLcmApi) : Sense
 {
-    public Guid Id
+    public override Guid Id
     {
         get => sense.Guid;
         set => throw new NotImplementedException();
     }
 
-    public IMultiString Definition
+    public override MultiString Definition
     {
         get => new UpdateMultiStringProxy(sense.Definition, lexboxLcmApi);
         set => throw new NotImplementedException();
     }
 
-    public IMultiString Gloss
+    public override MultiString Gloss
     {
         get => new UpdateMultiStringProxy(sense.Gloss, lexboxLcmApi);
         set => throw new NotImplementedException();
     }
 
-    public string PartOfSpeech
+    public override string PartOfSpeech
     {
         get => throw new NotImplementedException();
         set => throw new NotImplementedException();
     }
 
-    public IList<string> SemanticDomain
+    public override IList<string> SemanticDomain
     {
         get => throw new NotImplementedException();
         set => throw new NotImplementedException();
     }
 
-    public IList<IExampleSentence> ExampleSentences
+    public override IList<ExampleSentence> ExampleSentences
     {
         get =>
-            new UpdateListProxy<IExampleSentence>(
+            new UpdateListProxy<ExampleSentence>(
                 sentence => lexboxLcmApi.CreateExampleSentence(sense, sentence),
                 sentence => lexboxLcmApi.DeleteExampleSentence(sense.Owner.Guid, Id, sentence.Id),
                 i => new UpdateExampleSentenceProxy(sense.ExamplesOS[i], lexboxLcmApi)

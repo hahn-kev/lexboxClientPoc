@@ -9,7 +9,7 @@ namespace LcmCrdtModel.Changes;
 
 public class CreateEntryChange : Change<Entry>, ISelfNamedType<CreateEntryChange>
 {
-    public CreateEntryChange(IEntry entry) : base(entry.Id == Guid.Empty ? Guid.NewGuid() : entry.Id)
+    public CreateEntryChange(lexboxClientContracts.Entry entry) : base(entry.Id == Guid.Empty ? Guid.NewGuid() : entry.Id)
     {
         entry.Id = EntityId;
         LexemeForm = entry.LexemeForm;
@@ -23,13 +23,13 @@ public class CreateEntryChange : Change<Entry>, ISelfNamedType<CreateEntryChange
     {
     }
 
-    public IMultiString? LexemeForm { get; set; }
+    public MultiString? LexemeForm { get; set; }
 
-    public IMultiString? CitationForm { get; set; }
+    public MultiString? CitationForm { get; set; }
 
-    public IMultiString? LiteralMeaning { get; set; }
+    public MultiString? LiteralMeaning { get; set; }
 
-    public IMultiString? Note { get; set; }
+    public MultiString? Note { get; set; }
 
     public override IObjectBase NewEntity(Commit commit)
     {

@@ -8,7 +8,7 @@ namespace LcmCrdtModel.Changes;
 
 public class CreateSenseChange: Change<Sense>, ISelfNamedType<CreateSenseChange>
 {
-    public CreateSenseChange(ISense sense, Guid entryId) : base(sense.Id == Guid.Empty ? Guid.NewGuid() : sense.Id)
+    public CreateSenseChange(lexboxClientContracts.Sense sense, Guid entryId) : base(sense.Id == Guid.Empty ? Guid.NewGuid() : sense.Id)
     {
         sense.Id = EntityId;
         EntryId = entryId;
@@ -25,8 +25,8 @@ public class CreateSenseChange: Change<Sense>, ISelfNamedType<CreateSenseChange>
     }
 
     public Guid EntryId { get; set; }
-    public IMultiString? Definition { get; set; }
-    public IMultiString? Gloss { get; set; }
+    public MultiString? Definition { get; set; }
+    public MultiString? Gloss { get; set; }
     public string? PartOfSpeech { get; set; }
     public IList<string>? SemanticDomain { get; set; }
 

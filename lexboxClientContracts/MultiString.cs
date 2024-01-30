@@ -6,19 +6,11 @@ using Tapper;
 namespace lexboxClientContracts;
 
 
-[TranspilationSource]
-[JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-public interface IMultiString
-{
-    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    IDictionary<WritingSystemId, string> Values { get; }
-    IMultiString Copy();
-}
-
 /// <summary>
 /// map like object with writing system as key and string as value
 /// </summary>
-public class MultiString : IMultiString
+[TranspilationSource]
+public class MultiString
 {
     public MultiString()
     {
@@ -31,17 +23,12 @@ public class MultiString : IMultiString
         Values = new MultiStringDict(values);
     }
 
-    IMultiString IMultiString.Copy()
-    {
-        return Copy();
-    }
-
-    public MultiString Copy()
+    public virtual MultiString Copy()
     {
         return new(Values);
     }
 
-    public IDictionary<WritingSystemId, string> Values { get; }
+    public virtual IDictionary<WritingSystemId, string> Values { get; }
 
     private class MultiStringDict : Dictionary<WritingSystemId, string>,
         IDictionary<WritingSystemId, string>,

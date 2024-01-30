@@ -10,25 +10,25 @@ public interface ILexboxApi
 {
     Task<WritingSystems> GetWritingSystems();
     Task<string[]> GetExemplars();
-    Task<IEntry[]> GetEntries(string exemplar, QueryOptions? options = null);
-    Task<IEntry[]> GetEntries(QueryOptions? options = null);
-    Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null);
-    Task<IEntry> GetEntry(Guid id);
+    Task<Entry[]> GetEntries(string exemplar, QueryOptions? options = null);
+    Task<Entry[]> GetEntries(QueryOptions? options = null);
+    Task<Entry[]> SearchEntries(string query, QueryOptions? options = null);
+    Task<Entry> GetEntry(Guid id);
 
-    Task<IEntry> CreateEntry(IEntry entry);
-    Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update);
+    Task<Entry> CreateEntry(Entry entry);
+    Task<Entry> UpdateEntry(Guid id, UpdateObjectInput<Entry> update);
     Task DeleteEntry(Guid id);
 
-    Task<ISense> CreateSense(Guid entryId, ISense sense);
-    Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update);
+    Task<Sense> CreateSense(Guid entryId, Sense sense);
+    Task<Sense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<Sense> update);
     Task DeleteSense(Guid entryId, Guid senseId);
 
-    Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence);
+    Task<ExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, ExampleSentence exampleSentence);
 
-    Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
+    Task<ExampleSentence> UpdateExampleSentence(Guid entryId,
         Guid senseId,
         Guid exampleSentenceId,
-        UpdateObjectInput<IExampleSentence> update);
+        UpdateObjectInput<ExampleSentence> update);
 
     Task DeleteExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId);
 

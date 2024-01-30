@@ -26,7 +26,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\lexboxClientContracts\lexboxClientContracts.csproj" />
-      <ProjectReference Include="..\..\lexboxClientPoc\lexboxClientContracts\lexboxClientContracts.csproj" />
       <ProjectReference Include="..\CrdtSample\CrdtSample.csproj" />
       <ProjectReference Include="..\CrdtLib\CrdtLib.csproj" />
       <ProjectReference Include="..\LcmCrdtModel\LcmCrdtModel.csproj" />

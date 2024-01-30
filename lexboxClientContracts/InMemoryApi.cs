@@ -2,7 +2,7 @@
 
 public class InMemoryApi : ILexboxApi
 {
-    private readonly List<IEntry> _entries =
+    private readonly List<Entry> _entries =
     [
         new Entry
         {
@@ -111,14 +111,14 @@ public class InMemoryApi : ILexboxApi
 
     private readonly string[] _exemplars = Enumerable.Range('a', 'z').Select(c => ((char)c).ToString()).ToArray();
 
-    public Task<IEntry> CreateEntry(IEntry entry)
+    public Task<Entry> CreateEntry(Entry entry)
     {
         if (entry.Id == default) entry.Id = Guid.NewGuid();
         _entries.Add(entry);
         return Task.FromResult(entry);
     }
 
-    public Task<IExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, IExampleSentence exampleSentence)
+    public Task<ExampleSentence> CreateExampleSentence(Guid entryId, Guid senseId, ExampleSentence exampleSentence)
     {
         if (exampleSentence.Id == default) exampleSentence.Id = Guid.NewGuid();
         var entry = _entries.Single(e => e.Id == entryId);
@@ -127,7 +127,7 @@ public class InMemoryApi : ILexboxApi
         return Task.FromResult(exampleSentence);
     }
 
-    public Task<ISense> CreateSense(Guid entryId, ISense sense)
+    public Task<Sense> CreateSense(Guid entryId, Sense sense)
     {
         if (sense.Id == default) sense.Id = Guid.NewGuid();
         var entry = _entries.Single(e => e.Id == entryId);
@@ -157,21 +157,21 @@ public class InMemoryApi : ILexboxApi
         return Task.CompletedTask;
     }
 
-    public Task<IEntry[]> GetEntries(string exemplar, QueryOptions? options = null)
+    public Task<Entry[]> GetEntries(string exemplar, QueryOptions? options = null)
     {
-        var entries = _entries.Where(e => e.LexemeForm.Values["en"].StartsWith(exemplar)).OfType<IEntry>().ToArray();
+        var entries = _entries.Where(e => e.LexemeForm.Values["en"].StartsWith(exemplar)).OfType<Entry>().ToArray();
         return Task.FromResult(entries);
     }
 
-    public Task<IEntry[]> GetEntries(QueryOptions? options = null)
+    public Task<Entry[]> GetEntries(QueryOptions? options = null)
     {
-        return Task.FromResult(_entries.OfType<IEntry>().ToArray());
+        return Task.FromResult(_entries.OfType<Entry>().ToArray());
     }
 
-    public Task<IEntry> GetEntry(Guid id)
+    public Task<Entry> GetEntry(Guid id)
     {
         var entry = _entries.Single(e => e.Id == id);
-        return Task.FromResult(entry as IEntry);
+        return Task.FromResult(entry as Entry);
     }
 
     public Task<string[]> GetExemplars()
@@ -184,9 +184,9 @@ public class InMemoryApi : ILexboxApi
         return Task.FromResult(_writingSystems);
     }
 
-    public Task<IEntry[]> SearchEntries(string query, QueryOptions? options = null)
+    public Task<Entry[]> SearchEntries(string query, QueryOptions? options = null)
     {
-        var entries = _entries.Where(e => e.LexemeForm.Values["en"].Contains(query)).OfType<IEntry>().ToArray();
+        var entries = _entries.Where(e => e.LexemeForm.Values["en"].Contains(query)).OfType<Entry>().ToArray();
         return Task.FromResult(entries);
     }
 
@@ -195,17 +195,17 @@ public class InMemoryApi : ILexboxApi
         return new UpdateBuilder<T>();
     }
 
-    public Task<IEntry> UpdateEntry(Guid id, UpdateObjectInput<IEntry> update)
+    public Task<Entry> UpdateEntry(Guid id, UpdateObjectInput<Entry> update)
     {
         var entry = _entries.Single(e => e.Id == id);
         update.Apply(entry);
-        return Task.FromResult(entry as IEntry);
+        return Task.FromResult(entry as Entry);
     }
 
-    public Task<IExampleSentence> UpdateExampleSentence(Guid entryId,
+    public Task<ExampleSentence> UpdateExampleSentence(Guid entryId,
         Guid senseId,
         Guid exampleSentenceId,
-        UpdateObjectInput<IExampleSentence> update)
+        UpdateObjectInput<ExampleSentence> update)
     {
         var entry = _entries.Single(e => e.Id == entryId);
         var sense = entry.Senses.Single(s => s.Id == senseId);
@@ -214,7 +214,7 @@ public class InMemoryApi : ILexboxApi
         return Task.FromResult(es);
     }
 
-    public Task<ISense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<ISense> update)
+    public Task<Sense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<Sense> update)
     {
         var entry = _entries.Single(e => e.Id == entryId);
         var s = entry.Senses.Single(s => s.Id == senseId);
