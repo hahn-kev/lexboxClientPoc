@@ -81,12 +81,16 @@ public class LexboxApiHub(ILexboxApi lexboxApi, IOptions<JsonOptions> options) :
 
     public async Task<Entry> CreateEntry(Entry entry)
     {
-        return await lexboxApi.CreateEntry(entry);
+        var newEntry = await lexboxApi.CreateEntry(entry);
+        await NotifyEntryUpdated(newEntry);
+        return newEntry;
     }
 
     public async Task<Entry> UpdateEntry(Guid id, JsonOperation[] update)
     {
-        return await lexboxApi.UpdateEntry(id, FromOperations<Entry>(update));
+        var entry = await lexboxApi.UpdateEntry(id, FromOperations<Entry>(update));
+        await NotifyEntryUpdated(entry);
+        return entry;
     }
 
     public async Task DeleteEntry(Guid id)
@@ -135,5 +139,10 @@ public class LexboxApiHub(ILexboxApi lexboxApi, IOptions<JsonOptions> options) :
             new JsonPatchDocument<T>(operations.Select(o => new Operation<T>(o.Op, o.Path, o.From, o.Value)).ToList(),
                 options.Value.SerializerOptions)
         );
+    }
+
+    private async Task NotifyEntryUpdated(Entry entry)
+    {
+        await Clients.Others.OnEntryUpdated(entry);
     }
 }
