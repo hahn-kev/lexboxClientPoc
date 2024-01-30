@@ -1,8 +1,10 @@
 ﻿using System.Text.Json.Serialization.Metadata;
+using AppLayer.Api;
 using CrdtLib;
 using CrdtLib.Db;
 using LcmCrdtModel;
 using Lexbox.ClientServer.Hubs;
+using lexboxClientContracts;
 using TypedSignalR.Client.DevTools;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +25,15 @@ builder.Services.AddSignalR().AddJsonProtocol(options =>
         Modifiers = { LcmCrdtKernel.PolyTypeListBuilder().MakeModifier() }
     };
 });
-builder.Services.AddLcmCrdtClient("tmp.sqlite");
+var useCrdt = true;
+if (useCrdt)
+    builder.Services.AddLcmCrdtClient("tmp.sqlite");
+else
+{
+    var api = await LexboxLcmApiFactory.CreateApi(@"C:\ProgramData\SIL\FieldWorks\Projects\sena-3\sena-3.fwdata",
+        false);
+    builder.Services.AddSingleton<ILexboxApi>(api);
+}
 
 var app = builder.Build();
 
@@ -32,7 +42,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+
     app.UseSignalRHubSpecification();
     app.UseSignalRHubDevelopmentUI();
 }
@@ -40,6 +50,4 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapHub<LexboxApiHub>("/api/hub/project");
-
-await app.Services.GetRequiredService<CrdtDbContext>().Database.EnsureCreatedAsync();
 app.Run();

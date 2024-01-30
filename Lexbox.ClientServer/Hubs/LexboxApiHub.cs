@@ -1,7 +1,9 @@
 ﻿extern alias tapper;
 using System.Text.Json;
 using lexboxClientContracts;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using SystemTextJsonPatch;
 using SystemTextJsonPatch.Operations;
 using TypedSignalR.Client;
@@ -45,7 +47,7 @@ public interface ILexboxClient
     Task OnEntryUpdated(Entry entry);
 }
 
-public class LexboxApiHub(ILexboxApi lexboxApi, JsonSerializerOptions options) : Hub<ILexboxClient>, ILexboxApiHub
+public class LexboxApiHub(ILexboxApi lexboxApi, IOptions<JsonOptions> options) : Hub<ILexboxClient>, ILexboxApiHub
 {
     public async Task<WritingSystems> GetWritingSystems()
     {
@@ -131,7 +133,7 @@ public class LexboxApiHub(ILexboxApi lexboxApi, JsonSerializerOptions options) :
     {
         return new JsonPatchUpdateInput<T>(
             new JsonPatchDocument<T>(operations.Select(o => new Operation<T>(o.Op, o.Path, o.From, o.Value)).ToList(),
-                options)
+                options.Value.SerializerOptions)
         );
     }
 }

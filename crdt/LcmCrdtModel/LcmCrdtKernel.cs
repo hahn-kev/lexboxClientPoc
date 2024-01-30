@@ -1,9 +1,11 @@
 ﻿using CrdtLib;
 using CrdtLib.Changes;
+using CrdtLib.Db;
 using LcmCrdtModel.Changes;
 using lexboxClientContracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace LcmCrdtModel;
 
@@ -38,6 +40,20 @@ public static class LcmCrdtKernel
             objectTypes
         );
         services.AddSingleton<ILexboxApi, CrdtLexboxApi>();
+        services.AddSingleton<IHostedService, StartupService>();
         return services;
+    }
+    
+    private class StartupService(CrdtDbContext dbContext): IHostedService
+    {
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await dbContext.Database.MigrateAsync(cancellationToken);
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
     }
 }
