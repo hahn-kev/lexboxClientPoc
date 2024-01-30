@@ -1,27 +1,3 @@
 @using AppLayer
 <h3>Project</h3>
 
-<InputFile OnChange="LoadProject" accept=".fwdata"/>
-@if (_project is not null)
-{
-    <p>Project loaded:</p>
-    <ul>
-        @foreach (var entry in _project.Entries)
-        {
-            <li>@entry.LexemeForm</li>
-        }
-    </ul>
-}
-
-@code {
-    FlexProject? _project;
-
-    private async Task LoadProject(InputFileChangeEventArgs obj)
-    {
-        const long mb = 1024 * 1024;
-
-        using var file = obj.File.OpenReadStream(100 * mb);
-        _project = await ProjectLoader.LoadProject(file, obj.File.Name);
-    }
-
-}

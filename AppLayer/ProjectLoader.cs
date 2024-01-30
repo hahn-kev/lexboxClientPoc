@@ -39,7 +39,7 @@ public class ProjectLoader
         Directory.CreateDirectory(Path.GetDirectoryName(projectFilePath));
         var localFileCopy = File.Create(projectFilePath);
         Console.WriteLine("Copying file");
-        await Copy(projectFile, localFileCopy, 81920, new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
+        await projectFile.CopyToAsync(localFileCopy);
         localFileCopy.Flush();
         localFileCopy.Close();
         Console.WriteLine("Done copying file");
@@ -57,44 +57,4 @@ public class ProjectLoader
         Console.WriteLine("Done creating cache");
         return cache;
     }
-
-    public static async Task<FlexProject> LoadProject(Stream projectFile, string fileName)
-    {
-        var cache = await LoadCache(projectFile, fileName);
-        var entries = cache.ServiceLocator.GetInstance<IRepository<ILexEntry>>()
-            .AllInstances()
-            .Select(e => new Entry(e.LexemeFormOA.Form.VernacularDefaultWritingSystem.Text))
-            .ToArray();
-        var first = entries.First();
-        Console.WriteLine("Done loading project");
-        Console.WriteLine($"First entry: {first.LexemeForm}");
-        return new FlexProject(entries);
-    }
-
-    private static async Task Copy(Stream source,
-        Stream destination,
-        int bufferSize,
-        CancellationToken cancellationToken)
-    {
-        byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
-        try
-        {
-            int bytesRead;
-            while ((bytesRead = await source.ReadAsync(buffer, cancellationToken)) != 0)
-            {
-                await destination.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, bytesRead), cancellationToken);
-            }
-        }
-        finally
-        {
-            ArrayPool<byte>.Shared.Return(buffer);
-        }
-    }
 }
-
-public class FlexProject(Entry[] entries)
-{
-    public Entry[] Entries { get; init; } = entries;
-}
-
-public record Entry(string LexemeForm);
