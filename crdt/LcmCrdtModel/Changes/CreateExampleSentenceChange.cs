@@ -37,7 +37,7 @@ public class CreateExampleSentenceChange: Change<ExampleSentence>, ISelfNamedTyp
             SenseId = SenseId,
             Sentence = Sentence ?? new MultiString(),
             Translation = Translation ?? new MultiString(),
-            Reference = Reference ?? string.Empty
+            Reference = Reference
         };
     }
 

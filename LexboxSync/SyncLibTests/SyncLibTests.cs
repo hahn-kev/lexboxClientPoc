@@ -33,7 +33,7 @@ public class SyncLibTests : IAsyncLifetime
 
     public virtual async Task InitializeAsync()
     {
-        lcmApi = await LexboxLcmApiFactory.CreateApi("C:/ProgramData/SIL/FieldWorks/Projects/test-chris-02/test-chris-02.fwdata", false);
+        lcmApi = await LexboxLcmApiFactory.CreateApi("C:\\ProgramData\\SIL\\FieldWorks\\Projects\\sena-3\\sena-3.fwdata", false);
         await _crdtDbContext.Database.OpenConnectionAsync();
         await _crdtDbContext.Database.EnsureCreatedAsync();
     }
@@ -49,15 +49,16 @@ public class SyncLibTests : IAsyncLifetime
         var crdtEntries = await crdtApi.GetEntries();
         crdtEntries.Should().BeEmpty();
 
-        var lcmEntries = (await lcmApi.GetEntries()).Take(10);
-        lcmEntries.Count().Should().Be(10);
+        var lcmEntries = (await lcmApi.GetEntries())[..10];
+        lcmEntries.Should().HaveCount(10);
 
         foreach (var entry in lcmEntries)
         {
             await crdtApi.CreateEntry(entry);
         }
-
-        crdtEntries.Length.Should().Be(lcmEntries.Count());
-        JsonSerializer.Serialize(lcmEntries).Should().Be(JsonSerializer.Serialize(crdtEntries));
+        crdtEntries = await crdtApi.GetEntries();
+        crdtEntries.Should().HaveSameCount(lcmEntries);
+        //does a deep equality check
+        crdtEntries.Should().BeEquivalentTo(lcmEntries);
     }
 }
