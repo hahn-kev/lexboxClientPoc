@@ -49,6 +49,10 @@ public class CreateSenseChange: Change<Sense>, ISelfNamedType<CreateSenseChange>
         if (Gloss is not null) entity.Gloss = Gloss;
         if (PartOfSpeech is not null) entity.PartOfSpeech = PartOfSpeech;
         if (SemanticDomain is not null) entity.SemanticDomain = SemanticDomain;
-        if (await context.IsObjectDeleted(EntryId)) entity.DeletedAt = context.Commit.DateTime;
+        if (await context.IsObjectDeleted(EntryId))
+        {
+            entity.DeletedAt = context.Commit.DateTime;
+            await context.MarkDeleted(EntityId);
+        }
     }
 }

@@ -112,6 +112,7 @@ public class SnapshotWorker
     
     public void AddSnapshot(ObjectSnapshot snapshot)
     {
+        //if there was already a pending snapshot there's no need to store it as both may point to the same commit
         PendingSnapshots[snapshot.Entity.Id] = snapshot;
     }
 }

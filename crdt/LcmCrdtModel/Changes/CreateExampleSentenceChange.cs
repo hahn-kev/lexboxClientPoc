@@ -46,6 +46,10 @@ public class CreateExampleSentenceChange: Change<ExampleSentence>, ISelfNamedTyp
         if (Sentence is not null) entity.Sentence = Sentence;
         if (Translation is not null) entity.Translation = Translation;
         if (Reference is not null) entity.Reference = Reference;
-        if (await context.IsObjectDeleted(SenseId)) entity.DeletedAt = context.Commit.DateTime;
+        if (await context.IsObjectDeleted(SenseId))
+        {
+            entity.DeletedAt = context.Commit.DateTime;
+            await context.MarkDeleted(EntityId);
+        }
     }
 }

@@ -12,8 +12,7 @@ public class DeleteChange<T>(Guid entityId) : Change<T>(entityId), IPolyType
     public override async ValueTask ApplyChange(T entity, ChangeContext context)
     {
         entity.DeletedAt = context.Commit.DateTime;
-        await context.MutateOthers(snapshot => snapshot.References.Contains(EntityId),
-            o => o.RemoveReference(EntityId, context.Commit));
+        await context.MarkDeleted(EntityId);
     }
 
     public override IObjectBase NewEntity(Commit commit)

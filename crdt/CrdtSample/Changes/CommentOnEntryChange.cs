@@ -31,6 +31,10 @@ public class CommentOnEntryChange : Change<Comment>, ISelfNamedType<CommentOnEnt
     public override async ValueTask ApplyChange(Comment entity, ChangeContext context)
     {
         entity.CommentText = Comment;
-        if (await context.IsObjectDeleted(EntryId)) entity.DeletedAt = context.Commit.DateTime;
+        if (await context.IsObjectDeleted(EntryId))
+        {
+            entity.DeletedAt = context.Commit.DateTime;
+            await context.MarkDeleted(EntityId);
+        }
     }
 }
