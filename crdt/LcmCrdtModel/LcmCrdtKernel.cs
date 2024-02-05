@@ -11,44 +11,121 @@ namespace LcmCrdtModel;
 
 public static class LcmCrdtKernel
 {
-    public static (CrdtKernel.ChangeTypeListBuilder changeTypes, CrdtKernel.ObjectTypeListBuilder objectTypes)
-        PolyTypeListBuilder()
-    {
-        var objectTypes = new CrdtKernel.ObjectTypeListBuilder()
-            .Add<Entry>()
-            .Add<Sense>()
-            .Add<ExampleSentence>();
-        var changeTypes = new CrdtKernel.ChangeTypeListBuilder()
-            .Add<JsonPatchChange<Entry>>()
-            .Add<JsonPatchChange<Sense>>()
-            .Add<JsonPatchChange<ExampleSentence>>()
-            .Add<DeleteChange<Entry>>()
-            .Add<DeleteChange<Sense>>()
-            .Add<DeleteChange<ExampleSentence>>()
-            .Add<CreateEntryChange>()
-            .Add<CreateSenseChange>()
-            .Add<CreateExampleSentenceChange>();
-        return (changeTypes, objectTypes);
-    }
-
     public static IServiceCollection AddLcmCrdtClient(this IServiceCollection services, string dbPath)
     {
-        var (changeTypes, objectTypes) = PolyTypeListBuilder();
         services.AddCrdtData(
             builder => builder.UseSqlite($"Data Source={dbPath}"),
-            changeTypes,
-            objectTypes
+            config =>
+            {
+                config.ObjectTypeListBuilder.AddDbModelConfig(builder =>
+                    {
+                        builder.Owned<MultiString>();
+                    })
+                    .Add<Entry>(builder =>
+                    {
+                        builder.OwnsOne(e => e.Note, n => n.ToJson());
+                    })
+                    .Add<Sense>(builder =>
+                    {
+                        builder.HasOne<Entry>()
+                            .WithMany()
+                            .HasForeignKey(sense => sense.EntryId);
+                    })
+                    .Add<ExampleSentence>(builder =>
+                    {
+                        builder.HasOne<Sense>()
+                            .WithMany()
+                            .HasForeignKey(e => e.SenseId);
+                    });
+
+                config.ChangeTypeListBuilder.Add<JsonPatchChange<Entry>>()
+                    .Add<JsonPatchChange<Sense>>()
+                    .Add<JsonPatchChange<ExampleSentence>>()
+                    .Add<DeleteChange<Entry>>()
+                    .Add<DeleteChange<Sense>>()
+                    .Add<DeleteChange<ExampleSentence>>()
+                    .Add<CreateEntryChange>()
+                    .Add<CreateSenseChange>()
+                    .Add<CreateExampleSentenceChange>();
+            }
         );
         services.AddSingleton<ILexboxApi, CrdtLexboxApi>();
         services.AddSingleton<IHostedService, StartupService>();
         return services;
     }
-    
-    private class StartupService(CrdtDbContext dbContext): IHostedService
+
+    private class StartupService(CrdtDbContext dbContext, ILexboxApi lexboxApi) : IHostedService
     {
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await dbContext.Database.MigrateAsync(cancellationToken);
+            //todo use migrations before releasing
+            // await dbContext.Database.MigrateAsync(cancellationToken);
+            await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+            await lexboxApi.CreateEntry(new()
+            {
+                LexemeForm =
+                {
+                    Values =
+                    {
+                        { "en", "Kevin" }
+                    }
+                },
+                Note =
+                {
+                    Values =
+                    {
+                        { "en", "this is a test note from Kevin" }
+                    }
+                },
+                CitationForm =
+                {
+                    Values =
+                    {
+                        { "en", "Kevin" }
+                    }
+                },
+                LiteralMeaning =
+                {
+                    Values =
+                    {
+                        { "en", "Kevin" }
+                    }
+                },
+                Senses =
+                [
+                    new()
+                    {
+                        Gloss =
+                        {
+                            Values =
+                            {
+                                { "en", "Kevin" }
+                            }
+                        },
+                        Definition =
+                        {
+                            Values =
+                            {
+                                { "en", "Kevin" }
+                            }
+                        },
+                        SemanticDomain = ["Person"],
+                        ExampleSentences =
+                        [
+                            new()
+                            {
+                                Sentence =
+                                {
+                                    Values =
+                                    {
+                                        { "en", "Kevin is a good guy" }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

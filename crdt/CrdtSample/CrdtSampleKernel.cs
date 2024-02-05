@@ -13,14 +13,16 @@ public static class CrdtSampleKernel
     {
         services.AddCrdtData(
             builder => builder.UseSqlite($"Data Source={dbPath}"),
-            new CrdtKernel.ChangeTypeListBuilder()
-                .Add<DeleteChange<Entry>>()
-                .Add<SimpleChange>()
-                .Add<MakeCommentChange>()
-                .Add<ChangeText>()
-                .Add<AddReferenceChange>()
-                .Add<CommentOnEntryChange>(),
-            new CrdtKernel.ObjectTypeListBuilder().Add<Entry>().Add<Comment>());
+            config =>
+            {
+                config.ChangeTypeListBuilder.Add<DeleteChange<Entry>>()
+                    .Add<SimpleChange>()
+                    .Add<MakeCommentChange>()
+                    .Add<ChangeText>()
+                    .Add<AddReferenceChange>()
+                    .Add<CommentOnEntryChange>();
+                config.ObjectTypeListBuilder.Add<Entry>().Add<Comment>();
+            });
         return services;
     }
 }

@@ -1,14 +1,16 @@
 using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using CrdtLib.Changes;
 using CrdtLib.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.Options;
 
 namespace CrdtLib.Db;
 
-public class CrdtDbContext(DbContextOptions<CrdtDbContext> options, JsonSerializerOptions jsonSerializerOptions)
+public class CrdtDbContext(
+    DbContextOptions<CrdtDbContext> options,
+    IOptions<CrdtConfig> crdtConfig,
+    JsonSerializerOptions jsonSerializerOptions)
     : DbContext(options)
 {
     protected override void OnModelCreating(ModelBuilder builder)
@@ -42,6 +44,11 @@ public class CrdtDbContext(DbContextOptions<CrdtDbContext> options, JsonSerializ
                 change => JsonSerializer.Serialize(change, jsonSerializerOptions),
                 json => DeserializeChange(json)
             );
+
+        foreach (var modelConfiguration in crdtConfig.Value.ObjectTypeListBuilder.ModelConfigurations)
+        {
+            modelConfiguration(builder, crdtConfig.Value);
+        }
     }
 
     private IChange DeserializeChange(string json)

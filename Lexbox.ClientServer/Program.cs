@@ -4,24 +4,28 @@ using CrdtLib;
 using LcmCrdtModel;
 using Lexbox.ClientServer.Hubs;
 using lexboxClientContracts;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using TypedSignalR.Client.DevTools;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.ConfigureHttpJsonOptions(options =>
+builder.Services.AddOptions<JsonOptions>().PostConfigure<IOptions<CrdtConfig>>((jsonOptions, crdtConfig) =>
 {
-    options.SerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver
+    jsonOptions.SerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver
     {
-        Modifiers = { LcmCrdtKernel.PolyTypeListBuilder().MakeModifier() }
+        Modifiers = { crdtConfig.Value.MakeJsonTypeModifier() }
     };
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignalR().AddJsonProtocol(options =>
+builder.Services.AddSignalR().AddJsonProtocol();
+builder.Services.AddOptions<JsonHubProtocolOptions>().PostConfigure<IOptions<CrdtConfig>>((jsonOptions, crdtConfig) =>
 {
-    options.PayloadSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver
+    jsonOptions.PayloadSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver
     {
-        Modifiers = { LcmCrdtKernel.PolyTypeListBuilder().MakeModifier() }
+        Modifiers = { crdtConfig.Value.MakeJsonTypeModifier() }
     };
 });
 var useCrdt = true;

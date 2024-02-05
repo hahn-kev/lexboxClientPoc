@@ -3,10 +3,11 @@ using CrdtLib.Entities;
 using CrdtLib.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Options;
 
 namespace CrdtLib.Db;
 
-public class CrdtRepository(CrdtDbContext _dbContext, DateTimeOffset? currentTime = null)
+public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtConfig, DateTimeOffset? currentTime = null)
 {
     public Task<IDbContextTransaction> BeginTransactionAsync()
     {
@@ -89,7 +90,6 @@ public class CrdtRepository(CrdtDbContext _dbContext, DateTimeOffset? currentTim
 
     public async Task<IObjectBase> GetObjectBySnapshotId(Guid snapshotId)
     {
-
         var entity = await _dbContext.Snapshots
                          .Where(s => s.Id == snapshotId)
                          .Select(s => s.Entity)
@@ -150,19 +150,33 @@ public class CrdtRepository(CrdtDbContext _dbContext, DateTimeOffset? currentTim
 
     public async Task AddSnapshots(IEnumerable<ObjectSnapshot> snapshots)
     {
-        _dbContext.Snapshots.AddRange(snapshots);
+        foreach (var objectSnapshot in snapshots)
+        {
+            _dbContext.Snapshots.Add(objectSnapshot);
+            SnapshotAdded(objectSnapshot);
+        }
+
         await _dbContext.SaveChangesAsync();
     }
 
     public void AddIfNew(ObjectSnapshot snapshot)
     {
         if (!_dbContext.Snapshots.Local.Contains(snapshot))
+        {
             _dbContext.Snapshots.Add(snapshot);
+            SnapshotAdded(snapshot);
+        }
+    }
+
+    private void SnapshotAdded(ObjectSnapshot objectSnapshot)
+    {
+        if (crdtConfig.Value.EnableProjectedTables)
+            _dbContext.Add(objectSnapshot.Entity).Property("SnapshotId").CurrentValue = objectSnapshot.Id;
     }
     
     public CrdtRepository GetScopedRepository(DateTimeOffset newCurrentTime)
     {
-        return new CrdtRepository(_dbContext, newCurrentTime);
+        return new CrdtRepository(_dbContext, crdtConfig, newCurrentTime);
     }
 
     public async Task AddCommit(Commit commit)
