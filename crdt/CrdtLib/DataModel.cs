@@ -104,7 +104,7 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         return new ModelSnapshot(await GetEntitySnapshots());
     }
 
-    public IQueryable<T> GetLatestObjects<T>(Expression<Func<ObjectSnapshot, bool>>? predicate = null) where T : IObjectBase
+    public IQueryable<T> GetLatestObjects<T>(Expression<Func<ObjectSnapshot, bool>>? predicate = null) where T : class, IObjectBase
     {
         return crdtRepository.GetCurrentObjects<T>(predicate);
     }

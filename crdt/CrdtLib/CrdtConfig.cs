@@ -52,6 +52,13 @@ public class ObjectTypeListBuilder
     internal List<JsonDerivedType> Types { get; } = [];
 
     internal List<Action<ModelBuilder, CrdtConfig>> ModelConfigurations { get; } = [];
+    public List<Action<ModelConfigurationBuilder>> ModelConventions { get; } = [];
+    
+    public ObjectTypeListBuilder AddDbModelConvention(Action<ModelConfigurationBuilder> modelConvention)
+    {
+        ModelConventions.Add(modelConvention);
+        return this;
+    }
 
     public ObjectTypeListBuilder AddDbModelConfig(Action<ModelBuilder> modelConfiguration)
     {

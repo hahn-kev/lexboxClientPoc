@@ -1,9 +1,16 @@
-﻿using CrdtLib;
+﻿using System.Text.Json;
+using CrdtLib;
 using CrdtLib.Changes;
 using CrdtLib.Db;
+using CrdtLib.Entities;
 using LcmCrdtModel.Changes;
 using lexboxClientContracts;
+using LinqToDB;
+using LinqToDB.Data;
+using LinqToDB.EntityFrameworkCore;
+using LinqToDB.Mapping;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -13,17 +20,42 @@ public static class LcmCrdtKernel
 {
     public static IServiceCollection AddLcmCrdtClient(this IServiceCollection services, string dbPath)
     {
+        LinqToDBForEFTools.Initialize();
+        
+        //attemping to allow us to not have to manually use Json.Value in our code
+        // LinqToDB.Linq.Expressions.MapMember((MultiString multiString, string ws) => multiString.Values[ws], (multiString, ws) => Json.Value(multiString, ms => ms.Values[ws]));
+        // LinqToDB.Linq.Expressions.MapMember((MultiString multiString, string ws) => multiString.Values[(WritingSystemId)ws], (multiString, ws) => Json.Value(multiString, ms => ms.Values[(WritingSystemId)ws]));
+        LinqToDB.Linq.Expressions.MapMember((MultiString multiString, WritingSystemId ws) => multiString.Values[ws], (multiString, ws) => Json.Value(multiString, ms => ms.Values[ws]));
         services.AddCrdtData(
-            builder => builder.UseSqlite($"Data Source={dbPath}"),
+            builder => builder.UseSqlite($"Data Source={dbPath}").UseLinqToDB(optionsBuilder =>
+            {
+                var mappingSchema = new MappingSchema();
+                mappingSchema.SetConvertExpression((WritingSystemId id) => new DataParameter
+                {
+                    Value = id.Code,
+                    DataType = DataType.Text
+                });
+                optionsBuilder.AddMappingSchema(mappingSchema);
+            }),
             config =>
             {
+                config.EnableProjectedTables = true;
                 config.ObjectTypeListBuilder.AddDbModelConfig(builder =>
                     {
-                        builder.Owned<MultiString>();
+                        // builder.Owned<MultiString>();
+                    })
+                    .AddDbModelConvention(builder =>
+                    {
+                        builder.Properties<MultiString>()
+                            .HaveColumnType("jsonb")
+                            .HaveConversion<MultiStringDbConverter>();
                     })
                     .Add<Entry>(builder =>
                     {
-                        builder.OwnsOne(e => e.Note, n => n.ToJson());
+                        // builder.OwnsOne(e => e.Note, n => n.ToJson());
+                        // builder.OwnsOne(e => e.LexemeForm, n => n.ToJson());
+                        // builder.OwnsOne(e => e.CitationForm, n => n.ToJson());
+                        // builder.OwnsOne(e => e.LiteralMeaning, n => n.ToJson());
                     })
                     .Add<Sense>(builder =>
                     {
@@ -53,6 +85,10 @@ public static class LcmCrdtKernel
         services.AddSingleton<IHostedService, StartupService>();
         return services;
     }
+
+    private class MultiStringDbConverter() : ValueConverter<MultiString, string>(
+        mul => JsonSerializer.Serialize(mul, (JsonSerializerOptions?)null),
+        json => JsonSerializer.Deserialize<MultiString>(json, (JsonSerializerOptions?)null) ?? new());
 
     private class StartupService(CrdtDbContext dbContext, ILexboxApi lexboxApi) : IHostedService
     {
