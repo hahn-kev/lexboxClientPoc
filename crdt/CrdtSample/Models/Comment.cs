@@ -10,6 +10,7 @@ public record Comment: IObjectBase<Comment>
     static string IPolyType.TypeName => "custom_comment_discriminator";
     public required DateTimeOffset CreatedAt { get; init; }
     public required Guid EntryId { get; init; }
+    public Guid? ParentId { get; init; }
     public required string CommentText { get; set; }
     public Guid[] GetReferences()
     {

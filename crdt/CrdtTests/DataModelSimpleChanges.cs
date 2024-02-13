@@ -66,12 +66,12 @@ public class DataModelSimpleChanges : DataModelTestBase
         //add range has some additional logic that depends on proper commit ordering
         await DataModel.AddRange(new[]
         {
-            await WriteChangeBefore(second, new MakeCommentChange(_entity1Id, "comment"), false),
+            await WriteChangeBefore(second, new SetAgeChange(_entity1Id, 4), false),
             await WriteNextChange(SimpleChange(_entity1Id, "third"), false)
         });
         var entity = await DataModel.GetLatest<Entry>(_entity1Id);
         entity.Value.Should().Be("third");
-        entity.Comment.Should().Be("comment");
+        entity.Age.Should().Be(4);
     }
 
     [Fact]
@@ -80,10 +80,10 @@ public class DataModelSimpleChanges : DataModelTestBase
         var first = await WriteNextChange(SimpleChange(_entity1Id, "first"));
         await WriteNextChange(SimpleChange(_entity1Id, "second"));
 
-        await WriteChangeAfter(first, new MakeCommentChange(_entity1Id, "comment"));
+        await WriteChangeAfter(first, new SetAgeChange(_entity1Id, 3));
         var snapshot = await DbContext.Snapshots.DefaultOrder().LastAsync();
         var entry = snapshot.Entity.Is<Entry>();
-        entry.Comment.Should().Be("comment");
+        entry.Age.Should().Be(3);
         entry.Value.Should().Be("second");
     }
 

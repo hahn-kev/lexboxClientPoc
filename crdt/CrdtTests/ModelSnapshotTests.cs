@@ -44,7 +44,7 @@ public class ModelSnapshotTests : DataModelTestBase
     public async Task CanGetSnapshotFromEarlier(int changeCount)
     {
         var entityId = Guid.NewGuid();
-        await WriteNextChange(new MakeCommentChange(entityId, "hello"));
+        await WriteNextChange(new SetAgeChange(entityId, 24));
         var changes = new List<Commit>(changeCount);
         var addNew = new List<Commit>(changeCount);
         for (var i = 0; i < changeCount; i++)
@@ -63,7 +63,7 @@ public class ModelSnapshotTests : DataModelTestBase
             var snapshots = await DataModel.GetSnapshotsAt(changes[i].DateTime);
             var entry = snapshots[entityId].Entity.Is<Entry>();
             entry.Value.Should().Be($"change {i}");
-            entry.Comment.Should().Be("hello");
+            entry.Age.Should().Be(24);
             snapshots.Values.Should().HaveCount(1 + i);
         }
     }
@@ -77,7 +77,7 @@ public class ModelSnapshotTests : DataModelTestBase
     {
         int changeCount = 10_000;
         var entityId = Guid.NewGuid();
-        await WriteNextChange(new MakeCommentChange(entityId, "hello"));
+        await WriteNextChange(new SetAgeChange(entityId, 20));
         //adding all in one AddRange means there's sparse snapshots
         await DataModel.AddRange(Enumerable.Range(0, changeCount)
             .Select(i => WriteNextChange(SimpleChange(entityId, $"change {i}"), false).Result));
@@ -92,7 +92,7 @@ public class ModelSnapshotTests : DataModelTestBase
         entitySnapshot.Should().BeEquivalentTo(latestSnapshot, options => options.Excluding(snapshot => snapshot.Id));
         var latestSnapshotEntry = latestSnapshot.Entity.Is<Entry>();
         var entitySnapshotEntry = entitySnapshot.Entity.Is<Entry>();
-        entitySnapshotEntry.Comment.Should().Be(latestSnapshotEntry.Comment);
+        entitySnapshotEntry.Age.Should().Be(latestSnapshotEntry.Age);
         entitySnapshotEntry.Value.Should().Be(latestSnapshotEntry.Value);
     }
 }

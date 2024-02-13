@@ -17,7 +17,7 @@ public static class CrdtSampleKernel
             {
                 config.ChangeTypeListBuilder.Add<DeleteChange<Entry>>()
                     .Add<SimpleChange>()
-                    .Add<MakeCommentChange>()
+                    .Add<SetAgeChange>()
                     .Add<ChangeText>()
                     .Add<AddReferenceChange>()
                     .Add<CommentOnEntryChange>();
