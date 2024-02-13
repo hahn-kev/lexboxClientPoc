@@ -114,9 +114,11 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         return await crdtRepository.GetObjectBySnapshotId(snapshotId);
     }
 
-    private async Task<SimpleSnapshot[]> GetEntitySnapshots()
+    private async Task<SimpleSnapshot[]> GetEntitySnapshots(bool includeDeleted = false)
     {
-        var snapshots = await crdtRepository.CurrentSnapshots().Select(s =>
+        var queryable = crdtRepository.CurrentSnapshots();
+        if (!includeDeleted) queryable = queryable.Where(s => !s.EntityIsDeleted);
+        var snapshots = await queryable.Select(s =>
             new SimpleSnapshot(s.Id,
                 s.TypeName,
                 s.EntityId,

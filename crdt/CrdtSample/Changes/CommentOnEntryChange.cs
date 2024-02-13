@@ -6,16 +6,12 @@ using CrdtLib.Entities;
 
 namespace CrdtSample.Changes;
 
-public class CommentOnEntryChange : Change<Comment>, ISelfNamedType<CommentOnEntryChange>
+public class CommentOnEntryChange(string comment, Guid entryId)
+    : Change<Comment>(Guid.NewGuid()), ISelfNamedType<CommentOnEntryChange>
 {
-    public string Comment { get; }
-    public Guid EntryId { get; }
+    public string Comment { get; } = comment;
+    public Guid EntryId { get; } = entryId;
 
-    public CommentOnEntryChange(string comment, Guid entryId): base(Guid.NewGuid())
-    {
-        Comment = comment;
-        EntryId = entryId;
-    }
 
     public override IObjectBase NewEntity(Commit commit)
     {
