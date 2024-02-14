@@ -58,7 +58,7 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
     private async Task UpdateSnapshots(Commit oldestAddedCommit)
     {
         await crdtRepository.DeleteStaleSnapshots(oldestAddedCommit);
-        var modelSnapshot = await GetSnapshot();
+        var modelSnapshot = await GetProjectSnapshot();
         var snapshotWorker = new SnapshotWorker(modelSnapshot.Snapshots, crdtRepository);
         await snapshotWorker.UpdateSnapshots();
     }
@@ -83,13 +83,13 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         }
     }
 
-    public async Task<ObjectSnapshot?> GetEntitySnapshotAtTime(DateTimeOffset time, Guid entryId)
+    public async Task<ObjectSnapshot?> GetEntitySnapshotAtTime(DateTimeOffset time, Guid entityId)
     {
         var snapshots = await GetSnapshotsAt(time);
-        return snapshots.GetValueOrDefault(entryId);
+        return snapshots.GetValueOrDefault(entityId);
     }
 
-    public async Task<ObjectSnapshot> GetLatest(Guid entityId)
+    public async Task<ObjectSnapshot> GetLatestSnapshotByObjectId(Guid entityId)
     {
         return await crdtRepository.GetCurrentSnapshotByObjectId(entityId);
     }
@@ -99,17 +99,17 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         return await crdtRepository.GetCurrent<T>(objectId);
     }
 
-    public async Task<ModelSnapshot> GetSnapshot()
+    public async Task<ModelSnapshot> GetProjectSnapshot()
     {
         return new ModelSnapshot(await GetEntitySnapshots());
     }
 
-    public IQueryable<T> GetLatestObjects<T>(Expression<Func<ObjectSnapshot, bool>>? predicate = null) where T : class, IObjectBase
+    public IQueryable<T> GetLatestObjects<T>() where T : class, IObjectBase
     {
-        return crdtRepository.GetCurrentObjects<T>(predicate);
+        return crdtRepository.GetCurrentObjects<T>();
     }
 
-    public async Task<IObjectBase> LoadObject(Guid snapshotId)
+    public async Task<IObjectBase> GetBySnapshotId(Guid snapshotId)
     {
         return await crdtRepository.GetObjectBySnapshotId(snapshotId);
     }
@@ -137,8 +137,7 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         
         if (pendingCommits.Length != 0)
         {
-            var snapshotWorker = new SnapshotWorker(snapshots, repository);
-            await snapshotWorker.ApplyCommitChanges(pendingCommits, false);
+            snapshots = await SnapshotWorker.ApplyCommitsToSnapshots(snapshots, repository, pendingCommits);
         }
 
         return snapshots;

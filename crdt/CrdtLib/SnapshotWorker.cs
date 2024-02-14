@@ -14,15 +14,25 @@ public class SnapshotWorker
     private readonly IReadOnlyDictionary<Guid, SimpleSnapshot>? _snapshots;
     private readonly CrdtRepository _crdtRepository;
     private readonly SimpleSnapshot? _oldestSnapshot;
-    public Dictionary<Guid, ObjectSnapshot> PendingSnapshots { get; } = [];
+    private readonly Dictionary<Guid, ObjectSnapshot> _pendingSnapshots  = [];
     private readonly List<ObjectSnapshot> _newIntermediateSnapshots = [];
 
-    public SnapshotWorker(Dictionary<Guid, ObjectSnapshot> snapshots, CrdtRepository crdtRepository)
+    private SnapshotWorker(Dictionary<Guid, ObjectSnapshot> snapshots, CrdtRepository crdtRepository)
     {
-        PendingSnapshots = snapshots;
+        _pendingSnapshots = snapshots;
         var oldestSnapshot = snapshots.Values.MinBy(s => s.Commit.CompareKey);
         _oldestSnapshot = oldestSnapshot is null ? null : new SimpleSnapshot(oldestSnapshot);
         _crdtRepository = crdtRepository;
+    }
+
+    public static async Task<Dictionary<Guid, ObjectSnapshot>> ApplyCommitsToSnapshots(Dictionary<Guid, ObjectSnapshot> snapshots,
+        CrdtRepository crdtRepository,
+        ICollection<Commit> commits)
+    {
+        //we need to pass in the snapshots because we expect it to be modified, this is intended.
+        //if the constructor makes a copy in the future this will need to be updated
+        await new SnapshotWorker(snapshots, crdtRepository).ApplyCommitChanges(commits, false);
+        return snapshots;
     }
 
     public SnapshotWorker(IReadOnlyDictionary<Guid, SimpleSnapshot> snapshots, CrdtRepository crdtRepository)
@@ -46,7 +56,7 @@ public class SnapshotWorker
         
         //intermediate snapshots should be added first, as the last snapshot added for an entity will be used in the projected tables
         await _crdtRepository.AddIfNew(_newIntermediateSnapshots);
-        await _crdtRepository.AddSnapshots(PendingSnapshots.Values);
+        await _crdtRepository.AddSnapshots(_pendingSnapshots.Values);
     }
 
     public async ValueTask ApplyCommitChanges(ICollection<Commit> commits, bool updateCommitHash)
@@ -125,7 +135,7 @@ public class SnapshotWorker
             .Select(s => s.EntityId)
             .ToArrayAsync());
         //snapshots from the db might be out of date, we want to use the most up to date data in the worker as well
-        toRemoveRefFromIds.UnionWith(PendingSnapshots.Values.Where(predicate).Select(s => s.EntityId));
+        toRemoveRefFromIds.UnionWith(_pendingSnapshots.Values.Where(predicate).Select(s => s.EntityId));
         foreach (var entityId in toRemoveRefFromIds)
         {
             var snapshot = await GetSnapshot(entityId);
@@ -150,7 +160,7 @@ public class SnapshotWorker
 
     public async ValueTask<ObjectSnapshot?> GetSnapshot(Guid entityId)
     {
-        if (PendingSnapshots.TryGetValue(entityId, out var snapshot))
+        if (_pendingSnapshots.TryGetValue(entityId, out var snapshot))
         {
             return snapshot;
         }
@@ -166,6 +176,6 @@ public class SnapshotWorker
     public void AddSnapshot(ObjectSnapshot snapshot)
     {
         //if there was already a pending snapshot there's no need to store it as both may point to the same commit
-        PendingSnapshots[snapshot.Entity.Id] = snapshot;
+        _pendingSnapshots[snapshot.Entity.Id] = snapshot;
     }
 }

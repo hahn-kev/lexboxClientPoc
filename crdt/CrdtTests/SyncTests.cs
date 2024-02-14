@@ -43,13 +43,13 @@ public class SyncTests : IAsyncLifetime
         await _client1.DataModel.SyncWith(_client2.DataModel);
 
         _client2.DbContext.Snapshots.Should().NotBeEmpty();
-        var client1Snapshot = await _client1.DataModel.GetSnapshot();
-        var client2Snapshot = await _client2.DataModel.GetSnapshot();
+        var client1Snapshot = await _client1.DataModel.GetProjectSnapshot();
+        var client2Snapshot = await _client2.DataModel.GetProjectSnapshot();
         client1Snapshot.LastCommitHash.Should().Be(client2Snapshot.LastCommitHash);
-        var entity = await _client2.DataModel.LoadObject(client2Snapshot.Snapshots[entity1Id].Id);
+        var entity = await _client2.DataModel.GetBySnapshotId(client2Snapshot.Snapshots[entity1Id].Id);
         var client2Entity1 = entity.Is<Entry>();
         client2Entity1.Value.Should().Be("entity1");
-        var entity1 = await _client1.DataModel.LoadObject(client1Snapshot.Snapshots[entity2Id].Id);
+        var entity1 = await _client1.DataModel.GetBySnapshotId(client1Snapshot.Snapshots[entity2Id].Id);
         var client1Entity2 = entity1.Is<Entry>();
         client1Entity2.Value.Should().Be("entity2");
     }
@@ -92,17 +92,17 @@ public class SyncTests : IAsyncLifetime
 
         await _client1.DataModel.SyncMany(clients.Select(c => c.DataModel).ToArray());
 
-        var serverSnapshot = await _client1.DataModel.GetSnapshot();
+        var serverSnapshot = await _client1.DataModel.GetProjectSnapshot();
         serverSnapshot.Snapshots.Should().HaveCount(clientCount + 1);
         foreach (var entitySnapshot in serverSnapshot.Snapshots.Values)
         {
-            var entity1 = await _client1.DataModel.LoadObject(entitySnapshot.Id);
+            var entity1 = await _client1.DataModel.GetBySnapshotId(entitySnapshot.Id);
             var serverEntity = entity1.Is<Entry>();
             foreach (var client in clients)
             {
-                var clientSnapshot = await client.DataModel.GetSnapshot();
+                var clientSnapshot = await client.DataModel.GetProjectSnapshot();
                 var simpleSnapshot = clientSnapshot.Snapshots.Should().ContainKey(entitySnapshot.EntityId).WhoseValue;
-                var entity2 = await client.DataModel.LoadObject(simpleSnapshot.Id);
+                var entity2 = await client.DataModel.GetBySnapshotId(simpleSnapshot.Id);
                 var entity = entity2.Is<Entry>();
                   entity.Should().BeEquivalentTo(serverEntity);
             }

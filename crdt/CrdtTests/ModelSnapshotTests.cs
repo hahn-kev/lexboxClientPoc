@@ -10,7 +10,7 @@ public class ModelSnapshotTests : DataModelTestBase
     [Fact]
     public void CanGetEmptyModelSnapshot()
     {
-        DataModel.GetSnapshot().Should().NotBeNull();
+        DataModel.GetProjectSnapshot().Should().NotBeNull();
     }
 
     [Fact]
@@ -18,7 +18,7 @@ public class ModelSnapshotTests : DataModelTestBase
     {
         await WriteNextChange(SimpleChange(Guid.NewGuid(), "entity1"));
         await WriteNextChange(SimpleChange(Guid.NewGuid(), "entity2"));
-        var snapshot = await DataModel.GetSnapshot();
+        var snapshot = await DataModel.GetProjectSnapshot();
         snapshot.Snapshots.Should().HaveCount(2);
     }
 
@@ -28,9 +28,9 @@ public class ModelSnapshotTests : DataModelTestBase
         var entityId = Guid.NewGuid();
         await WriteNextChange(SimpleChange(entityId, "first"));
         var secondChange = await WriteNextChange(SimpleChange(entityId, "second"));
-        var snapshot = await DataModel.GetSnapshot();
+        var snapshot = await DataModel.GetProjectSnapshot();
         var simpleSnapshot = snapshot.Snapshots.Values.First();
-        var entity = await DataModel.LoadObject(simpleSnapshot.Id);
+        var entity = await DataModel.GetBySnapshotId(simpleSnapshot.Id);
         var entry = entity.Is<Entry>();
         entry.Value.Should().Be("second");
         snapshot.LastChange.Should().Be(secondChange.DateTime);
@@ -82,7 +82,7 @@ public class ModelSnapshotTests : DataModelTestBase
         await DataModel.AddRange(Enumerable.Range(0, changeCount)
             .Select(i => WriteNextChange(SimpleChange(entityId, $"change {i}"), false).Result));
 
-        var latestSnapshot = await DataModel.GetLatest(entityId);
+        var latestSnapshot = await DataModel.GetLatestSnapshotByObjectId(entityId);
         //delete snapshots so when we get at then we need to re-apply
         await DbContext.Snapshots.Where(s => !s.IsRoot).ExecuteDeleteAsync();
 

@@ -95,7 +95,7 @@ public class DataModelReferenceTests : DataModelTestBase
 
         await WriteNextChange(new DeleteChange<Entry>(entry1));
 
-        var snapshot = await DataModel.GetSnapshot();
+        var snapshot = await DataModel.GetProjectSnapshot();
         snapshot.Snapshots.Should().NotContainKeys(
             entry1,
             comment1Id,
