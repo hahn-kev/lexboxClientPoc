@@ -49,7 +49,6 @@ public class CreateExampleSentenceChange: Change<ExampleSentence>, ISelfNamedTyp
         if (await context.IsObjectDeleted(SenseId))
         {
             entity.DeletedAt = context.Commit.DateTime;
-            await context.MarkDeleted(EntityId);
         }
     }
 }

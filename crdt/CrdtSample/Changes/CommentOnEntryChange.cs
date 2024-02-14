@@ -30,7 +30,6 @@ public class CommentOnEntryChange(string comment, Guid entryId)
         if (await context.IsObjectDeleted(EntryId))
         {
             entity.DeletedAt = context.Commit.DateTime;
-            await context.MarkDeleted(EntityId);
         }
     }
 }

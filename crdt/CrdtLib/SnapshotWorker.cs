@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using CrdtLib.Changes;
 using CrdtLib.Db;
 using CrdtLib.Entities;
@@ -64,16 +65,26 @@ public class SnapshotWorker
                 IObjectBase entity;
                 var snapshot = await GetSnapshot(commitChange.EntityId);
                 var changeContext = new ChangeContext(commit, this, _crdtRepository);
+                bool wasDeleted;
                 if (snapshot is not null)
                 {
                     entity = snapshot.Entity.Copy();
+                    wasDeleted = entity.DeletedAt.HasValue;
                 }
                 else
                 {
                     entity = commitChange.Change.NewEntity(commit);
+                    wasDeleted = false;
                 }
 
                 await commitChange.Change.ApplyChange(entity, changeContext);
+
+                var deletedByChange = !wasDeleted && entity.DeletedAt.HasValue;
+                if (deletedByChange)
+                {
+                    await MarkDeleted(entity.Id, commit);
+                }
+
                 //to get the state in a point in time we would have to find a snapshot before that time, then apply any commits that came after that snapshot but still before the point in time.
                 //we would probably want the most recent snapshot to always follow current, so we might need to track the number of changes a given snapshot represents so we can 
                 //decide when to create a new snapshot instead of replacing one inline. This would be done by using the current snapshots parent, instead of the snapshot itself.
@@ -91,6 +102,45 @@ public class SnapshotWorker
 
                 var newSnapshot = new ObjectSnapshot(entity, commit, snapshot is null);
                 AddSnapshot(newSnapshot);
+            }
+        }
+    }
+
+    /// <summary>
+    /// responsible for removing references to the deleted entity from other entities
+    /// </summary>
+    /// <param name="deletedEntityId"></param>
+    /// <param name="commit"></param>
+    private async ValueTask MarkDeleted(Guid deletedEntityId, Commit commit)
+    {
+        Expression<Func<ObjectSnapshot, bool>> predicateExpression =
+            snapshot => snapshot.References.Contains(deletedEntityId);
+        var predicate = predicateExpression.Compile();
+
+        var toRemoveRefFromIds = new HashSet<Guid>(await _crdtRepository.CurrentSnapshots()
+            .Where(predicateExpression)
+            .Select(s => s.EntityId)
+            .ToArrayAsync());
+        //snapshots from the db might be out of date, we want to use the most up to date data in the worker as well
+        toRemoveRefFromIds.UnionWith(PendingSnapshots.Values.Where(predicate).Select(s => s.EntityId));
+        foreach (var entityId in toRemoveRefFromIds)
+        {
+            var snapshot = await GetSnapshot(entityId);
+            if (snapshot is null) throw new NullReferenceException("unable to find snapshot for entity " + entityId);
+            //could be different from what's in the db if a previous change has already updated it
+            if (!predicate(snapshot)) continue;
+            var updatedEntry = snapshot.Entity.Copy();
+            var wasDeleted = updatedEntry.DeletedAt.HasValue;
+
+            updatedEntry.RemoveReference(deletedEntityId, commit);
+            var deletedByRemoveRef = !wasDeleted && updatedEntry.DeletedAt.HasValue;
+
+            AddSnapshot(new ObjectSnapshot(updatedEntry, commit, false));
+
+            //we need to do this after we add the snapshot above otherwise we might get stuck in a loop of deletions
+            if (deletedByRemoveRef)
+            {
+                await MarkDeleted(updatedEntry.Id, commit);
             }
         }
     }

@@ -52,7 +52,6 @@ public class CreateSenseChange: Change<Sense>, ISelfNamedType<CreateSenseChange>
         if (await context.IsObjectDeleted(EntryId))
         {
             entity.DeletedAt = context.Commit.DateTime;
-            await context.MarkDeleted(EntityId);
         }
     }
 }

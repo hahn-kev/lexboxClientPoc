@@ -9,10 +9,10 @@ public class DeleteChange<T>(Guid entityId) : Change<T>(entityId), IPolyType
 {
     public static string TypeName => "delete:" + T.TypeName;
 
-    public override async ValueTask ApplyChange(T entity, ChangeContext context)
+    public override ValueTask ApplyChange(T entity, ChangeContext context)
     {
         entity.DeletedAt = context.Commit.DateTime;
-        await context.MarkDeleted(EntityId);
+        return ValueTask.CompletedTask;
     }
 
     public override IObjectBase NewEntity(Commit commit)

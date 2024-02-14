@@ -23,7 +23,6 @@ public class UpVoteCommentChange(Guid commentId): Change<UpVote>(Guid.NewGuid())
         if (await context.IsObjectDeleted(CommentId))
         {
             entity.DeletedAt = context.Commit.DateTime;
-            await context.MarkDeleted(EntityId);
         }
     }
 }
