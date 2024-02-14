@@ -1,10 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Linq.Expressions;
+using System.Text.Json;
 using CrdtLib;
 using CrdtLib.Changes;
 using CrdtLib.Db;
 using LcmCrdtModel.Changes;
 using lexboxClientContracts;
 using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 
 namespace LcmCrdtModel;
 
@@ -40,32 +42,43 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
 
     public async Task<lexboxClientContracts.Entry[]> GetEntries(QueryOptions? options = null)
     {
-        var entries = await dataModel
-            .GetLatestObjects<Entry>()
-            .OfType<lexboxClientContracts.Entry>()
-            .ToArrayAsync();
-        //todo very ugly n+1 query
-        foreach (var entry in entries)
-        {
-            entry.Senses = await dataModel.GetLatestObjects<Sense>(snapshot => snapshot.References.Contains(entry.Id))
-                .ToArrayAsync();
-            foreach (var sense in entry.Senses)
-            {
-                sense.ExampleSentences = await dataModel
-                    .GetLatestObjects<ExampleSentence>(snapshot => snapshot.References.Contains(sense.Id))
-                    .ToArrayAsync();
-            }
-        }
-
-        return entries;
+        return await GetEntries(predicate: null, options);
     }
 
     public async Task<lexboxClientContracts.Entry[]> SearchEntries(string query, QueryOptions? options = null)
     {
-        return await dataModel
-            .GetLatestObjects<Entry>()
-            .Where(e => e.LexemeForm.SearchValue(query))
+        return await GetEntries(e => e.LexemeForm.SearchValue(query), options);
+    }
+
+    private async Task<lexboxClientContracts.Entry[]> GetEntries(
+        Expression<Func<Entry, bool>>? predicate = null,
+        QueryOptions? options = null)
+    {
+        var queryable = dataModel.GetLatestObjects<Entry>().ToLinqToDB();
+        if (predicate is not null) queryable = queryable.Where(predicate);
+        var entries = await queryable
+            .OfType<lexboxClientContracts.Entry>()
             .ToArrayAsync();
+        var allSenses = await dataModel.GetLatestObjects<Sense>()
+            .Where(s => entries.Select(e => e.Id).Contains(s.EntryId))
+            .GroupBy(s => s.EntryId)
+            .ToDictionaryAsync(g => g.Key);
+        var allSenseIds = allSenses.Values.SelectMany(s => s, (_, sense) => sense.Id);
+        var allExampleSentences = await dataModel
+            .GetLatestObjects<ExampleSentence>()
+            .Where(e => allSenseIds.Contains(e.SenseId))
+            .GroupBy(s => s.SenseId)
+            .ToDictionaryAsync(g => g.Key);
+        foreach (var entry in entries)
+        {
+            entry.Senses = allSenses.TryGetValue(entry.Id, out var senses) ? senses.ToArray() : [];
+            foreach (var sense in entry.Senses)
+            {
+                sense.ExampleSentences = allExampleSentences.TryGetValue(sense.Id, out var sentences) ? sentences.ToArray() : [];
+            }
+        }
+
+        return entries;
     }
 
     public async Task<lexboxClientContracts.Entry> GetEntry(Guid id)
@@ -77,11 +90,12 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         var exampleSentences = await dataModel
             .GetLatestObjects<ExampleSentence>()
             .Where(e => senses.Select(s => s.Id).Contains(e.SenseId))
-            .ToArrayAsync();
+            .GroupBy(s => s.SenseId)
+            .ToDictionaryAsync(g => g.Key);
         entry.Senses = senses;
         foreach (var sense in senses)
         {
-            sense.ExampleSentences = exampleSentences.Where(s => s.SenseId == sense.Id).ToArray();
+            sense.ExampleSentences = exampleSentences.TryGetValue(sense.Id, out var sentences) ? sentences.ToArray() : [];
         }
 
         return entry;
@@ -104,7 +118,8 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return await GetEntry(entry.Id);
     }
 
-    public async Task<lexboxClientContracts.Entry> UpdateEntry(Guid id, UpdateObjectInput<lexboxClientContracts.Entry> update)
+    public async Task<lexboxClientContracts.Entry> UpdateEntry(Guid id,
+        UpdateObjectInput<lexboxClientContracts.Entry> update)
     {
         var patchChange = new JsonPatchChange<Entry>(id, update.Patch, jsonOptions);
         await dataModel.Add(new Commit
@@ -139,7 +154,9 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return await dataModel.GetLatest<Sense>(sense.Id);
     }
 
-    public async Task<lexboxClientContracts.Sense> UpdateSense(Guid entryId, Guid senseId, UpdateObjectInput<lexboxClientContracts.Sense> update)
+    public async Task<lexboxClientContracts.Sense> UpdateSense(Guid entryId,
+        Guid senseId,
+        UpdateObjectInput<lexboxClientContracts.Sense> update)
     {
         var patchChange = new JsonPatchChange<Sense>(senseId, update.Patch, jsonOptions);
         await dataModel.Add(new Commit(Guid.NewGuid())
