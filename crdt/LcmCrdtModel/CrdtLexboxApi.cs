@@ -1,13 +1,10 @@
-﻿using System.Linq.Expressions;
-using System.Text.Json;
+﻿using System.Text.Json;
 using CrdtLib;
 using CrdtLib.Changes;
 using CrdtLib.Db;
 using LcmCrdtModel.Changes;
 using lexboxClientContracts;
-using LinqToDB.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using SystemTextJsonPatch;
+using LinqToDB;
 
 namespace LcmCrdtModel;
 
@@ -67,10 +64,8 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
     {
         return await dataModel
             .GetLatestObjects<Entry>()
-            .ToLinqToDB()
-            //todo, make this better
-            .Where(e => Json.Value(e.LexemeForm, ms => ms.Values["en"]).Contains(query))
-            .ToArrayAsyncLinqToDB();
+            .Where(e => e.LexemeForm.SearchValue(query))
+            .ToArrayAsync();
     }
 
     public async Task<lexboxClientContracts.Entry> GetEntry(Guid id)
