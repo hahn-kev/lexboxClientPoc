@@ -76,11 +76,12 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
     public async Task<lexboxClientContracts.Entry> GetEntry(Guid id)
     {
         var entry = await dataModel.GetLatest<Entry>(id);
-        var senses = await dataModel.GetLatestObjects<Sense>(snapshot => snapshot.References.Contains(id))
+        var senses = await dataModel.GetLatestObjects<Sense>()
+            .Where(s => s.EntryId == id)
             .ToArrayAsync();
         var exampleSentences = await dataModel
-            .GetLatestObjects<ExampleSentence>(
-                snapshot => snapshot.References.Intersect(senses.Select(s => s.Id)).Any())
+            .GetLatestObjects<ExampleSentence>()
+            .Where(e => senses.Select(s => s.Id).Contains(e.SenseId))
             .ToArrayAsync();
         entry.Senses = senses;
         foreach (var sense in senses)

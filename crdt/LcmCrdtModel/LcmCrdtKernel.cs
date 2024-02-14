@@ -25,7 +25,7 @@ public static class LcmCrdtKernel
         //attemping to allow us to not have to manually use Json.Value in our code
         // LinqToDB.Linq.Expressions.MapMember((MultiString multiString, string ws) => multiString.Values[ws], (multiString, ws) => Json.Value(multiString, ms => ms.Values[ws]));
         // LinqToDB.Linq.Expressions.MapMember((MultiString multiString, string ws) => multiString.Values[(WritingSystemId)ws], (multiString, ws) => Json.Value(multiString, ms => ms.Values[(WritingSystemId)ws]));
-        LinqToDB.Linq.Expressions.MapMember((MultiString multiString, WritingSystemId ws) => multiString.Values[ws], (multiString, ws) => Json.Value(multiString, ms => ms.Values[ws]));
+        // LinqToDB.Linq.Expressions.MapMember((MultiString multiString, WritingSystemId ws) => multiString.Values[ws], (multiString, ws) => Json.Value(multiString, ms => ms.Values[ws]));
         services.AddCrdtData(
             builder => builder.UseSqlite($"Data Source={dbPath}").UseLinqToDB(optionsBuilder =>
             {
