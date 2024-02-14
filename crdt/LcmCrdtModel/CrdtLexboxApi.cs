@@ -33,12 +33,12 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
 
     public Task<string[]> GetExemplars()
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public Task<lexboxClientContracts.Entry[]> GetEntries(string exemplar, QueryOptions? options = null)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public async Task<lexboxClientContracts.Entry[]> GetEntries(QueryOptions? options = null)

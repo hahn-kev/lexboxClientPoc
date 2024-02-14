@@ -2,6 +2,7 @@
 using CrdtLib.Entities;
 using CrdtLib.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 
@@ -160,25 +161,48 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
         foreach (var objectSnapshot in snapshots)
         {
             _dbContext.Snapshots.Add(objectSnapshot);
-            SnapshotAdded(objectSnapshot);
+            await SnapshotAdded(objectSnapshot);
         }
 
         await _dbContext.SaveChangesAsync();
     }
 
-    public void AddIfNew(ObjectSnapshot snapshot)
+    public async ValueTask AddIfNew(IEnumerable<ObjectSnapshot> snapshots)
     {
-        if (!_dbContext.Snapshots.Local.Contains(snapshot))
+        foreach (var snapshot in snapshots)
         {
+            if (_dbContext.Snapshots.Local.Contains(snapshot)) continue;
             _dbContext.Snapshots.Add(snapshot);
-            SnapshotAdded(snapshot);
+            await SnapshotAdded(snapshot);
         }
     }
 
-    private void SnapshotAdded(ObjectSnapshot objectSnapshot)
+    private async ValueTask SnapshotAdded(ObjectSnapshot objectSnapshot)
     {
-        if (crdtConfig.Value.EnableProjectedTables)
-            _dbContext.Add(objectSnapshot.Entity).Property("SnapshotId").CurrentValue = objectSnapshot.Id;
+        if (!crdtConfig.Value.EnableProjectedTables) return;
+        EntityEntry? existingEntry = null;
+        if (!objectSnapshot.IsRoot)
+        {
+            existingEntry = await GetEntityEntry(objectSnapshot);
+        }
+
+        if (existingEntry is not null)
+        {
+            existingEntry.CurrentValues.SetValues(objectSnapshot.Entity);
+            existingEntry.Property("SnapshotId").CurrentValue = objectSnapshot.Id;
+        }
+        else
+        {
+            _dbContext.Add((object)objectSnapshot.Entity).Property("SnapshotId").CurrentValue = objectSnapshot.Id;
+        }
+    }
+    
+    private async ValueTask<EntityEntry?> GetEntityEntry(ObjectSnapshot objectSnapshot)
+    {
+        if (!crdtConfig.Value.EnableProjectedTables) return null;
+        var entityType = objectSnapshot.Entity.GetType();
+        var entity = await _dbContext.FindAsync(entityType, objectSnapshot.EntityId);
+        return entity is not null ? _dbContext.Entry(entity) : null;
     }
     
     public CrdtRepository GetScopedRepository(DateTimeOffset newCurrentTime)

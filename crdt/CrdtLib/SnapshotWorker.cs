@@ -14,7 +14,8 @@ public class SnapshotWorker
     private readonly IReadOnlyDictionary<Guid, SimpleSnapshot>? _snapshots;
     private readonly CrdtRepository _crdtRepository;
     private readonly SimpleSnapshot? _oldestSnapshot;
-    public Dictionary<Guid, ObjectSnapshot> PendingSnapshots { get; } = new();
+    public Dictionary<Guid, ObjectSnapshot> PendingSnapshots { get; } = [];
+    private readonly List<ObjectSnapshot> _newIntermediateSnapshots = [];
 
     public SnapshotWorker(Dictionary<Guid, ObjectSnapshot> snapshots, CrdtRepository crdtRepository)
     {
@@ -42,7 +43,9 @@ public class SnapshotWorker
                 || c.DateTime > _oldestSnapshot.DateTime)
             .Include(c => c.ChangeEntities).ToArrayAsync();
         await ApplyCommitChanges(commits, true);
-
+        
+        //intermediate snapshots should be added first, as the last snapshot added for an entity will be used in the projected tables
+        await _crdtRepository.AddIfNew(_newIntermediateSnapshots);
         await _crdtRepository.AddSnapshots(PendingSnapshots.Values);
     }
 
@@ -97,7 +100,7 @@ public class SnapshotWorker
                 //for now just skip every other change
                 if (snapshot is not null && (snapshot.IsRoot || commitIndex % 2 == 0))
                 {
-                    _crdtRepository.AddIfNew(snapshot);
+                    _newIntermediateSnapshots.Add(snapshot);
                 }
 
                 var newSnapshot = new ObjectSnapshot(entity, commit, snapshot is null);
