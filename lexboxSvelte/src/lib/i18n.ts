@@ -1,6 +1,6 @@
-import type { WellKnownFieldId } from "./types";
+import type { FieldConfig, WellKnownFieldId } from "./types";
 
-export const i18n: Record<WellKnownFieldId, string> = {
+const wellKnownFieldsI18n: Record<WellKnownFieldId, string> = {
   "lexemeForm": "Lexeme form",
   "citationForm": "Citation form",
   "literalMeaning": "Literal meaning",
@@ -13,3 +13,7 @@ export const i18n: Record<WellKnownFieldId, string> = {
   "translation": "Translation",
   "reference": "Reference",
 };
+
+export function fieldName(fieldConfig: FieldConfig): string {
+  return 'name' in fieldConfig ? fieldConfig.name : wellKnownFieldsI18n[fieldConfig.id as WellKnownFieldId];
+}

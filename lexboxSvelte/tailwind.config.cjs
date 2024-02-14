@@ -24,8 +24,8 @@ module.exports = {
         "base": colors.slate,
         "base-content": "#fff",
         "info": "#89e0eb",
-        "success": "#addfad",
-        "warning": "#f1c891",
+        "success": "#00b400",
+        "warning": "#ed9419",
         "error": "#ffbbbd",
       },
     }, {

@@ -7,17 +7,17 @@ export type WritingSystemSelection = WritingSystemType | `first-${WritingSystemT
 export type FieldType = 'multi' | 'single' | 'option' | 'multi-option';
 export type WellKnownFieldId = Exclude<keyof (IEntry & ISense & IExampleSentence), 'id' | 'exampleSentences' | 'senses'>
 
-type FieldConfig = {
+type BaseFieldConfig = {
   type: FieldType;
   id: string;
   ws: WritingSystemSelection;
 }
 
-export type CustomFieldConfig = FieldConfig & {
+export type CustomFieldConfig = BaseFieldConfig & {
   name: string;
 }
 
-export type EntityFieldConfig<T extends {}> = ({
+export type BaseEntityFieldConfig<T> = (({
   type: 'multi';
   id: ConditionalKeys<T, IMultiString>;
 } | {
@@ -34,4 +34,7 @@ export type EntityFieldConfig<T extends {}> = ({
   optionType: string;
   id: ConditionalKeys<T, string[]>;
   ws: `first-${WritingSystemType}`;
-}) & FieldConfig & { id: WellKnownFieldId};
+}) & BaseFieldConfig & { id: WellKnownFieldId});
+
+export type EntityFieldConfig = BaseEntityFieldConfig<IEntry> | BaseEntityFieldConfig<ISense> | BaseEntityFieldConfig<IExampleSentence>;
+export type FieldConfig = EntityFieldConfig | CustomFieldConfig;

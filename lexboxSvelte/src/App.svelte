@@ -2,24 +2,36 @@
   import {
     AppBar,
     Button,
+    ButtonGroup,
     Checkbox,
     Dialog,
     Field,
     ListItem,
+    MultiSelectField,
+    MultiSelectOption,
     TextField,
+    ToggleGroup,
     cls,
   } from "svelte-ux";
   import { mdiMagnify, mdiCog } from "@mdi/js";
   import Editor from "./lib/Editor.svelte";
   import { firstDefVal, firstVal } from "./lib/utils";
   import { allFields } from "./lib/config-data";
-  import { i18n } from "./lib/i18n";
+  import { fieldName } from "./lib/i18n";
   import { LexboxServiceProvider, LexboxServices } from "./lib/services/service-provider";
   import type { LexboxApi } from "./lib/services/lexbox-api";
   import { entries as mockEntries, writingSystems as mockWritingSystems } from "./lib/entry-data";
   import type { IEntry, WritingSystems } from "./lib/mini-lcm";
   import { setContext } from "svelte";
   import { writable } from "svelte/store";
+
+  const demoValues = writable<{
+    generateExternalChanges: boolean,
+  }>({
+    generateExternalChanges: false,
+  });
+
+  setContext("demoValues", demoValues);
 
   const lexboxApi = LexboxServiceProvider.getService<LexboxApi>(LexboxServices.LexboxApi);
 
@@ -43,11 +55,20 @@
 
   $: filteredFields = allFields.filter(
     (field) =>
-      !fieldSearch || ("name" in field ? field.name : i18n[field.id])?.toLocaleLowerCase().includes(fieldSearch.toLocaleLowerCase())
+      !fieldSearch || fieldName(field)?.toLocaleLowerCase().includes(fieldSearch.toLocaleLowerCase())
   );
+
+  const options = [
+    { name: 'One', value: 1 },
+    { name: 'Two', value: 2 },
+    { name: 'Three', value: 3 },
+    { name: 'Four', value: 4 },
+  ];
+
+  let value = [3];
 </script>
 
-<div class="min-h-full flex flex-col">
+<div class="min-h-full_ flex flex-col">
   <AppBar title="Lexbox Svelte" class="bg-accent-300">
     <div class="flex-grow"></div>
     <Field
@@ -60,6 +81,8 @@
     <div slot="actions"></div>
   </AppBar>
 
+  <MultiSelectField {options} {value} on:change={(e) => (value = e.detail.value)} />
+
   <main class="p-8 flex-grow flex flex-col">
     <div
       class="grid flex-grow"
@@ -68,7 +91,10 @@
       <h2 class="flex text-2xl font-semibold col-span-2">
         Welcome to LexBox Svelte
         <div class="flex-grow"></div>
-        <div class="mr-12">
+        <div class="mr-12 flex gap-4">
+          <Checkbox bind:checked={$demoValues.generateExternalChanges}>
+            Generate external changes
+          </Checkbox>
           <Button
             on:click={() => (showConfigDialog = true)}
             variant="outline"
@@ -131,7 +157,7 @@
     {#each filteredFields as field}
       <label for={field.id} class="contents">
         <ListItem
-          title={"name" in field ? field.name : i18n[field.id]}
+          title={fieldName(field)}
           subheading={`Type: ${field.type}. WS: ${field.ws}.`}
           class={cls("cursor-pointer", "hover:bg-accent-50")}
           noShadow>

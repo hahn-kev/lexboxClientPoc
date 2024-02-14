@@ -1,9 +1,8 @@
 <script lang="ts">
   import { ListItem, cls } from "svelte-ux";
-  import EntryEditor from "./EntryEditor.svelte";
-  import type { IEntry, WritingSystems } from "./mini-lcm";
-  import { getContext, setContext } from "svelte";
+  import type { IEntry } from "./mini-lcm";
   import { firstDefVal, firstVal } from "./utils";
+  import EntryEditor from "./entry-editor/EntryEditor.svelte";
 
   export let entries: IEntry[];
 
@@ -31,7 +30,7 @@
 
   {#if selectedEntry}
     <div id="entry" class="grid self-start pr-8 border-r-2" style="grid-template-columns: 170px 40px 1fr">
-      <EntryEditor on:change={() => {selectedEntry = selectedEntry; selectedEntry.senses = selectedEntry.senses;}} entry={selectedEntry} />
+      <EntryEditor on:change={() => {selectedEntry = selectedEntry; if (selectedEntry) selectedEntry.senses = selectedEntry.senses;}} entry={selectedEntry} />
     </div>
 
     <div class="min-w-48 flex flex-col flex-grow max-h-[calc(100vh - 30px) sticky top-[15px] self-start">
