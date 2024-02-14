@@ -104,7 +104,7 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         return new ModelSnapshot(await GetEntitySnapshots());
     }
 
-    public IQueryable<T> GetLatestObjects<T>(Expression<Func<ObjectSnapshot, bool>>? predicate = null) where T : IObjectBase
+    public IQueryable<T> GetLatestObjects<T>(Expression<Func<ObjectSnapshot, bool>>? predicate = null) where T : class, IObjectBase
     {
         return crdtRepository.GetCurrentObjects<T>(predicate);
     }
@@ -114,9 +114,11 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         return await crdtRepository.GetObjectBySnapshotId(snapshotId);
     }
 
-    private async Task<SimpleSnapshot[]> GetEntitySnapshots()
+    private async Task<SimpleSnapshot[]> GetEntitySnapshots(bool includeDeleted = false)
     {
-        var snapshots = await crdtRepository.CurrentSnapshots().Select(s =>
+        var queryable = crdtRepository.CurrentSnapshots();
+        if (!includeDeleted) queryable = queryable.Where(s => !s.EntityIsDeleted);
+        var snapshots = await queryable.Select(s =>
             new SimpleSnapshot(s.Id,
                 s.TypeName,
                 s.EntityId,

@@ -13,7 +13,7 @@ namespace Tests.LcmModelTests;
 
 public class BasicApiTests: IAsyncLifetime
 {
-    private ILexboxApi _api;
+    private CrdtLexboxApi _api;
 
     protected readonly ServiceProvider _services;
     public readonly DataModel DataModel;
@@ -97,6 +97,13 @@ public class BasicApiTests: IAsyncLifetime
                 }
             ]
         });
+        await _api.CreateEntry(new()
+        {
+            LexemeForm =
+            {
+                Values = { { "en", "apple" } }
+            }
+        });
     }
 
     public async Task DisposeAsync()
@@ -146,6 +153,7 @@ public class BasicApiTests: IAsyncLifetime
     {
         var entries = await _api.SearchEntries("a");
         entries.Should().NotBeEmpty();
+        entries.Should().NotContain(e => e.LexemeForm.Values["en"] == "Kevin");
     }
 
     [Fact]

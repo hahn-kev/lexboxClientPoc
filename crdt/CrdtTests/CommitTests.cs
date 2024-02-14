@@ -96,12 +96,12 @@ public class CommitTests
         var serializerOptions = new ServiceCollection()
             .AddCrdtDataSample(":memory:")
             .BuildServiceProvider().GetRequiredService<JsonSerializerOptions>();
-        var commit = new Commit()
+        var commit = new Commit
         {
             ClientId = Guid.NewGuid(),
             ChangeEntities =
             {
-                new ChangeEntity(new MakeCommentChange(Guid.NewGuid(), "test"))
+                new ChangeEntity(new SetAgeChange(Guid.NewGuid(), 3))
             }
         };
         commit.SetParentHash(Convert.ToHexString(XxHash64.Hash(Guid.NewGuid().ToByteArray())));

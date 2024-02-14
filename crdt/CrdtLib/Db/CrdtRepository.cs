@@ -48,13 +48,16 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
 
     public IQueryable<ObjectSnapshot> CurrentSnapshots()
     {
-        return _dbContext.Snapshots.Where(snapshot =>
-            _dbContext.Snapshots.GroupBy(s => s.EntityId,
-                    (entityId, snapshots) => snapshots
-                        .OrderByDescending(s => s.Commit.DateTime)
-                        .ThenBy(s => s.CommitId)
-                        .First(s => currentTime == null || s.Commit.DateTime <= currentTime).Id)
-                .Contains(snapshot.Id));
+        return _dbContext.Snapshots.Where(snapshot => CurrentSnapshotIds().Contains(snapshot.Id));
+    }
+
+    private IQueryable<Guid> CurrentSnapshotIds()
+    {
+        return _dbContext.Snapshots.GroupBy(s => s.EntityId,
+            (entityId, snapshots) => snapshots
+                .OrderByDescending(s => s.Commit.DateTime)
+                .ThenBy(s => s.CommitId)
+                .First(s => currentTime == null || s.Commit.DateTime <= currentTime).Id);
     }
 
     public async Task<(Dictionary<Guid, ObjectSnapshot> currentSnapshots, Commit[] pendingCommits)> GetCurrentSnapshotsAndPendingCommits()
@@ -106,8 +109,12 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
         return snapshot.Entity.Is<T>();
     }
 
-    public IQueryable<T> GetCurrentObjects<T>(Expression<Func<ObjectSnapshot, bool>>? predicate = null) where T : IObjectBase
+    public IQueryable<T> GetCurrentObjects<T>(Expression<Func<ObjectSnapshot, bool>>? predicate = null) where T : class, IObjectBase
     {
+        if (crdtConfig.Value.EnableProjectedTables && predicate is null)
+        {
+            return _dbContext.Set<T>().Where(e => CurrentSnapshotIds().Contains(EF.Property<Guid>(e, "SnapshotId")));
+        }
         var typeName = DerivedTypeHelper.GetEntityDiscriminator<T>();
         var queryable = CurrentSnapshots().Where(s => s.TypeName == typeName && !s.EntityIsDeleted);
         if (predicate is not null) queryable = queryable.Where(predicate);

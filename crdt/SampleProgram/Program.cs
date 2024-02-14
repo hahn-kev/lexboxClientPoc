@@ -36,10 +36,7 @@ await localModel.AddRange(new[]
                 }
             ),
             new ChangeEntity(
-                new MakeCommentChange(entry2Id)
-                {
-                    Comment = "Hello Entry 2"
-                }
+                new SetAgeChange(entry2Id, 4)
             )
         }
     },
@@ -54,7 +51,7 @@ await localModel.AddRange(new[]
                 {
                     Values =
                     {
-                        { nameof(Entry.Comment), "This is a comment" }
+                        { nameof(Entry.Age), 20 }
                     }
                 })
         }

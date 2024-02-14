@@ -13,12 +13,20 @@ public class CrdtDbContext(
     JsonSerializerOptions jsonSerializerOptions)
     : DbContext(options)
 {
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        foreach (var modelConvention in crdtConfig.Value.ObjectTypeListBuilder.ModelConventions)
+        {
+            modelConvention.Invoke(configurationBuilder);
+        }
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         var commitEntity = builder.Entity<Commit>();
         commitEntity.HasKey(c => c.Id);
-        commitEntity.Property(c => c.DateTime).HasConversion(
-            d => d.ToUniversalTime().DateTime,
+        commitEntity.Property(c => (DateTimeOffset?)c.DateTime).HasConversion(
+            d => d.Value.ToUniversalTime().DateTime,
             d => new DateTimeOffset(d, TimeSpan.Zero)
         );
         commitEntity.HasMany(c => c.ChangeEntities)

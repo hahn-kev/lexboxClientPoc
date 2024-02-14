@@ -34,9 +34,8 @@ public record Entry : IObjectBase<Entry>, INewableObject<Entry>
     {
         return this with { };
     }
-
-    public string? Comment { get; set; }
     public string? Value { get; set; }
+    public int Age { get; set; } = 0;
     public DateTime? FirstUsed { get; set; }
 
     private YDoc _yDoc = new YDoc();

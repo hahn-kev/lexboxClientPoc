@@ -80,4 +80,26 @@ public class DataModelReferenceTests : DataModelTestBase
         var entry = await DataModel.GetLatest<Entry>(entityId3);
         entry.EntryReference.Should().BeNull();
     }
+
+    [Fact]
+    public async Task CommentChainGetsDeleted()
+    {
+        var entry1 = Guid.NewGuid();
+        await WriteNextChange(SimpleChange(entry1, "entry1"));
+        var comment1 = new CommentOnEntryChange("hello 1", entry1);
+        var comment1Id = comment1.EntityId;
+        await WriteNextChange(comment1);
+        var upvote = new UpVoteCommentChange(comment1Id);
+        var upvoteId = upvote.EntityId;
+        await WriteNextChange(upvote);
+
+        await WriteNextChange(new DeleteChange<Entry>(entry1));
+
+        var snapshot = await DataModel.GetSnapshot();
+        snapshot.Snapshots.Should().NotContainKeys(
+            entry1,
+            comment1Id,
+            upvoteId
+        );
+    }
 }
