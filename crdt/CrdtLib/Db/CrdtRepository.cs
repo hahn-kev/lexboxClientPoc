@@ -186,6 +186,12 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
             existingEntry = await GetEntityEntry(objectSnapshot);
         }
 
+        if (objectSnapshot.EntityIsDeleted)
+        {
+            if (existingEntry is not null) _dbContext.Remove(existingEntry.Entity);
+            return;
+        }
+
         if (existingEntry is not null)
         {
             existingEntry.CurrentValues.SetValues(objectSnapshot.Entity);

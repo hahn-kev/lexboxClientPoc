@@ -15,6 +15,7 @@ public class BasicApiTests: IAsyncLifetime
 {
     private CrdtLexboxApi _api;
     private Guid _entry1Id = new Guid("a3f5aa5a-578f-4181-8f38-eaaf27f01f1c");
+    private Guid _entry2Id = new Guid("2de6c334-58fa-4844-b0fd-0bc2ce4ef835");
 
     protected readonly ServiceProvider _services;
     public readonly DataModel DataModel;
@@ -101,6 +102,7 @@ public class BasicApiTests: IAsyncLifetime
         });
         await _api.CreateEntry(new()
         {
+            Id = _entry2Id,
             LexemeForm =
             {
                 Values = { { "en", "apple" } }
@@ -128,7 +130,7 @@ public class BasicApiTests: IAsyncLifetime
     }
 
     [Fact(Skip = "not implemented")]
-    public async Task GetEntries()
+    public async Task GetEntriesByExemplar()
     {
         var entries = await _api.GetEntries("a");
         entries.Should().NotBeEmpty();
@@ -142,12 +144,17 @@ public class BasicApiTests: IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetEntriesWithoutExemplar()
+    public async Task GetEntries()
     {
         var entries = await _api.GetEntries();
         entries.Should().NotBeEmpty();
-        var entry = entries.First();
-        entry.LexemeForm.Values.Should().NotBeEmpty();
+        var entry1 = entries.First(e => e.Id == _entry1Id);
+        entry1.LexemeForm.Values.Should().NotBeEmpty();
+        entry1.Senses.Should().NotBeEmpty();
+
+        var entry2 = entries.First(e => e.Id == _entry2Id);
+        entry2.LexemeForm.Values.Should().NotBeEmpty();
+        entry2.Senses.Should().BeEmpty();
     }
 
     [Fact]
@@ -161,8 +168,7 @@ public class BasicApiTests: IAsyncLifetime
     [Fact]
     public async Task GetEntry()
     {
-        var entries = await _api.GetEntries();
-        var entry = await _api.GetEntry(entries.First().Id);
+        var entry = await _api.GetEntry(_entry1Id);
         entry.Should().NotBeNull();
         entry.LexemeForm.Values.Should().NotBeEmpty();
         var sense = entry.Senses.Should()
