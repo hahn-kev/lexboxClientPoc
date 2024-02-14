@@ -114,7 +114,7 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
     {
         if (crdtConfig.Value.EnableProjectedTables && predicate is null)
         {
-            return _dbContext.Set<T>().Where(e => CurrentSnapshotIds().Contains(EF.Property<Guid>(e, "SnapshotId")));
+            return _dbContext.Set<T>().Where(e => CurrentSnapshotIds().Contains(EF.Property<Guid>(e, ObjectSnapshot.ShadowRefName)));
         }
         var typeName = DerivedTypeHelper.GetEntityDiscriminator<T>();
         var queryable = CurrentSnapshots().Where(s => s.TypeName == typeName && !s.EntityIsDeleted);
@@ -195,11 +195,11 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
         if (existingEntry is not null)
         {
             existingEntry.CurrentValues.SetValues(objectSnapshot.Entity);
-            existingEntry.Property("SnapshotId").CurrentValue = objectSnapshot.Id;
+            existingEntry.Property(ObjectSnapshot.ShadowRefName).CurrentValue = objectSnapshot.Id;
         }
         else
         {
-            _dbContext.Add((object)objectSnapshot.Entity).Property("SnapshotId").CurrentValue = objectSnapshot.Id;
+            _dbContext.Add((object)objectSnapshot.Entity).Property(ObjectSnapshot.ShadowRefName).CurrentValue = objectSnapshot.Id;
         }
     }
     

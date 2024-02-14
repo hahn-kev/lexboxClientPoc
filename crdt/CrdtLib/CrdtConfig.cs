@@ -81,7 +81,7 @@ public class ObjectTypeListBuilder
             entity.HasKey(e => e.Id);
             entity.HasOne<ObjectSnapshot>()
                 .WithOne()
-                .HasForeignKey<TDerived>("SnapshotId")
+                .HasForeignKey<TDerived>(ObjectSnapshot.ShadowRefName)
                 .IsRequired();
 
             entity.Property(e => e.DeletedAt);

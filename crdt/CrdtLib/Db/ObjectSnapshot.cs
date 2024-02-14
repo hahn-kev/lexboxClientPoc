@@ -31,6 +31,8 @@ public record SimpleSnapshot(
 
 public class ObjectSnapshot
 {
+    //determines column name used in projected object tables, changing this will require a migration
+    public const string ShadowRefName = "SnapshotId";
     [JsonConstructor]
     protected ObjectSnapshot()
     {
