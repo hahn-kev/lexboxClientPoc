@@ -6,3 +6,5 @@ riderModule.iml
 .vs/
 node_modules/
 *.sqlite
+# Verify files
+*.received.*

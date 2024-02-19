@@ -38,6 +38,11 @@ public class DataModelTestBase : IAsyncLifetime
         return await WriteChange(_localClientId, NextDate(), change, add);
     }
 
+    public async ValueTask<Commit> WriteNextChange(IEnumerable<IChange> changes, bool add = true)
+    {
+        return await WriteChange(_localClientId, NextDate(), changes, add);
+    }
+
     public async ValueTask<Commit> WriteChangeAfter(Commit after, IChange change)
     {
         return await WriteChange(_localClientId, after.DateTime.AddHours(1), change);
@@ -48,16 +53,21 @@ public class DataModelTestBase : IAsyncLifetime
         return await WriteChange(_localClientId, after.DateTime.AddHours(-1), change, add);
     }
 
-    protected async ValueTask<Commit> WriteChange(Guid clientId, DateTimeOffset dateTime, IChange change, bool add = true)
+    protected async ValueTask<Commit> WriteChange(Guid clientId,
+        DateTimeOffset dateTime,
+        IChange change,
+        bool add = true)
+    {
+        return await WriteChange(clientId, dateTime, [change], add);
+    }
+    
+    protected async ValueTask<Commit> WriteChange(Guid clientId, DateTimeOffset dateTime, IEnumerable<IChange> change, bool add = true)
     {
         var commit = new Commit
         {
             ClientId = clientId,
             DateTime = dateTime,
-            ChangeEntities =
-            {
-                new ChangeEntity(change)
-            }
+            ChangeEntities = change.Select(c => new ChangeEntity(c)).ToList()
         };
         if (add) await DataModel.Add(commit);
         return commit;

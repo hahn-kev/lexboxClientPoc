@@ -1,3 +1,4 @@
+using Argon;
 using CrdtSample.Changes;
 using CrdtSample.Models;
 using CrdtLib.Changes;
@@ -17,6 +18,13 @@ public class DataModelSimpleChanges : DataModelTestBase
         await WriteNextChange(SimpleChange(_entity1Id, "test-value"));
         var snapshot = DbContext.Snapshots.Should().ContainSingle().Subject;
         snapshot.Entity.Is<Entry>().Value.Should().Be("test-value");
+    }
+
+    [Fact]
+    public async Task WritingACommitWithMultipleChangesWorks()
+    {
+        await WriteNextChange([SimpleChange(_entity1Id, "test-value"), SimpleChange(_entity2Id, "test-value")]);
+        await Verify(DbContext.AllData());
     }
 
     [Fact]
