@@ -1,9 +1,11 @@
 ﻿using System.Text.Json.Serialization.Metadata;
 using AppLayer.Api;
 using CrdtLib;
+using CrdtLib.Db;
 using LcmCrdtModel;
 using Lexbox.ClientServer.Hubs;
 using lexboxClientContracts;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
@@ -30,7 +32,7 @@ builder.Services.AddOptions<JsonHubProtocolOptions>().PostConfigure<IOptions<Crd
 });
 var useCrdt = true;
 if (useCrdt)
-    builder.Services.AddLcmCrdtClient("tmp.sqlite");
+    builder.Services.AddLcmCrdtClient("tmp.sqlite", builder.Services.BuildServiceProvider().GetService<ILoggerFactory>());
 else
 {
     var api = await LexboxLcmApiFactory.CreateApi(@"C:\ProgramData\SIL\FieldWorks\Projects\sena-3\sena-3.fwdata",
@@ -51,6 +53,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.Map("/api/entries", (ILexboxApi api) => api.GetEntries()).WithName("GetEntries").WithOpenApi();
+app.Map("/api/commits", (CrdtDbContext db) => db.Commits.ToArrayAsyncEF());
 app.MapHub<LexboxApiHub>("/api/hub/project");
 app.Run();

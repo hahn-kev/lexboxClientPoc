@@ -9,12 +9,20 @@ namespace CrdtSample;
 
 public static class CrdtSampleKernel
 {
-    public static IServiceCollection AddCrdtDataSample(this IServiceCollection services, string dbPath)
+    public static IServiceCollection AddCrdtDataSample(this IServiceCollection services,
+        string dbPath,
+        bool enableProjectedTables = true)
     {
         services.AddCrdtData(
-            builder => builder.UseSqlite($"Data Source={dbPath}"),
+            builder =>
+            {
+                builder.UseSqlite($"Data Source={dbPath}");
+                builder.EnableDetailedErrors();
+                builder.EnableSensitiveDataLogging();
+            },
             config =>
             {
+                config.EnableProjectedTables = enableProjectedTables;
                 config.ChangeTypeListBuilder.Add<DeleteChange<Entry>>()
                     .Add<SimpleChange>()
                     .Add<SetAgeChange>()

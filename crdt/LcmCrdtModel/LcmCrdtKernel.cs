@@ -6,6 +6,7 @@ using CrdtLib.Entities;
 using LcmCrdtModel.Changes;
 using lexboxClientContracts;
 using LinqToDB;
+using LinqToDB.AspNet.Logging;
 using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
 using LinqToDB.Mapping;
@@ -13,12 +14,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace LcmCrdtModel;
 
 public static class LcmCrdtKernel
 {
-    public static IServiceCollection AddLcmCrdtClient(this IServiceCollection services, string dbPath)
+    public static IServiceCollection AddLcmCrdtClient(this IServiceCollection services, string dbPath, ILoggerFactory? loggerFactory = null)
     {
         LinqToDBForEFTools.Initialize();
         
@@ -36,6 +38,8 @@ public static class LcmCrdtKernel
                     DataType = DataType.Text
                 });
                 optionsBuilder.AddMappingSchema(mappingSchema);
+                if (loggerFactory is not null)
+                optionsBuilder.AddCustomOptions(dataOptions => dataOptions.UseLoggerFactory(loggerFactory));
             }),
             config =>
             {
