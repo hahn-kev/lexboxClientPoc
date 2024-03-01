@@ -26,6 +26,18 @@ public class DataModelSimpleChanges : DataModelTestBase
         await WriteNextChange([SimpleChange(_entity1Id, "test-value"), SimpleChange(_entity2Id, "test-value")]);
         await Verify(DbContext.AllData());
     }
+    [Fact]
+    public async Task WriteMultipleCommits()
+    {
+        await WriteNextChange(SimpleChange(Guid.NewGuid(), "change 1"));
+        await WriteNextChange(SimpleChange(Guid.NewGuid(), "change 2"));
+        DbContext.Snapshots.Should().HaveCount(2);
+        await Verify(DbContext.Commits);
+        
+        await WriteNextChange(SimpleChange(Guid.NewGuid(), "change 3"));
+        DbContext.Snapshots.Should().HaveCount(3);
+        DataModel.GetLatestObjects<Entry>().Should().HaveCount(3);
+    }
 
     [Fact]
     public async Task WritingNoChangesWorks()

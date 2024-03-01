@@ -48,9 +48,9 @@ public class DataModelTestBase : IAsyncLifetime
         return await WriteChange(_localClientId, after.DateTime.AddHours(1), change);
     }
 
-    public async ValueTask<Commit> WriteChangeBefore(Commit after, IChange change, bool add = true)
+    public async ValueTask<Commit> WriteChangeBefore(Commit before, IChange change, bool add = true)
     {
-        return await WriteChange(_localClientId, after.DateTime.AddHours(-1), change, add);
+        return await WriteChange(_localClientId, before.DateTime.AddHours(-1), change, add);
     }
 
     protected async ValueTask<Commit> WriteChange(Guid clientId,
