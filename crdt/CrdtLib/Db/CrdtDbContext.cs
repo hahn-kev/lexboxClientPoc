@@ -36,7 +36,7 @@ public class CrdtDbContext(
         snapshotObject.HasKey(s => s.Id);
         snapshotObject
             .HasOne(s => s.Commit)
-            .WithMany()
+            .WithMany(c => c.Snapshots)
             .HasForeignKey(s => s.CommitId);
         snapshotObject.Property(s => s.Entity)
             .HasColumnType("jsonb")

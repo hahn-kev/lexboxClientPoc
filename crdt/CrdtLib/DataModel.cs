@@ -15,6 +15,7 @@ public interface ISyncable
     Task<SyncState> GetSyncState();
     Task<ChangesResult> GetChanges(SyncState otherHeads);
     Task<SyncResults> SyncWith(ISyncable remoteModel);
+    Task SyncMany(ISyncable[] remotes);
 }
 
 public record SyncState(Dictionary<Guid, long> ClientHeads);
@@ -169,5 +170,10 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
     public async Task<SyncResults> SyncWith(ISyncable remoteModel)
     {
         return await SyncHelper.SyncWith(this, remoteModel, serializerOptions);
+    }
+
+    public async Task SyncMany(ISyncable[] remotes)
+    {
+        await SyncHelper.SyncMany(this, remotes, serializerOptions);
     }
 }

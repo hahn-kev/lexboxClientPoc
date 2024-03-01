@@ -1,0 +1,21 @@
+﻿{
+  "solution": {
+    "path": "lexboxClientPoc.sln",
+    "projects": [
+      "AppLayer\\AppLayer.csproj",
+      "crdt\\CrdtLib\\CrdtLib.csproj",
+      "crdt\\CrdtSample\\CrdtSample.csproj",
+      "crdt\\CrdtTests\\CrdtTests.csproj",
+      "crdt\\LcmCrdtModel\\LcmCrdtModel.csproj",
+      "crdt\\SampleProgram\\SampleProgram.csproj",
+      "crdt\\Ycs\\Ycs.csproj",
+      "Lexbox.ClientServer\\Lexbox.ClientServer.csproj",
+      "LexboxBlazorWeb\\LexboxBlazorWeb.Client\\LexboxBlazorWeb.Client.csproj",
+      "LexboxBlazorWeb\\LexboxBlazorWeb\\LexboxBlazorWeb.csproj",
+      "lexboxClientContracts\\lexboxClientContracts.csproj",
+      "lexboxContractTests\\lexboxContractTests.csproj",
+      "LexboxSync\\SyncLibTests\\SyncLibTests.csproj",
+      "LexboxSync\\SyncLib\\SyncLib.csproj"
+    ]
+  }
+}

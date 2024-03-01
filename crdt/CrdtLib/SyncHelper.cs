@@ -15,11 +15,11 @@ public static class SyncHelper
         ISyncable remoteModel,
         JsonSerializerOptions serializerOptions)
     {
-        var localHeads = await localModel.GetSyncState();
+        var localSyncState = await localModel.GetSyncState();
 
-        var (missingFromLocal, remoteHeads) = await remoteModel.GetChanges(localHeads);
+        var (missingFromLocal, remoteSyncState) = await remoteModel.GetChanges(localSyncState);
         //todo abort if local and remote heads are the same
-        var (missingFromRemote, _) = await localModel.GetChanges(remoteHeads);
+        var (missingFromRemote, _) = await localModel.GetChanges(remoteSyncState);
         if (localModel is DataModel && remoteModel is DataModel)
         {
             //cloning just to simulate the objects going over the wire
@@ -34,7 +34,7 @@ public static class SyncHelper
         return new SyncResults(missingFromLocal, missingFromRemote);
     }
 
-    public static async Task SyncMany(this ISyncable localModel, ISyncable[] remotes)
+    internal static async Task SyncMany(ISyncable localModel, ISyncable[] remotes, JsonSerializerOptions serializerOptions)
     {
         var localSyncState = await localModel.GetSyncState();
         var remoteSyncStates = new SyncState[remotes.Length];
@@ -42,6 +42,11 @@ public static class SyncHelper
         {
             var remote = remotes[i];
             var (missingFromLocal, remoteSyncState) = await remote.GetChanges(localSyncState);
+            if (localModel is DataModel && remote is DataModel)
+            {
+                //cloning just to simulate the objects going over the wire
+                missingFromLocal = Clone(missingFromLocal, serializerOptions);
+            }
             remoteSyncStates[i] = remoteSyncState;
             await localModel.AddRangeFromSync(missingFromLocal);
         }
@@ -51,6 +56,11 @@ public static class SyncHelper
             var remote = remotes[i];
             var remoteSyncState = remoteSyncStates[i];
             var (missingFromRemote, _) = await localModel.GetChanges(remoteSyncState);
+            if (localModel is DataModel && remote is DataModel)
+            {
+                //cloning just to simulate the objects going over the wire
+                missingFromRemote = Clone(missingFromRemote, serializerOptions);
+            }
             await remote.AddRangeFromSync(missingFromRemote);
         }
     }

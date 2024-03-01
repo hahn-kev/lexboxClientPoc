@@ -21,26 +21,10 @@
           $type: SimpleChange,
           Values: {
             $type: Dictionary<string, object>,
-            Value: first
+            Value: test-value
           },
           Id: Guid_3,
           EntityId: Guid_4,
-          EntityType: Entry
-        }
-      },
-      {
-        $type: ChangeEntity,
-        Id: Guid_5,
-        CommitId: Guid_1,
-        EntityId: Guid_6,
-        Change: {
-          $type: SimpleChange,
-          Values: {
-            $type: Dictionary<string, object>,
-            Value: second
-          },
-          Id: Guid_5,
-          EntityId: Guid_6,
           EntityType: Entry
         }
       }
@@ -48,32 +32,16 @@
     Snapshots: [
       {
         $type: ObjectSnapshot,
-        Id: Guid_7,
+        Id: Guid_5,
         TypeName: Entry,
         Entity: {
           $type: Entry,
           Id: Guid_4,
-          Value: first,
+          Value: test-value,
           YText: [],
           YTextBlob: AAAAAAAAAQAAAAAAAA==
         },
         EntityId: Guid_4,
-        EntityIsDeleted: false,
-        CommitId: Guid_1,
-        IsRoot: true
-      },
-      {
-        $type: ObjectSnapshot,
-        Id: Guid_8,
-        TypeName: Entry,
-        Entity: {
-          $type: Entry,
-          Id: Guid_6,
-          Value: second,
-          YText: [],
-          YTextBlob: AAAAAAAAAQAAAAAAAA==
-        },
-        EntityId: Guid_6,
         EntityIsDeleted: false,
         CommitId: Guid_1,
         IsRoot: true
@@ -83,14 +51,7 @@
   {
     $type: Entry,
     Id: Guid_4,
-    Value: first,
-    YText: [],
-    YTextBlob: AAAAAAAAAQAAAAAAAA==
-  },
-  {
-    $type: Entry,
-    Id: Guid_6,
-    Value: second,
+    Value: test-value,
     YText: [],
     YTextBlob: AAAAAAAAAQAAAAAAAA==
   }

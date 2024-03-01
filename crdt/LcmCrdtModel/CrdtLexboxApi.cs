@@ -10,10 +10,14 @@ using LinqToDB.EntityFrameworkCore;
 
 namespace LcmCrdtModel;
 
-public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOptions) : ILexboxApi
+public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOptions, CrdtDbContext dbContext) : ILexboxApi
 {
     //todo persist somewhere
     Guid ClientId = Guid.NewGuid();
+
+    private IQueryable<Entry> Entries => dataModel.GetLatestObjects<Entry>().ToLinqToDB();
+    private IQueryable<Sense> Senses => dataModel.GetLatestObjects<Sense>().ToLinqToDB();
+    private IQueryable<ExampleSentence> ExampleSentences => dataModel.GetLatestObjects<ExampleSentence>().ToLinqToDB();
 
     public Task<WritingSystems> GetWritingSystems()
     {
@@ -54,27 +58,28 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         Expression<Func<Entry, bool>>? predicate = null,
         QueryOptions? options = null)
     {
-        var queryable = dataModel.GetLatestObjects<Entry>().ToLinqToDB();
+        var queryable = Entries;
         if (predicate is not null) queryable = queryable.Where(predicate);
-        var entries = await queryable
-            .OfType<lexboxClientContracts.Entry>()
-            .ToArrayAsync();
-        var allSenses = await dataModel.GetLatestObjects<Sense>()
+        var entries = await queryable.ToArrayAsyncLinqToDB();
+        var allSenses = (await Senses
             .Where(s => entries.Select(e => e.Id).Contains(s.EntryId))
-            .GroupBy(s => s.EntryId)
-            .ToDictionaryAsync(g => g.Key);
+            .ToArrayAsync())
+            .ToLookup(s => s.EntryId)
+            .ToDictionary(g => g.Key, g => g.ToArray());
         var allSenseIds = allSenses.Values.SelectMany(s => s, (_, sense) => sense.Id);
-        var allExampleSentences = await dataModel
-            .GetLatestObjects<ExampleSentence>()
+        var allExampleSentences = (await ExampleSentences
             .Where(e => allSenseIds.Contains(e.SenseId))
-            .GroupBy(s => s.SenseId)
-            .ToDictionaryAsync(g => g.Key);
+            .ToArrayAsync())
+            .ToLookup(s => s.SenseId)
+            .ToDictionary(g => g.Key, g => g.ToArray());
         foreach (var entry in entries)
         {
             entry.Senses = allSenses.TryGetValue(entry.Id, out var senses) ? senses.ToArray() : [];
             foreach (var sense in entry.Senses)
             {
-                sense.ExampleSentences = allExampleSentences.TryGetValue(sense.Id, out var sentences) ? sentences.ToArray() : [];
+                sense.ExampleSentences = allExampleSentences.TryGetValue(sense.Id, out var sentences)
+                    ? sentences.ToArray()
+                    : [];
             }
         }
 
@@ -84,14 +89,12 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
     public async Task<lexboxClientContracts.Entry> GetEntry(Guid id)
     {
         var entry = await dataModel.GetLatest<Entry>(id);
-        var senses = await dataModel.GetLatestObjects<Sense>()
-            .Where(s => s.EntryId == id)
-            .ToArrayAsync();
-        var exampleSentences = await dataModel
-            .GetLatestObjects<ExampleSentence>()
-            .Where(e => senses.Select(s => s.Id).Contains(e.SenseId))
-            .GroupBy(s => s.SenseId)
-            .ToDictionaryAsync(g => g.Key);
+        var senses = await Senses
+                .Where(s => s.EntryId == id).ToArrayAsyncLinqToDB();
+        var exampleSentences = (await ExampleSentences
+                .Where(e => senses.Select(s => s.Id).Contains(e.SenseId)).ToArrayAsyncLinqToDB())
+            .ToLookup(e => e.SenseId)
+            .ToDictionary(g => g.Key, g => g.ToArray());
         entry.Senses = senses;
         foreach (var sense in senses)
         {

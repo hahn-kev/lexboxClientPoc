@@ -22,6 +22,7 @@ public class DataModelReferenceTests : DataModelTestBase
         await WriteNextChange(new AddReferenceChange(_entity1Id, _entity2Id));
         var entry = await DataModel.GetLatest<Entry>(_entity1Id);
         entry.EntryReference.Should().Be(_entity2Id);
+        await Verify(AllData());
     }
 
     [Fact]

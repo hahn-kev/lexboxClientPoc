@@ -28,7 +28,7 @@ public class SyncLibTests : IAsyncLifetime
             .BuildServiceProvider();
         _crdtDbContext = _services.GetRequiredService<CrdtDbContext>();
         DataModel = _services.GetRequiredService<DataModel>();
-        crdtApi = new CrdtLexboxApi(DataModel, _services.GetRequiredService<JsonSerializerOptions>());
+        crdtApi = ActivatorUtilities.CreateInstance<CrdtLexboxApi>(_services);
     }
 
     public virtual async Task InitializeAsync()

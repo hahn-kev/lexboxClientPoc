@@ -1,0 +1,205 @@
+﻿[
+  {
+    $type: Commit,
+    CompareKey: {
+      $type: ValueTuple<DateTimeOffset, Guid>,
+      Item1: DateTimeOffset_1,
+      Item2: Guid_1
+    },
+    Id: Guid_1,
+    DateTime: DateTimeOffset_1,
+    Hash: Hash_1,
+    ParentHash: Hash_Empty,
+    ClientId: Guid_2,
+    ChangeEntities: [
+      {
+        $type: ChangeEntity,
+        Id: Guid_3,
+        CommitId: Guid_1,
+        EntityId: Guid_4,
+        Change: {
+          $type: SimpleChange,
+          Values: {
+            $type: Dictionary<string, object>,
+            Value: first
+          },
+          Id: Guid_3,
+          EntityId: Guid_4,
+          EntityType: Entry
+        }
+      }
+    ],
+    Snapshots: [
+      {
+        $type: ObjectSnapshot,
+        Id: Guid_5,
+        TypeName: Entry,
+        Entity: {
+          $type: Entry,
+          Id: Guid_4,
+          Value: first,
+          YText: [],
+          YTextBlob: AAAAAAAAAQAAAAAAAA==
+        },
+        EntityId: Guid_4,
+        EntityIsDeleted: false,
+        CommitId: Guid_1,
+        IsRoot: true
+      }
+    ]
+  },
+  {
+    $type: Commit,
+    CompareKey: {
+      $type: ValueTuple<DateTimeOffset, Guid>,
+      Item1: DateTimeOffset_2,
+      Item2: Guid_6
+    },
+    Id: Guid_6,
+    DateTime: DateTimeOffset_2,
+    Hash: Hash_2,
+    ParentHash: Hash_1,
+    ClientId: Guid_2,
+    ChangeEntities: [
+      {
+        $type: ChangeEntity,
+        Id: Guid_7,
+        CommitId: Guid_6,
+        EntityId: Guid_4,
+        Change: {
+          $type: SetAgeChange,
+          Age: 4,
+          Id: Guid_7,
+          EntityId: Guid_4,
+          EntityType: Entry
+        }
+      }
+    ],
+    Snapshots: [
+      {
+        $type: ObjectSnapshot,
+        Id: Guid_8,
+        TypeName: Entry,
+        Entity: {
+          $type: Entry,
+          Id: Guid_4,
+          Value: first,
+          Age: 4,
+          YText: [],
+          YTextBlob: AAAAAAAAAQAAAAAAAA==
+        },
+        EntityId: Guid_4,
+        EntityIsDeleted: false,
+        CommitId: Guid_6,
+        IsRoot: false
+      }
+    ]
+  },
+  {
+    $type: Commit,
+    CompareKey: {
+      $type: ValueTuple<DateTimeOffset, Guid>,
+      Item1: DateTimeOffset_3,
+      Item2: Guid_9
+    },
+    Id: Guid_9,
+    DateTime: DateTimeOffset_3,
+    Hash: Hash_3,
+    ParentHash: Hash_2,
+    ClientId: Guid_2,
+    ChangeEntities: [
+      {
+        $type: ChangeEntity,
+        Id: Guid_10,
+        CommitId: Guid_9,
+        EntityId: Guid_4,
+        Change: {
+          $type: SimpleChange,
+          Values: {
+            $type: Dictionary<string, object>,
+            Value: second
+          },
+          Id: Guid_10,
+          EntityId: Guid_4,
+          EntityType: Entry
+        }
+      }
+    ],
+    Snapshots: [
+      {
+        $type: ObjectSnapshot,
+        Id: Guid_11,
+        TypeName: Entry,
+        Entity: {
+          $type: Entry,
+          Id: Guid_4,
+          Value: second,
+          YText: [],
+          YTextBlob: AAAAAAAAAQAAAAAAAA==
+        },
+        EntityId: Guid_4,
+        EntityIsDeleted: false,
+        CommitId: Guid_9,
+        IsRoot: false
+      }
+    ]
+  },
+  {
+    $type: Commit,
+    CompareKey: {
+      $type: ValueTuple<DateTimeOffset, Guid>,
+      Item1: DateTimeOffset_4,
+      Item2: Guid_12
+    },
+    Id: Guid_12,
+    DateTime: DateTimeOffset_4,
+    Hash: Hash_4,
+    ParentHash: Hash_3,
+    ClientId: Guid_2,
+    ChangeEntities: [
+      {
+        $type: ChangeEntity,
+        Id: Guid_13,
+        CommitId: Guid_12,
+        EntityId: Guid_4,
+        Change: {
+          $type: SimpleChange,
+          Values: {
+            $type: Dictionary<string, object>,
+            Value: third
+          },
+          Id: Guid_13,
+          EntityId: Guid_4,
+          EntityType: Entry
+        }
+      }
+    ],
+    Snapshots: [
+      {
+        $type: ObjectSnapshot,
+        Id: Guid_14,
+        TypeName: Entry,
+        Entity: {
+          $type: Entry,
+          Id: Guid_4,
+          Value: third,
+          Age: 4,
+          YText: [],
+          YTextBlob: AAAAAAAAAQAAAAAAAA==
+        },
+        EntityId: Guid_4,
+        EntityIsDeleted: false,
+        CommitId: Guid_12,
+        IsRoot: false
+      }
+    ]
+  },
+  {
+    $type: Entry,
+    Id: Guid_4,
+    Value: third,
+    Age: 4,
+    YText: [],
+    YTextBlob: AAAAAAAAAQAAAAAAAA==
+  }
+]

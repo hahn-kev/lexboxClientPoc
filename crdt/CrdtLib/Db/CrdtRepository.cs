@@ -175,39 +175,40 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
             _dbContext.Snapshots.Add(snapshot);
             await SnapshotAdded(snapshot);
         }
+
+        await _dbContext.SaveChangesAsync();
     }
 
     private async ValueTask SnapshotAdded(ObjectSnapshot objectSnapshot)
     {
         if (!crdtConfig.Value.EnableProjectedTables) return;
-        EntityEntry? existingEntry = null;
-        if (!objectSnapshot.IsRoot)
+        if (objectSnapshot.IsRoot && objectSnapshot.EntityIsDeleted) return;
+        //need to check if an entry exists already, even if this is the root commit it may have already been added to the db
+        var existingEntry = await GetEntityEntry(objectSnapshot.Entity.GetType(), objectSnapshot.EntityId);
+        if (existingEntry is null && objectSnapshot.IsRoot)
         {
-            existingEntry = await GetEntityEntry(objectSnapshot);
-        }
-
-        if (objectSnapshot.EntityIsDeleted)
-        {
-            if (existingEntry is not null) _dbContext.Remove(existingEntry.Entity);
+            //if we don't make a copy first then the entity will be tracked by the context and be modified
+            //by future changes in the same session
+            _dbContext.Add((object)objectSnapshot.Entity.Copy())
+                .Property(ObjectSnapshot.ShadowRefName).CurrentValue = objectSnapshot.Id;
             return;
         }
 
-        if (existingEntry is not null)
+        if (existingEntry is null) return;
+        if (objectSnapshot.EntityIsDeleted)
         {
-            existingEntry.CurrentValues.SetValues(objectSnapshot.Entity);
-            existingEntry.Property(ObjectSnapshot.ShadowRefName).CurrentValue = objectSnapshot.Id;
+            _dbContext.Remove(existingEntry.Entity);
+            return;
         }
-        else
-        {
-            _dbContext.Add((object)objectSnapshot.Entity).Property(ObjectSnapshot.ShadowRefName).CurrentValue = objectSnapshot.Id;
-        }
+
+        existingEntry.CurrentValues.SetValues(objectSnapshot.Entity);
+        existingEntry.Property(ObjectSnapshot.ShadowRefName).CurrentValue = objectSnapshot.Id;
     }
     
-    private async ValueTask<EntityEntry?> GetEntityEntry(ObjectSnapshot objectSnapshot)
+    private async ValueTask<EntityEntry?> GetEntityEntry(Type entityType, Guid entityId)
     {
         if (!crdtConfig.Value.EnableProjectedTables) return null;
-        var entityType = objectSnapshot.Entity.GetType();
-        var entity = await _dbContext.FindAsync(entityType, objectSnapshot.EntityId);
+        var entity = await _dbContext.FindAsync(entityType, entityId);
         return entity is not null ? _dbContext.Entry(entity) : null;
     }
     

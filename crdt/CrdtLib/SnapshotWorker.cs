@@ -77,6 +77,7 @@ public class SnapshotWorker
             {
                 IObjectBase entity;
                 var snapshot = await GetSnapshot(commitChange.EntityId);
+                var hasBeenApplied = snapshot?.CommitId == commit.Id;
                 var changeContext = new ChangeContext(commit, this, _crdtRepository);
                 bool wasDeleted;
                 if (snapshot is not null)
@@ -97,6 +98,9 @@ public class SnapshotWorker
                 {
                     await MarkDeleted(entity.Id, commit);
                 }
+                //this snapshot has already been applied, we don't need to add it again
+                //but we did need to run apply again because we may need to mark other entities as deleted
+                if (hasBeenApplied) continue;
 
                 //to get the state in a point in time we would have to find a snapshot before that time, then apply any commits that came after that snapshot but still before the point in time.
                 //we would probably want the most recent snapshot to always follow current, so we might need to track the number of changes a given snapshot represents so we can 
@@ -142,13 +146,17 @@ public class SnapshotWorker
             if (snapshot is null) throw new NullReferenceException("unable to find snapshot for entity " + entityId);
             //could be different from what's in the db if a previous change has already updated it
             if (!predicate(snapshot)) continue;
+            var hasBeenApplied = snapshot.CommitId == commit.Id;
             var updatedEntry = snapshot.Entity.Copy();
             var wasDeleted = updatedEntry.DeletedAt.HasValue;
 
             updatedEntry.RemoveReference(deletedEntityId, commit);
             var deletedByRemoveRef = !wasDeleted && updatedEntry.DeletedAt.HasValue;
 
-            AddSnapshot(new ObjectSnapshot(updatedEntry, commit, false));
+            //this snapshot has already been applied, we don't need to add it again
+            //but we did need to run apply again because we may need to mark other entities as deleted
+            if (!hasBeenApplied)
+                AddSnapshot(new ObjectSnapshot(updatedEntry, commit, false));
 
             //we need to do this after we add the snapshot above otherwise we might get stuck in a loop of deletions
             if (deletedByRemoveRef)

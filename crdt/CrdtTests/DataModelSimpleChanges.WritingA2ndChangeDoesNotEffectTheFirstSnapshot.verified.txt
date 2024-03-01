@@ -21,26 +21,10 @@
           $type: SimpleChange,
           Values: {
             $type: Dictionary<string, object>,
-            Value: first
+            Value: change1
           },
           Id: Guid_3,
           EntityId: Guid_4,
-          EntityType: Entry
-        }
-      },
-      {
-        $type: ChangeEntity,
-        Id: Guid_5,
-        CommitId: Guid_1,
-        EntityId: Guid_6,
-        Change: {
-          $type: SimpleChange,
-          Values: {
-            $type: Dictionary<string, object>,
-            Value: second
-          },
-          Id: Guid_5,
-          EntityId: Guid_6,
           EntityType: Entry
         }
       }
@@ -48,12 +32,12 @@
     Snapshots: [
       {
         $type: ObjectSnapshot,
-        Id: Guid_7,
+        Id: Guid_5,
         TypeName: Entry,
         Entity: {
           $type: Entry,
           Id: Guid_4,
-          Value: first,
+          Value: change1,
           YText: [],
           YTextBlob: AAAAAAAAAQAAAAAAAA==
         },
@@ -61,36 +45,62 @@
         EntityIsDeleted: false,
         CommitId: Guid_1,
         IsRoot: true
-      },
+      }
+    ]
+  },
+  {
+    $type: Commit,
+    CompareKey: {
+      $type: ValueTuple<DateTimeOffset, Guid>,
+      Item1: DateTimeOffset_2,
+      Item2: Guid_6
+    },
+    Id: Guid_6,
+    DateTime: DateTimeOffset_2,
+    Hash: Hash_2,
+    ParentHash: Hash_1,
+    ClientId: Guid_2,
+    ChangeEntities: [
+      {
+        $type: ChangeEntity,
+        Id: Guid_7,
+        CommitId: Guid_6,
+        EntityId: Guid_4,
+        Change: {
+          $type: SimpleChange,
+          Values: {
+            $type: Dictionary<string, object>,
+            Value: change2
+          },
+          Id: Guid_7,
+          EntityId: Guid_4,
+          EntityType: Entry
+        }
+      }
+    ],
+    Snapshots: [
       {
         $type: ObjectSnapshot,
         Id: Guid_8,
         TypeName: Entry,
         Entity: {
           $type: Entry,
-          Id: Guid_6,
-          Value: second,
+          Id: Guid_4,
+          Value: change2,
           YText: [],
           YTextBlob: AAAAAAAAAQAAAAAAAA==
         },
-        EntityId: Guid_6,
+        EntityId: Guid_4,
         EntityIsDeleted: false,
-        CommitId: Guid_1,
-        IsRoot: true
+        CommitId: Guid_6,
+        IsRoot: false
       }
     ]
   },
   {
     $type: Entry,
     Id: Guid_4,
-    Value: first,
-    YText: [],
-    YTextBlob: AAAAAAAAAQAAAAAAAA==
-  },
-  {
-    $type: Entry,
-    Id: Guid_6,
-    Value: second,
+    Value: change2,
     YText: [],
     YTextBlob: AAAAAAAAAQAAAAAAAA==
   }

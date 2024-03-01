@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using CrdtLib;
 using CrdtLib.Changes;
 using CrdtLib.Db;
@@ -66,6 +67,10 @@ public static class LcmCrdtKernel
                         builder.HasOne<Entry>()
                             .WithMany()
                             .HasForeignKey(sense => sense.EntryId);
+                        builder.Property(s => s.SemanticDomain)
+                            .HasColumnType("jsonb")
+                            .HasConversion(list => JsonSerializer.Serialize(list, (JsonSerializerOptions?)null),
+                                json => JsonSerializer.Deserialize<List<string>>(json, (JsonSerializerOptions?)null) ?? new());
                     })
                     .Add<ExampleSentence>(builder =>
                     {
@@ -101,6 +106,7 @@ public static class LcmCrdtKernel
             //todo use migrations before releasing
             // await dbContext.Database.MigrateAsync(cancellationToken);
             await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+            // return;
             await lexboxApi.CreateEntry(new()
             {
                 LexemeForm =

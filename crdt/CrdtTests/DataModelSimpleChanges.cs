@@ -18,14 +18,35 @@ public class DataModelSimpleChanges : DataModelTestBase
         await WriteNextChange(SimpleChange(_entity1Id, "test-value"));
         var snapshot = DbContext.Snapshots.Should().ContainSingle().Subject;
         snapshot.Entity.Is<Entry>().Value.Should().Be("test-value");
+
+        await Verify(AllData());
+    }
+    
+    [Fact]
+    public async Task WritingA2ndChangeDoesNotEffectTheFirstSnapshot()
+    {
+        await WriteNextChange(SimpleChange(_entity1Id, "change1"));
+        await WriteNextChange(SimpleChange(_entity1Id, "change2"));
+
+        DbContext.Snapshots.Should()
+            .SatisfyRespectively(
+                snap1 => snap1.Entity.Is<Entry>().Value.Should().Be("change1"),
+                snap2 => snap2.Entity.Is<Entry>().Value.Should().Be("change2")
+            );
+
+        await Verify(AllData());
     }
 
     [Fact]
     public async Task WritingACommitWithMultipleChangesWorks()
     {
-        await WriteNextChange([SimpleChange(_entity1Id, "test-value"), SimpleChange(_entity2Id, "test-value")]);
-        await Verify(DbContext.AllData());
+        await WriteNextChange([
+            SimpleChange(_entity1Id, "first"),
+            SimpleChange(_entity2Id, "second")
+        ]);
+        await Verify(AllData());
     }
+
     [Fact]
     public async Task WriteMultipleCommits()
     {
@@ -33,7 +54,7 @@ public class DataModelSimpleChanges : DataModelTestBase
         await WriteNextChange(SimpleChange(Guid.NewGuid(), "change 2"));
         DbContext.Snapshots.Should().HaveCount(2);
         await Verify(DbContext.Commits);
-        
+
         await WriteNextChange(SimpleChange(Guid.NewGuid(), "change 3"));
         DbContext.Snapshots.Should().HaveCount(3);
         DataModel.GetLatestObjects<Entry>().Should().HaveCount(3);
@@ -92,6 +113,8 @@ public class DataModelSimpleChanges : DataModelTestBase
         var entity = await DataModel.GetLatest<Entry>(_entity1Id);
         entity.Value.Should().Be("third");
         entity.Age.Should().Be(4);
+
+        await Verify(AllData());
     }
 
     [Fact]
@@ -107,6 +130,7 @@ public class DataModelSimpleChanges : DataModelTestBase
         entry.Value.Should().Be("second");
     }
 
+
     [Fact]
     public async Task CanTrackMultipleEntries()
     {
@@ -115,6 +139,13 @@ public class DataModelSimpleChanges : DataModelTestBase
 
         (await DataModel.GetLatest<Entry>(_entity1Id)).Value.Should().Be("entity1");
         (await DataModel.GetLatest<Entry>(_entity2Id)).Value.Should().Be("entity2");
+    }
+
+    [Fact]
+    public async Task CanCreate2EntriesOutOfOrder()
+    {
+        var commit1 = await WriteNextChange(SimpleChange(_entity1Id, "entity1"));
+        await WriteChangeBefore(commit1, SimpleChange(_entity2Id, "entity2"));
     }
 
     [Fact]

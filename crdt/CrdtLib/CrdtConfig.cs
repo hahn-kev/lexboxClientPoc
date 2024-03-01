@@ -79,10 +79,12 @@ public class ObjectTypeListBuilder
             var entity = builder.Entity<TDerived>();
             entity.HasBaseType((Type)null!);
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id);
             entity.HasOne<ObjectSnapshot>()
                 .WithOne()
                 .HasForeignKey<TDerived>(ObjectSnapshot.ShadowRefName)
-                .IsRequired();
+            //set null otherwise it will cascade delete, which would happen whenever snapshots are deleted 
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.Property(e => e.DeletedAt);
             entity.Ignore(e => e.TypeName);

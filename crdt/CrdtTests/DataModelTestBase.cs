@@ -29,8 +29,8 @@ public class DataModelTestBase : IAsyncLifetime
     {
         currentDate = dateTime;
     }
-
-    private DateTimeOffset currentDate = new(new DateTime(2000, 1, 1));
+    private static int _instanceCount = 0;
+    private DateTimeOffset currentDate = new(new DateTime(2000, 1, 1, 0, _instanceCount++, 0));
     private DateTimeOffset NextDate() => currentDate = currentDate.AddDays(1);
 
     public async ValueTask<Commit> WriteNextChange(IChange change, bool add = true)
@@ -93,5 +93,16 @@ public class DataModelTestBase : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _services.DisposeAsync();
+    }
+
+    protected IEnumerable<object> AllData()
+    {
+        return DbContext.Commits
+            .Include(c => c.ChangeEntities)
+            .Include(c => c.Snapshots)
+            .DefaultOrder()
+            .ToArray()
+            .OfType<object>()
+            .Concat(DbContext.Set<Entry>());
     }
 }

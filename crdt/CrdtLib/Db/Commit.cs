@@ -55,6 +55,8 @@ public class Commit
     }
 
     public List<ChangeEntity> ChangeEntities { get; init; } = new();
+    [JsonIgnore]
+    public List<ObjectSnapshot> Snapshots { get; init; } = [];
 
     public override string ToString()
     {

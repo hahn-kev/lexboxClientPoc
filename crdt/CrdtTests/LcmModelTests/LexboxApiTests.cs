@@ -28,7 +28,7 @@ public class BasicApiTests: IAsyncLifetime
             .BuildServiceProvider();
         _crdtDbContext = _services.GetRequiredService<CrdtDbContext>();
         DataModel = _services.GetRequiredService<DataModel>();
-        _api = new CrdtLexboxApi(DataModel, _services.GetRequiredService<JsonSerializerOptions>());
+        _api = ActivatorUtilities.CreateInstance<CrdtLexboxApi>(_services);
     }
 
     public virtual async Task InitializeAsync()
@@ -162,6 +162,7 @@ public class BasicApiTests: IAsyncLifetime
     {
         var entries = await _api.SearchEntries("a");
         entries.Should().NotBeEmpty();
+        entries.Should().NotContain(e => e.Id == default);
         entries.Should().NotContain(e => e.LexemeForm.Values["en"] == "Kevin");
     }
 
