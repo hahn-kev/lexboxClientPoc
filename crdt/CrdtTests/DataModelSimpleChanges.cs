@@ -156,4 +156,16 @@ public class DataModelSimpleChanges : DataModelTestBase
         var snapshot = await DbContext.Snapshots.DefaultOrder().LastAsync();
         snapshot.Entity.DeletedAt.Should().Be(deleteCommit.DateTime);
     }
+
+    [Fact]
+    public async Task CanUseYText()
+    {
+        await WriteNextChange(SimpleChange(_entity1Id, "test-value"));
+        var entry1 = await DataModel.GetLatest<Entry>(_entity1Id);
+        await WriteNextChange(new ChangeText(entry1, text => text.Insert(0, "Yo Jason")));
+        await WriteNextChange(new ChangeText(entry1, text => text.Insert(3, "What's up ")));
+
+        entry1 = await DataModel.GetLatest<Entry>(_entity1Id);
+        entry1.YText.ToString().Should().Be("Yo What's up Jason");
+    }
 }
