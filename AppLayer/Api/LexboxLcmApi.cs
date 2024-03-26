@@ -57,21 +57,32 @@ public class LexboxLcmApi(LcmCache cache, bool onCloseSave) : ILexboxApi, IDispo
 
     public Task<WritingSystems> GetWritingSystems()
     {
+        var currentVernacularWs = cache.ServiceLocator.WritingSystems
+            .CurrentVernacularWritingSystems
+            .Select(ws => ws.Id).ToHashSet();
+        var currentAnalysisWs = cache.ServiceLocator.WritingSystems
+            .CurrentAnalysisWritingSystems
+            .Select(ws => ws.Id).ToHashSet();
         return Task.FromResult(new WritingSystems
         {
             Vernacular = cache.ServiceLocator.WritingSystems.VernacularWritingSystems.Select(ws => new WritingSystem
             {
+                //todo determine current and create a property for that.
                 Id = ws.Id,
                 Name = ws.LanguageTag,
                 Abbreviation = ws.Abbreviation,
-                Font = ws.DefaultFontName
+                Font = ws.DefaultFontName,
+                Exemplars = ws.CharacterSets.FirstOrDefault(s => s.Type == "index")?.Characters.ToArray() ?? [],
+                Current = currentVernacularWs.Contains(ws.Id)
             }).ToArray(),
             Analysis = cache.ServiceLocator.WritingSystems.AnalysisWritingSystems.Select(ws => new WritingSystem
             {
                 Id = ws.Id,
                 Name = ws.LanguageTag,
                 Abbreviation = ws.Abbreviation,
-                Font = ws.DefaultFontName
+                Font = ws.DefaultFontName,
+                Exemplars = ws.CharacterSets.FirstOrDefault(s => s.Type == "index")?.Characters.ToArray() ?? [],
+                Current = currentAnalysisWs.Contains(ws.Id)
             }).ToArray()
         });
     }

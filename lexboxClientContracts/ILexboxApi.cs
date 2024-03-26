@@ -9,7 +9,6 @@ namespace lexboxClientContracts;
 public interface ILexboxApi
 {
     Task<WritingSystems> GetWritingSystems();
-    Task<string[]> GetExemplars();
     Task<Entry[]> GetEntries(string exemplar, QueryOptions? options = null);
     Task<Entry[]> GetEntries(QueryOptions? options = null);
     Task<Entry[]> SearchEntries(string query, QueryOptions? options = null);
