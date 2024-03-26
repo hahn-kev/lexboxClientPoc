@@ -86,9 +86,10 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         return entries;
     }
 
-    public async Task<lexboxClientContracts.Entry> GetEntry(Guid id)
+    public async Task<lexboxClientContracts.Entry?> GetEntry(Guid id)
     {
         var entry = await dataModel.GetLatest<Entry>(id);
+        if (entry is null) return null;
         var senses = await Senses
                 .Where(s => s.EntryId == id).ToArrayAsyncLinqToDB();
         var exampleSentences = (await ExampleSentences

@@ -13,7 +13,7 @@ public interface ILexboxApi
     Task<Entry[]> GetEntries(string exemplar, QueryOptions? options = null);
     Task<Entry[]> GetEntries(QueryOptions? options = null);
     Task<Entry[]> SearchEntries(string query, QueryOptions? options = null);
-    Task<Entry> GetEntry(Guid id);
+    Task<Entry?> GetEntry(Guid id);
 
     Task<Entry> CreateEntry(Entry entry);
     Task<Entry> UpdateEntry(Guid id, UpdateObjectInput<Entry> update);

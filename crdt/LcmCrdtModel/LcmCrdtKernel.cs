@@ -106,9 +106,11 @@ public static class LcmCrdtKernel
             //todo use migrations before releasing
             // await dbContext.Database.MigrateAsync(cancellationToken);
             await dbContext.Database.EnsureCreatedAsync(cancellationToken);
-            // return;
+            var id = new Guid("c7328f18-118a-4f83-9d88-c408778b7f63");
+            if (await lexboxApi.GetEntry(id) is not null) return;
             await lexboxApi.CreateEntry(new()
             {
+                Id = id,
                 LexemeForm =
                 {
                     Values =

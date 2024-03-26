@@ -95,7 +95,7 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         return await crdtRepository.GetCurrentSnapshotByObjectId(entityId);
     }
 
-    public async Task<T> GetLatest<T>(Guid objectId) where T : IObjectBase
+    public async Task<T?> GetLatest<T>(Guid objectId) where T : class, IObjectBase
     {
         return await crdtRepository.GetCurrent<T>(objectId);
     }

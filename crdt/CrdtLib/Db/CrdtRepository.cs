@@ -102,12 +102,12 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
         return entity;
     }
 
-    public async Task<T> GetCurrent<T>(Guid objectId) where T: IObjectBase
+    public async Task<T?> GetCurrent<T>(Guid objectId) where T: class, IObjectBase
     {
         var snapshot = await _dbContext.Snapshots
             .DefaultOrder()
-            .LastAsync(s => s.EntityId == objectId && (currentTime == null || s.Commit.DateTime <= currentTime));
-        return snapshot.Entity.Is<T>();
+            .LastOrDefaultAsync(s => s.EntityId == objectId && (currentTime == null || s.Commit.DateTime <= currentTime));
+        return snapshot?.Entity.Is<T>();
     }
 
     public IQueryable<T> GetCurrentObjects<T>(Expression<Func<ObjectSnapshot, bool>>? predicate = null) where T : class, IObjectBase

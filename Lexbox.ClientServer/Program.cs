@@ -54,6 +54,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.Map("/api/entries", (ILexboxApi api) => api.GetEntries()).WithName("GetEntries").WithOpenApi();
-app.Map("/api/commits", (CrdtDbContext db) => db.Commits.ToArrayAsyncEF());
+app.Map("/api/commits", (CrdtDbContext db) => db.Commits.AsAsyncEnumerable());
 app.MapHub<LexboxApiHub>("/api/hub/project");
 app.Run();
