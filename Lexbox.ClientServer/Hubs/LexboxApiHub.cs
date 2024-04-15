@@ -17,7 +17,6 @@ public record JsonOperation(string Op, string Path, object? Value = null, string
 public interface ILexboxApiHub
 {
     Task<WritingSystems> GetWritingSystems();
-    Task<string[]> GetExemplars();
     Task<Entry[]> GetEntriesForExemplar(string exemplar, QueryOptions? options = null);
     Task<Entry[]> GetEntries(QueryOptions? options = null);
     Task<Entry[]> SearchEntries(string query, QueryOptions? options = null);
@@ -52,11 +51,6 @@ public class LexboxApiHub(ILexboxApi lexboxApi, IOptions<JsonOptions> options) :
     public async Task<WritingSystems> GetWritingSystems()
     {
         return await lexboxApi.GetWritingSystems();
-    }
-
-    public async Task<string[]> GetExemplars()
-    {
-        return await lexboxApi.GetExemplars();
     }
 
     public async Task<Entry[]> GetEntriesForExemplar(string exemplar, QueryOptions? options = null)

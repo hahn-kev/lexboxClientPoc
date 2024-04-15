@@ -40,13 +40,6 @@ public class BasicApiTests
     }
 
     [Test]
-    public async Task GetExemplars()
-    {
-        var exemplars = await _api.GetExemplars();
-        exemplars.Should().NotBeEmpty();
-    }
-
-    [Test]
     public async Task GetEntries()
     {
         var entries = await _api.GetEntries("a");
