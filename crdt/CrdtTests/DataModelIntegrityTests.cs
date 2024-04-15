@@ -8,8 +8,8 @@ public class DataModelIntegrityTests : DataModelTestBase
     public async Task CanAddTheSameCommitMultipleTimes()
     {
         var entity1Id = Guid.NewGuid();
-        var first = await WriteNextChange(SimpleChange(entity1Id, "entity1"));
-        await WriteNextChange(SimpleChange(entity1Id, "entity1.1"));
+        var first = await WriteNextChange(NewWord(entity1Id, "entity1"));
+        await WriteNextChange(NewWord(entity1Id, "entity1.1"));
         await DataModel.Add(first);
         await DataModel.Add(first);
 
@@ -21,8 +21,8 @@ public class DataModelIntegrityTests : DataModelTestBase
     public async Task CanAddTheSameCommitMultipleTimesAtOnce()
     {
         var entity1Id = Guid.NewGuid();
-        var first = await WriteNextChange(SimpleChange(entity1Id, "entity1"));
-        await WriteNextChange(SimpleChange(entity1Id, "entity1.1"));
+        var first = await WriteNextChange(NewWord(entity1Id, "entity1"));
+        await WriteNextChange(NewWord(entity1Id, "entity1.1"));
         await DataModel.AddRange(Enumerable.Repeat(first, 5));
 
         var entry = await DataModel.GetLatest<Entry>(entity1Id);

@@ -24,7 +24,7 @@ public class SyncTests : IAsyncLifetime
     public async Task GetNewHistoryReturnsAddedChanges()
     {
         var entity1Id = Guid.NewGuid();
-        var commit = await _client1.WriteNextChange(_client1.SimpleChange(entity1Id, "entity1"));
+        var commit = await _client1.WriteNextChange(_client1.NewWord(entity1Id, "entity1"));
         var syncResults = await _client1.DataModel.SyncWith(_client2.DataModel);
         syncResults.MissingFromRemote.Should().ContainSingle(c => c.Id == commit.Id);
     }
@@ -34,9 +34,9 @@ public class SyncTests : IAsyncLifetime
     {
         var entity1Id = Guid.NewGuid();
         var entity2Id = Guid.NewGuid();
-        await _client1.WriteNextChange(_client1.SimpleChange(entity1Id, "entity1"));
+        await _client1.WriteNextChange(_client1.NewWord(entity1Id, "entity1"));
         (await _client1.DataModel.GetLatest<Entry>(entity1Id)).Value.Should().Be("entity1");
-        await _client2.WriteNextChange(_client2.SimpleChange(entity2Id, "entity2"));
+        await _client2.WriteNextChange(_client2.NewWord(entity2Id, "entity2"));
         (await _client2.DataModel.GetLatest<Entry>(entity2Id)).Value.Should().Be("entity2");
 
         //act
@@ -59,11 +59,11 @@ public class SyncTests : IAsyncLifetime
     {
         var entity1Id = Guid.NewGuid();
         var entity2Id = Guid.NewGuid();
-        await _client1.WriteNextChange(_client1.SimpleChange(entity1Id, "entity1"));
+        await _client1.WriteNextChange(_client1.NewWord(entity1Id, "entity1"));
         await _client1.DataModel.SyncWith(_client2.DataModel);
 
-        await _client2.WriteNextChange(_client2.SimpleChange(entity2Id, "entity2"));
-        await _client1.WriteNextChange(_client1.SimpleChange(entity1Id, "entity1.1"));
+        await _client2.WriteNextChange(_client2.NewWord(entity2Id, "entity2"));
+        await _client1.WriteNextChange(_client1.NewWord(entity1Id, "entity1.1"));
 
         //act
         await _client1.DataModel.SyncWith(_client2.DataModel);
@@ -80,14 +80,14 @@ public class SyncTests : IAsyncLifetime
     {
         //for this test client1 will be the server
         var entity1Id = Guid.NewGuid();
-        await _client1.WriteNextChange(_client1.SimpleChange(entity1Id, "entity1"));
+        await _client1.WriteNextChange(_client1.NewWord(entity1Id, "entity1"));
         var clients = Enumerable.Range(0, clientCount).Select(_ => new DataModelTestBase()).ToArray();
         for (var i = 0; i < clients.Length; i++)
         {
             var client = clients[i];
             await client.InitializeAsync();
             client.SetCurrentDate(new DateTime(2001, 1, 1).AddDays(i));
-            await client.WriteNextChange(client.SimpleChange(Guid.NewGuid(), "entityClient" + i));
+            await client.WriteNextChange(client.NewWord(Guid.NewGuid(), "entityClient" + i));
         }
 
         await _client1.DataModel.SyncMany(clients.Select(c => c.DataModel).ToArray());

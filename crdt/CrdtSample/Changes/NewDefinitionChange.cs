@@ -1,0 +1,37 @@
+﻿using CrdtLib.Changes;
+using CrdtLib.Db;
+using CrdtLib.Entities;
+using CrdtSample.Models;
+
+namespace CrdtSample.Changes;
+
+public class NewDefinitionChange(Guid entityId) : Change<Definition>(entityId), ISelfNamedType<NewDefinitionChange>
+{
+    public required string Text { get; init; }
+    public string? OneWordDefinition { get; init; }
+    public required string PartOfSpeech { get; init; }
+    public required Guid WordId { get; init; }
+
+    public override IObjectBase NewEntity(Commit commit)
+    {
+        return new Definition
+        {
+            Id = EntityId,
+            Text = Text,
+            OneWordDefinition = OneWordDefinition,
+            PartOfSpeech = PartOfSpeech,
+            WordId = WordId
+        };
+    }
+
+    public override async ValueTask ApplyChange(Definition definition, ChangeContext context)
+    {
+        definition.Text = Text;
+        definition.OneWordDefinition = OneWordDefinition;
+        definition.PartOfSpeech = PartOfSpeech;
+        if (await context.IsObjectDeleted(WordId))
+        {
+            definition.DeletedAt = context.Commit.DateTime;
+        }
+    }
+}

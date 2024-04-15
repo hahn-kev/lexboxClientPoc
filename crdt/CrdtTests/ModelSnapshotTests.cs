@@ -16,8 +16,8 @@ public class ModelSnapshotTests : DataModelTestBase
     [Fact]
     public async Task CanGetModelSnapshot()
     {
-        await WriteNextChange(SimpleChange(Guid.NewGuid(), "entity1"));
-        await WriteNextChange(SimpleChange(Guid.NewGuid(), "entity2"));
+        await WriteNextChange(NewWord(Guid.NewGuid(), "entity1"));
+        await WriteNextChange(NewWord(Guid.NewGuid(), "entity2"));
         var snapshot = await DataModel.GetProjectSnapshot();
         snapshot.Snapshots.Should().HaveCount(2);
     }
@@ -26,8 +26,8 @@ public class ModelSnapshotTests : DataModelTestBase
     public async Task ModelSnapshotShowsMultipleChanges()
     {
         var entityId = Guid.NewGuid();
-        await WriteNextChange(SimpleChange(entityId, "first"));
-        var secondChange = await WriteNextChange(SimpleChange(entityId, "second"));
+        await WriteNextChange(NewWord(entityId, "first"));
+        var secondChange = await WriteNextChange(NewWord(entityId, "second"));
         var snapshot = await DataModel.GetProjectSnapshot();
         var simpleSnapshot = snapshot.Snapshots.Values.First();
         var entity = await DataModel.GetBySnapshotId(simpleSnapshot.Id);
@@ -49,8 +49,8 @@ public class ModelSnapshotTests : DataModelTestBase
         var addNew = new List<Commit>(changeCount);
         for (var i = 0; i < changeCount; i++)
         {
-            changes.Add(await WriteNextChange(SimpleChange(entityId, $"change {i}"), false).AsTask());
-            addNew.Add(await WriteNextChange(SimpleChange(Guid.NewGuid(), $"add {i}"), false).AsTask());
+            changes.Add(await WriteNextChange(NewWord(entityId, $"change {i}"), false).AsTask());
+            addNew.Add(await WriteNextChange(NewWord(Guid.NewGuid(), $"add {i}"), false).AsTask());
         }
 
         //adding all in one AddRange means there's sparse snapshots
@@ -80,7 +80,7 @@ public class ModelSnapshotTests : DataModelTestBase
         await WriteNextChange(new SetAgeChange(entityId, 20));
         //adding all in one AddRange means there's sparse snapshots
         await DataModel.AddRange(Enumerable.Range(0, changeCount)
-            .Select(i => WriteNextChange(SimpleChange(entityId, $"change {i}"), false).Result));
+            .Select(i => WriteNextChange(NewWord(entityId, $"change {i}"), false).Result));
 
         var latestSnapshot = await DataModel.GetLatestSnapshotByObjectId(entityId);
         //delete snapshots so when we get at then we need to re-apply

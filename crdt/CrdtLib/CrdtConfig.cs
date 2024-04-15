@@ -42,6 +42,7 @@ public class ChangeTypeListBuilder
 
     public ChangeTypeListBuilder Add<TDerived>() where TDerived : IChange, IPolyType
     {
+        if (Types.Any(t => t.DerivedType == typeof(TDerived))) return this;
         Types.Add(new JsonDerivedType(typeof(TDerived), TDerived.TypeName));
         return this;
     }
@@ -69,6 +70,7 @@ public class ObjectTypeListBuilder
     public ObjectTypeListBuilder Add<TDerived>(Action<EntityTypeBuilder<TDerived>>? configureDb = null)
         where TDerived : class, IObjectBase
     {
+        if (Types.Any(t => t.DerivedType == typeof(TDerived))) throw new InvalidOperationException($"Type {typeof(TDerived)} already added");
         Types.Add(new JsonDerivedType(typeof(TDerived), TDerived.TypeName));
         ModelConfigurations.Add((builder, config) =>
         {

@@ -76,15 +76,9 @@ public class DataModelTestBase : IAsyncLifetime
         return commit;
     }
 
-    public SimpleChange SimpleChange(Guid entityId, string value)
+    public IChange NewWord(Guid entityId, string value)
     {
-        return new SimpleChange(entityId)
-        {
-            Values =
-            {
-                { nameof(Entry.Value), value }
-            }
-        };
+        return new NewWordChange(entityId, value);
     }
 
     public virtual Task InitializeAsync()

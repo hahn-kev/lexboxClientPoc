@@ -12,8 +12,8 @@ public class DataModelReferenceTests : DataModelTestBase
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        await WriteNextChange(SimpleChange(_entity1Id, "entity1"));
-        await WriteNextChange(SimpleChange(_entity2Id, "entity2"));
+        await WriteNextChange(NewWord(_entity1Id, "entity1"));
+        await WriteNextChange(NewWord(_entity2Id, "entity2"));
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class DataModelReferenceTests : DataModelTestBase
     public async Task DeleteRetroactivelyRemovesRefs()
     {
         var entityId3 = Guid.NewGuid();
-        await WriteNextChange(SimpleChange(entityId3, "entity3"));
+        await WriteNextChange(NewWord(entityId3, "entity3"));
         await WriteNextChange(new AddReferenceChange(_entity1Id, _entity2Id));
         var delete = await WriteNextChange(new DeleteChange<Entry>(_entity2Id));
 
@@ -86,7 +86,7 @@ public class DataModelReferenceTests : DataModelTestBase
     public async Task CommentChainGetsDeleted()
     {
         var entry1 = Guid.NewGuid();
-        await WriteNextChange(SimpleChange(entry1, "entry1"));
+        await WriteNextChange(NewWord(entry1, "entry1"));
         var comment1 = new CommentOnEntryChange("hello 1", entry1);
         var comment1Id = comment1.EntityId;
         await WriteNextChange(comment1);

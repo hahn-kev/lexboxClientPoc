@@ -9,7 +9,7 @@ public class DataQueryTests: DataModelTestBase
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        await WriteNextChange(SimpleChange(_entity1Id, "entity1"));
+        await WriteNextChange(NewWord(_entity1Id, "entity1"));
     }
 
     [Fact]
