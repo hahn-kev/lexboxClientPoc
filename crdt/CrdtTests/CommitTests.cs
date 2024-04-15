@@ -3,6 +3,7 @@ using System.Text.Json;
 using CrdtSample;
 using CrdtSample.Changes;
 using CrdtLib.Db;
+using CrdtLib.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests;
@@ -14,7 +15,8 @@ public class CommitTests
     {
         var commit1 = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         commit1.Hash.Should().NotBeEmpty();
     }
@@ -24,11 +26,13 @@ public class CommitTests
     {
         var commit1 = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         var commit1Copy = new Commit(commit1.Id)
         {
-            ClientId = commit1.ClientId
+            ClientId = commit1.ClientId,
+            HybridDateTime = commit1.HybridDateTime
         };
         commit1.Hash.Should().Be(commit1Copy.Hash);
     }
@@ -38,15 +42,18 @@ public class CommitTests
     {
         var parentCommit = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         var commit1 = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         var commit1Copy = new Commit(commit1.Id)
         {
-            ClientId = commit1.ClientId
+            ClientId = commit1.ClientId,
+            HybridDateTime = commit1.HybridDateTime
         };
         commit1.SetParentHash(parentCommit.Hash);
         commit1Copy.SetParentHash(parentCommit.Hash);
@@ -58,11 +65,13 @@ public class CommitTests
     {
         var commit1 = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         var commit2 = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         var initialCommit2Hash = commit2.Hash;
         commit2.SetParentHash(commit1.Hash);
@@ -74,15 +83,18 @@ public class CommitTests
     {
         var commit1 = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         var commit2 = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         var commit3 = new Commit()
         {
-            ClientId = Guid.NewGuid()
+            ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow
         };
         commit2.SetParentHash(commit1.Hash);
         var initialCommit2Hash = commit2.Hash;
@@ -99,6 +111,7 @@ public class CommitTests
         var commit = new Commit
         {
             ClientId = Guid.NewGuid(),
+            HybridDateTime = HybridDateTime.ForTestingNow,
             ChangeEntities =
             {
                 new ChangeEntity(new SetAgeChange(Guid.NewGuid(), 3))

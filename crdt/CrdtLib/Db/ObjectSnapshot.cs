@@ -11,7 +11,7 @@ public record SimpleSnapshot(
     Guid EntityId,
     Guid CommitId,
     bool IsRoot,
-    DateTimeOffset DateTime,
+    HybridDateTime HybridDateTime,
     string CommitHash,
     bool EntityIsDeleted)
 {
@@ -22,7 +22,7 @@ public record SimpleSnapshot(
         snapshot.EntityId,
         snapshot.CommitId,
         snapshot.IsRoot,
-        snapshot.Commit.DateTime,
+        snapshot.Commit.HybridDateTime,
         snapshot.Commit.Hash,
         snapshot.EntityIsDeleted)
     {

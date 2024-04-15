@@ -4,6 +4,7 @@ using CrdtSample.Models;
 using CrdtLib;
 using CrdtLib.Changes;
 using CrdtLib.Db;
+using CrdtLib.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +23,8 @@ public class DataModelTestBase : IAsyncLifetime
             .AddCrdtDataSample(":memory:")
             .BuildServiceProvider();
         DbContext = _services.GetRequiredService<CrdtDbContext>();
+        DbContext.Database.OpenConnection();
+        DbContext.Database.EnsureCreated();
         DataModel = _services.GetRequiredService<DataModel>();
     }
 
@@ -66,7 +69,7 @@ public class DataModelTestBase : IAsyncLifetime
         var commit = new Commit
         {
             ClientId = clientId,
-            DateTime = dateTime,
+            HybridDateTime = new HybridDateTime(dateTime, 0),
             ChangeEntities = change.Select(c => new ChangeEntity(c)).ToList()
         };
         if (add) await DataModel.Add(commit);
@@ -84,10 +87,9 @@ public class DataModelTestBase : IAsyncLifetime
         };
     }
 
-    public virtual async Task InitializeAsync()
+    public virtual Task InitializeAsync()
     {
-        await DbContext.Database.OpenConnectionAsync();
-        await DbContext.Database.EnsureCreatedAsync();
+        return Task.CompletedTask;
     }
 
     public async Task DisposeAsync()

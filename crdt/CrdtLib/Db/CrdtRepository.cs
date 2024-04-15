@@ -36,15 +36,21 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
 
     public async Task DeleteStaleSnapshots(Commit oldestChange)
     {
-        //use oldest commit added to clear any snapshots that are based on a now incomplete history
+        //use the oldest commit added to clear any snapshots that are based on a now incomplete history
         await _dbContext.Snapshots
-            .Where(s => (s.Commit.DateTime == oldestChange.DateTime && s.CommitId > oldestChange.Id) ||
-                        s.Commit.DateTime > oldestChange.DateTime).ExecuteDeleteAsync();
+            .Where(s => s.Commit.HybridDateTime.DateTime > oldestChange.DateTime
+                        || (s.Commit.HybridDateTime.DateTime == oldestChange.DateTime &&
+                            s.Commit.HybridDateTime.Counter > oldestChange.HybridDateTime.Counter)
+                        || (s.Commit.HybridDateTime.DateTime == oldestChange.DateTime &&
+                            s.Commit.HybridDateTime.Counter == oldestChange.HybridDateTime.Counter &&
+                            s.CommitId > oldestChange.Id)
+            )
+            .ExecuteDeleteAsync();
     }
 
     public IQueryable<Commit> CurrentCommits()
     {
-        return _dbContext.Commits.DefaultOrder().Where(c => currentTime == null || c.DateTime <= currentTime);
+        return _dbContext.Commits.DefaultOrder().Where(c => currentTime == null || c.HybridDateTime.DateTime <= currentTime);
     }
 
     public IQueryable<ObjectSnapshot> CurrentSnapshots()
@@ -56,9 +62,10 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
     {
         return _dbContext.Snapshots.GroupBy(s => s.EntityId,
             (entityId, snapshots) => snapshots
-                .OrderByDescending(s => s.Commit.DateTime)
+                .OrderByDescending(s => s.Commit.HybridDateTime.DateTime)
+                .ThenBy(s => s.Commit.HybridDateTime.Counter)
                 .ThenBy(s => s.CommitId)
-                .First(s => currentTime == null || s.Commit.DateTime <= currentTime).Id);
+                .First(s => currentTime == null || s.Commit.HybridDateTime.DateTime <= currentTime).Id);
     }
 
     public async Task<(Dictionary<Guid, ObjectSnapshot> currentSnapshots, Commit[] pendingCommits)> GetCurrentSnapshotsAndPendingCommits()
@@ -70,7 +77,8 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
         ArgumentNullException.ThrowIfNull(lastCommit);
         var newCommits = await CurrentCommits()
             .Include(c => c.ChangeEntities)
-            .Where(c => lastCommit.DateTime < c.DateTime)
+            .Where(c => lastCommit.HybridDateTime.DateTime < c.HybridDateTime.DateTime 
+                        || (lastCommit.HybridDateTime.DateTime == c.HybridDateTime.DateTime && lastCommit.HybridDateTime.Counter < c.HybridDateTime.Counter))
             .ToArrayAsync();
         return (snapshots, newCommits);
     }
@@ -124,8 +132,8 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
 
     public async Task<SyncState> GetCurrentSyncState()
     {
-        return new(await _dbContext.Commits.Where(c => currentTime == null || c.DateTime <= currentTime).GroupBy(c => c.ClientId)
-            .Select(g => new { ClientId = g.Key, DateTime = g.Max(c => c.DateTime) })
+        return new(await _dbContext.Commits.Where(c => currentTime == null || c.HybridDateTime.DateTime <= currentTime).GroupBy(c => c.ClientId)
+            .Select(g => new { ClientId = g.Key, DateTime = g.Max(c => c.HybridDateTime.DateTime) })
             .ToDictionaryAsync(c => c.ClientId, c => c.DateTime.Ticks));
     }
 
@@ -148,7 +156,7 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
                 //todo even slower we want to also filter out changes that are already in the other history
                 //client has newer history than the other history
                 newHistory.AddRange(await _dbContext.Commits.Include(c => c.ChangeEntities).DefaultOrder()
-                    .Where(c => c.ClientId == clientId && c.DateTime > otherDt)
+                    .Where(c => c.ClientId == clientId && c.HybridDateTime.DateTime > otherDt)
                     .ToArrayAsync());
             }
         }
@@ -227,5 +235,15 @@ public class CrdtRepository(CrdtDbContext _dbContext, IOptions<CrdtConfig> crdtC
     {
         _dbContext.Commits.AddRange(commits);
         await _dbContext.SaveChangesAsync();
+    }
+
+    public HybridDateTime? GetLatestDateTime()
+    {
+        return _dbContext.Commits
+            .OrderBy(c => c.HybridDateTime.DateTime)
+            .ThenByDescending(c => c.HybridDateTime.Counter)
+            .AsNoTracking()
+            .Select(c => c.HybridDateTime)
+            .FirstOrDefault();
     }
 }

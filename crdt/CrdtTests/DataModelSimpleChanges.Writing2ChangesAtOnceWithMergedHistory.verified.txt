@@ -2,11 +2,15 @@
   {
     $type: Commit,
     CompareKey: {
-      $type: ValueTuple<DateTimeOffset, Guid>,
+      $type: ValueTuple<DateTimeOffset, long,
       Item1: DateTimeOffset_1,
-      Item2: Guid_1
+      Item3: Guid_1
     },
     Id: Guid_1,
+    HybridDateTime: {
+      $type: HybridDateTime,
+      DateTime: DateTimeOffset_1
+    },
     DateTime: DateTimeOffset_1,
     Hash: Hash_1,
     ParentHash: Hash_Empty,
@@ -51,11 +55,15 @@
   {
     $type: Commit,
     CompareKey: {
-      $type: ValueTuple<DateTimeOffset, Guid>,
+      $type: ValueTuple<DateTimeOffset, long,
       Item1: DateTimeOffset_2,
-      Item2: Guid_6
+      Item3: Guid_6
     },
     Id: Guid_6,
+    HybridDateTime: {
+      $type: HybridDateTime,
+      DateTime: DateTimeOffset_2
+    },
     DateTime: DateTimeOffset_2,
     Hash: Hash_2,
     ParentHash: Hash_1,
@@ -98,11 +106,15 @@
   {
     $type: Commit,
     CompareKey: {
-      $type: ValueTuple<DateTimeOffset, Guid>,
+      $type: ValueTuple<DateTimeOffset, long,
       Item1: DateTimeOffset_3,
-      Item2: Guid_9
+      Item3: Guid_9
     },
     Id: Guid_9,
+    HybridDateTime: {
+      $type: HybridDateTime,
+      DateTime: DateTimeOffset_3
+    },
     DateTime: DateTimeOffset_3,
     Hash: Hash_3,
     ParentHash: Hash_2,
@@ -147,11 +159,15 @@
   {
     $type: Commit,
     CompareKey: {
-      $type: ValueTuple<DateTimeOffset, Guid>,
+      $type: ValueTuple<DateTimeOffset, long,
       Item1: DateTimeOffset_4,
-      Item2: Guid_12
+      Item3: Guid_12
     },
     Id: Guid_12,
+    HybridDateTime: {
+      $type: HybridDateTime,
+      DateTime: DateTimeOffset_4
+    },
     DateTime: DateTimeOffset_4,
     Hash: Hash_4,
     ParentHash: Hash_3,

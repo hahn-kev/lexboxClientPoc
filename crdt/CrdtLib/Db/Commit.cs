@@ -2,18 +2,21 @@
 using System.IO.Hashing;
 using System.Text.Json.Serialization;
 using CrdtLib.Changes;
+using CrdtLib.Helpers;
 
 namespace CrdtLib.Db;
 
 public class Commit
 {
     [JsonConstructor]
-    public Commit(Guid id, string hash, string parentHash)
+    protected Commit(Guid id, string hash, string parentHash, HybridDateTime hybridDateTime)
     {
         Id = id;
         Hash = hash;
         ParentHash = parentHash;
+        HybridDateTime = hybridDateTime;
     }
+
     public Commit(Guid id)
     {
         Id = id;
@@ -25,9 +28,10 @@ public class Commit
     {
     }
 
-    public (DateTimeOffset, Guid) CompareKey => (DateTime, Id);
+    public (DateTimeOffset, long, Guid) CompareKey => (HybridDateTime.DateTime, HybridDateTime.Counter, Id);
     public Guid Id { get; }
-    public DateTimeOffset DateTime { get; init; } = DateTimeOffset.UtcNow;
+    public required HybridDateTime HybridDateTime { get; init; }
+    public DateTimeOffset DateTime => HybridDateTime.DateTime;
     public string Hash { get; private set; }
     public string ParentHash { get; private set; }
 

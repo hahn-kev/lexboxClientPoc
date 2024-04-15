@@ -3,6 +3,7 @@ using System.Text.Json.Serialization.Metadata;
 using CrdtLib.Changes;
 using CrdtLib.Db;
 using CrdtLib.Entities;
+using CrdtLib.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,13 @@ public static class CrdtKernel
                     sp.GetRequiredService<IOptions<CrdtConfig>>().Value.MakeJsonTypeModifier()
                 }
             }
+        });
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IHybridDateTimeProvider>(provider =>
+        {
+            var hybridDateTime = provider.GetRequiredService<CrdtRepository>().GetLatestDateTime();
+            hybridDateTime ??= HybridDateTimeProvider.DefaultLastDateTime;
+            return ActivatorUtilities.CreateInstance<HybridDateTimeProvider>(provider, hybridDateTime);
         });
         services.AddDbContext<CrdtDbContext>((provider, builder) =>
             {

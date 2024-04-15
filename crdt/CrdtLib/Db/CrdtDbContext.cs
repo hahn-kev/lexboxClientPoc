@@ -2,6 +2,7 @@ using System.Runtime.Serialization;
 using System.Text.Json;
 using CrdtLib.Changes;
 using CrdtLib.Entities;
+using CrdtLib.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -25,10 +26,16 @@ public class CrdtDbContext(
     {
         var commitEntity = builder.Entity<Commit>();
         commitEntity.HasKey(c => c.Id);
-        commitEntity.Property(c => (DateTimeOffset?)c.DateTime).HasConversion(
-            d => d.Value.ToUniversalTime().DateTime,
-            d => new DateTimeOffset(d, TimeSpan.Zero)
-        );
+        commitEntity.OwnsOne(c => c.HybridDateTime,
+            hybridEntity =>
+            {
+                hybridEntity.Property(h => (DateTimeOffset?)h.DateTime)
+                    .HasConversion(
+                        d => d.Value.ToUniversalTime().DateTime,
+                        d => new DateTimeOffset(d, TimeSpan.Zero))
+                    .HasColumnName("DateTime");
+                hybridEntity.Property(h => h.Counter).HasColumnName("Counter");
+            });
         commitEntity.HasMany(c => c.ChangeEntities)
             .WithOne()
             .HasForeignKey(c => c.CommitId);
@@ -80,21 +87,17 @@ public static class DbSetExtensions
 {
     public static IQueryable<Commit> DefaultOrder(this IQueryable<Commit> queryable)
     {
-        return queryable.OrderBy(c => c.DateTime).ThenBy(c => c.Id);
+        return queryable
+            .OrderBy(c => c.HybridDateTime.DateTime)
+            .ThenBy(c => c.HybridDateTime.Counter)
+            .ThenBy(c => c.Id);
     }
 
     public static IQueryable<ObjectSnapshot> DefaultOrder(this IQueryable<ObjectSnapshot> queryable)
     {
-        return queryable.OrderBy(c => c.Commit.DateTime).ThenBy(c => c.Commit.Id);
-    }
-
-    public static IQueryable<ObjectSnapshot> LatestSnapshots(this IQueryable<ObjectSnapshot> queryable)
-    {
-        return queryable.Where(snapshot =>
-            queryable.GroupBy(s => s.EntityId,
-                    (entityId, snapshots) => snapshots.OrderByDescending(s => s.Commit.DateTime)
-                        .ThenBy(s => s.CommitId)
-                        .First().Id)
-                .Contains(snapshot.Id));
+        return queryable
+            .OrderBy(c => c.Commit.HybridDateTime.DateTime)
+            .ThenBy(c => c.Commit.HybridDateTime.Counter)
+            .ThenBy(c => c.Commit.Id);
     }
 }

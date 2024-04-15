@@ -27,14 +27,18 @@ public static class CrdtSampleKernel
             config =>
             {
                 config.EnableProjectedTables = enableProjectedTables;
-                config.ChangeTypeListBuilder.Add<DeleteChange<Entry>>()
+                config.ChangeTypeListBuilder
+                    .Add<DeleteChange<Entry>>()
                     .Add<SimpleChange>()
                     .Add<SetAgeChange>()
                     .Add<UpVoteCommentChange>()
                     .Add<ChangeText>()
                     .Add<AddReferenceChange>()
                     .Add<CommentOnEntryChange>();
-                config.ObjectTypeListBuilder.Add<Entry>().Add<Comment>().Add<UpVote>();
+                config.ObjectTypeListBuilder
+                    .Add<Entry>()
+                    .Add<Comment>()
+                    .Add<UpVote>();
             });
         return services;
     }

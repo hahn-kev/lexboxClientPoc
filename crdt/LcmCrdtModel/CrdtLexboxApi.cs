@@ -3,6 +3,7 @@ using System.Text.Json;
 using CrdtLib;
 using CrdtLib.Changes;
 using CrdtLib.Db;
+using CrdtLib.Helpers;
 using LcmCrdtModel.Changes;
 using lexboxClientContracts;
 using LinqToDB;
@@ -10,7 +11,7 @@ using LinqToDB.EntityFrameworkCore;
 
 namespace LcmCrdtModel;
 
-public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOptions, CrdtDbContext dbContext) : ILexboxApi
+public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOptions, IHybridDateTimeProvider timeProvider) : ILexboxApi
 {
     //todo persist somewhere
     Guid ClientId = Guid.NewGuid();
@@ -107,18 +108,13 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
 
     public async Task<lexboxClientContracts.Entry> CreateEntry(lexboxClientContracts.Entry entry)
     {
-        var changeEntity = new ChangeEntity(new CreateEntryChange(entry));
-        await dataModel.Add(new Commit
-        {
-            ClientId = ClientId,
-            ChangeEntities =
-            [
-                changeEntity,
-                ..entry.Senses.Select(s => new ChangeEntity(new CreateSenseChange(s, entry.Id))),
-                ..entry.Senses.SelectMany(s => s.ExampleSentences,
-                    (sense, sentence) => new ChangeEntity(new CreateExampleSentenceChange(sentence, sense.Id)))
-            ]
-        });
+        await dataModel.AddChanges(ClientId,
+        [
+            new CreateEntryChange(entry),
+            ..entry.Senses.Select(s => new CreateSenseChange(s, entry.Id)),
+            ..entry.Senses.SelectMany(s => s.ExampleSentences,
+                (sense, sentence) => new CreateExampleSentenceChange(sentence, sense.Id))
+        ]);
         return await GetEntry(entry.Id);
     }
 
@@ -126,35 +122,23 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         UpdateObjectInput<lexboxClientContracts.Entry> update)
     {
         var patchChange = new JsonPatchChange<Entry>(id, update.Patch, jsonOptions);
-        await dataModel.Add(new Commit
-        {
-            ClientId = ClientId,
-            ChangeEntities = { new ChangeEntity(patchChange) }
-        });
+        await dataModel.AddChange(ClientId, patchChange);
         return await GetEntry(id);
     }
 
     public async Task DeleteEntry(Guid id)
     {
-        await dataModel.Add(new Commit
-        {
-            ClientId = ClientId,
-            ChangeEntities = { new ChangeEntity(new DeleteChange<Entry>(id)) }
-        });
+        await dataModel.AddChange(ClientId, new DeleteChange<Entry>(id));
     }
 
     public async Task<lexboxClientContracts.Sense> CreateSense(Guid entryId, lexboxClientContracts.Sense sense)
     {
-        await dataModel.Add(new Commit
-        {
-            ClientId = ClientId,
-            ChangeEntities =
-            [
-                new ChangeEntity(new CreateSenseChange(sense, entryId)),
-                ..sense.ExampleSentences.Select(sentence =>
-                    new ChangeEntity(new CreateExampleSentenceChange(sentence, sense.Id)))
-            ]
-        });
+        await dataModel.AddChanges(ClientId,
+        [
+            new CreateSenseChange(sense, entryId),
+            ..sense.ExampleSentences.Select(sentence =>
+                new CreateExampleSentenceChange(sentence, sense.Id))
+        ]);
         return await dataModel.GetLatest<Sense>(sense.Id);
     }
 
@@ -163,35 +147,20 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
         UpdateObjectInput<lexboxClientContracts.Sense> update)
     {
         var patchChange = new JsonPatchChange<Sense>(senseId, update.Patch, jsonOptions);
-        await dataModel.Add(new Commit(Guid.NewGuid())
-        {
-            ClientId = ClientId,
-            ChangeEntities = { new ChangeEntity(patchChange) }
-        });
+        await dataModel.AddChange(ClientId, patchChange);
         return await dataModel.GetLatest<Sense>(senseId);
     }
 
     public async Task DeleteSense(Guid entryId, Guid senseId)
     {
-        await dataModel.Add(new Commit
-        {
-            ClientId = ClientId,
-            ChangeEntities = { new ChangeEntity(new DeleteChange<Sense>(senseId)) }
-        });
+        await dataModel.AddChange(ClientId, new DeleteChange<Sense>(senseId));
     }
 
     public async Task<lexboxClientContracts.ExampleSentence> CreateExampleSentence(Guid entryId,
         Guid senseId,
         lexboxClientContracts.ExampleSentence exampleSentence)
     {
-        await dataModel.Add(new Commit
-        {
-            ClientId = ClientId,
-            ChangeEntities =
-            {
-                new ChangeEntity(new CreateExampleSentenceChange(exampleSentence, senseId))
-            }
-        });
+        await dataModel.AddChange(ClientId, new CreateExampleSentenceChange(exampleSentence, senseId));
         return await dataModel.GetLatest<ExampleSentence>(exampleSentence.Id);
     }
 
@@ -202,21 +171,13 @@ public class CrdtLexboxApi(DataModel dataModel, JsonSerializerOptions jsonOption
     {
         var jsonPatch = update.Patch;
         var patchChange = new JsonPatchChange<ExampleSentence>(exampleSentenceId, jsonPatch, jsonOptions);
-        await dataModel.Add(new Commit(Guid.NewGuid())
-        {
-            ClientId = ClientId,
-            ChangeEntities = { new ChangeEntity(patchChange) }
-        });
+        await dataModel.AddChange(ClientId, patchChange);
         return await dataModel.GetLatest<ExampleSentence>(exampleSentenceId);
     }
 
     public Task DeleteExampleSentence(Guid entryId, Guid senseId, Guid exampleSentenceId)
     {
-        return dataModel.Add(new Commit
-        {
-            ClientId = ClientId,
-            ChangeEntities = { new ChangeEntity(new DeleteChange<ExampleSentence>(exampleSentenceId)) }
-        });
+        return dataModel.AddChange(ClientId, new DeleteChange<ExampleSentence>(exampleSentenceId));
     }
 
     public UpdateBuilder<T> CreateUpdateBuilder<T>() where T : class

@@ -5,6 +5,7 @@ using CrdtSample.Models;
 using CrdtLib;
 using CrdtLib.Changes;
 using CrdtLib.Db;
+using CrdtLib.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,7 +24,7 @@ await localModel.AddRange(new[]
     new Commit
     {
         ClientId = client1Id,
-        DateTime = new DateTime(2000, 1, 1),
+        HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 1), 0),
         ChangeEntities =
         {
             new ChangeEntity(new SimpleChange(entry1Id)
@@ -43,7 +44,7 @@ await localModel.AddRange(new[]
     new Commit
     {
         ClientId = client1Id,
-        DateTime = new DateTime(2000, 1, 15),
+        HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 15), 0),
         ChangeEntities =
         {
             new ChangeEntity(
@@ -59,7 +60,7 @@ await localModel.AddRange(new[]
     new Commit
     {
         ClientId = client1Id,
-        DateTime = new DateTime(2000, 1, 30),
+        HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 30), 0),
         ChangeEntities =
         {
             new ChangeEntity(new DeleteChange<Entry>(entry1Id))
@@ -70,7 +71,7 @@ var entry1 = await localModel.GetLatest<Entry>(entry1Id);
 await localModel.Add(new Commit()
 {
     ClientId = client1Id,
-    DateTime = new DateTime(2000, 1, 16),
+    HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 16), 0),
     ChangeEntities =
     {
         new ChangeEntity(
@@ -93,7 +94,7 @@ await remoteModel.AddRange(new[]
     new Commit
     {
         ClientId = client2Id,
-        DateTime = new DateTime(2000, 1, 5),
+        HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 5), 0),
         ChangeEntities =
         {
             new ChangeEntity(
@@ -109,7 +110,7 @@ await remoteModel.AddRange(new[]
     new Commit
     {
         ClientId = client2Id,
-        DateTime = new DateTime(2000, 1, 7),
+        HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 7), 0),
         ChangeEntities =
         {
             new ChangeEntity(
@@ -143,7 +144,7 @@ Console.WriteLine("Insert text");
 await localModel.Add(new Commit
 {
     ClientId = client1Id,
-    DateTime = new DateTime(2000, 1, 17),
+    HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 17), 0),
     ChangeEntities =
     {
         new ChangeEntity(

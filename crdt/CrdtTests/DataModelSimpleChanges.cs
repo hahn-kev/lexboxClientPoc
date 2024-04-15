@@ -3,6 +3,7 @@ using CrdtSample.Changes;
 using CrdtSample.Models;
 using CrdtLib.Changes;
 using CrdtLib.Db;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tests;
@@ -167,5 +168,14 @@ public class DataModelSimpleChanges : DataModelTestBase
 
         entry1 = await DataModel.GetLatest<Entry>(_entity1Id);
         entry1.YText.ToString().Should().Be("Yo What's up Jason");
+    }
+
+    [Fact]
+    public async Task CanGetEntryLinq2Db()
+    {
+        await WriteNextChange(SimpleChange(_entity1Id, "test-value"));
+
+        var entries = await DataModel.GetLatestObjects<Entry>().ToArrayAsyncLinqToDB();
+        entries.Should().ContainSingle();
     }
 }

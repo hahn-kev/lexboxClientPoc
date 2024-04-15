@@ -3,6 +3,7 @@ using System.Text.Json;
 using CrdtLib.Db;
 using CrdtLib.Entities;
 using CrdtLib.Changes;
+using CrdtLib.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace CrdtLib;
@@ -20,7 +21,7 @@ public interface ISyncable
 
 public record SyncState(Dictionary<Guid, long> ClientHeads);
 
-public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions serializerOptions) : ISyncable
+public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions serializerOptions, IHybridDateTimeProvider timeProvider) : ISyncable
 {
     /// <summary>
     /// after adding any commit validate the commit history, not great for performance but good for testing.
@@ -36,6 +37,29 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         await UpdateSnapshots(commit);
         if (_autoValidate) await ValidateCommits();
         await transaction.CommitAsync();
+    }
+
+    public async Task AddChange(Guid clientId, IChange change)
+    {
+        var commitId = Guid.NewGuid();
+        change.CommitId = commitId;
+        await Add(new Commit(commitId)
+        {
+            ClientId = clientId,
+            HybridDateTime = timeProvider.GetDateTime(),
+            ChangeEntities = {new ChangeEntity(change)}
+        });
+    }
+
+    public async Task AddChanges(Guid clientId, IEnumerable<IChange> change)
+    {
+        var commitId = Guid.NewGuid();
+        await Add(new Commit(commitId)
+        {
+            ClientId = clientId,
+            HybridDateTime = timeProvider.GetDateTime(),
+            ChangeEntities = [..change.Select(c => new ChangeEntity(c))]
+        });
     }
 
     async Task ISyncable.AddRangeFromSync(IEnumerable<Commit> commits)
@@ -125,9 +149,9 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
                 s.EntityId,
                 s.CommitId,
                 s.IsRoot,
-                s.Commit.DateTime,
+                s.Commit.HybridDateTime,
                 s.Commit.Hash,
-                s.EntityIsDeleted)).ToArrayAsync();
+                s.EntityIsDeleted)).AsNoTracking().ToArrayAsync();
         return snapshots;
     }
 

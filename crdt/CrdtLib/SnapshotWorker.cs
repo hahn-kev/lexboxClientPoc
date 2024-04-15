@@ -39,7 +39,7 @@ public class SnapshotWorker
     {
         _snapshots = snapshots;
         _crdtRepository = crdtRepository;
-        _oldestSnapshot = snapshots.Values.MinBy(s => (s.DateTime, s.CommitId));
+        _oldestSnapshot = snapshots.Values.MinBy(s => (s.HybridDateTime.DateTime, s.HybridDateTime.Counter, s.CommitId));
     }
 
     public async Task UpdateSnapshots()
@@ -48,9 +48,11 @@ public class SnapshotWorker
         //but before the oldestAddedCommit
         var commits = await _crdtRepository.CurrentCommits().Where(c =>
                 _oldestSnapshot == null
-                || (c.DateTime == _oldestSnapshot.DateTime &&
+                || (c.HybridDateTime.DateTime == _oldestSnapshot.HybridDateTime.DateTime &&
                     c.Id > _oldestSnapshot.CommitId)
-                || c.DateTime > _oldestSnapshot.DateTime)
+                || c.HybridDateTime.DateTime > _oldestSnapshot.HybridDateTime.DateTime
+                || (c.HybridDateTime.DateTime == _oldestSnapshot.HybridDateTime.DateTime 
+                && c.HybridDateTime.Counter > _oldestSnapshot.HybridDateTime.Counter))
             .Include(c => c.ChangeEntities).ToArrayAsync();
         await ApplyCommitChanges(commits, true);
         

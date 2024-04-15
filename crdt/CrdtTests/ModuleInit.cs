@@ -2,7 +2,9 @@
 using System.Runtime.CompilerServices;
 using Argon;
 using CrdtLib.Db;
+using CrdtSample;
 using LinqToDB.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests;
 
@@ -11,7 +13,10 @@ public class ModuleInit
     [ModuleInitializer]
     public static void Initialize()
     {
-        var model = new DataModelTestBase().DbContext.Model;
+        var services = new ServiceCollection()
+            .AddCrdtDataSample(":memory:")
+            .BuildServiceProvider();
+        var model = services.GetRequiredService<CrdtDbContext>().Model;
         VerifyEntityFramework.Initialize(model);
         VerifierSettings.AddExtraSettings(s =>
         {

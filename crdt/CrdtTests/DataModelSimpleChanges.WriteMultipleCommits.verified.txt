@@ -25,7 +25,7 @@
           $type: SimpleChange,
           Values: {
             $type: Dictionary<string, object>,
-            Value: change1
+            Value: change 1
           },
           Id: Guid_3,
           EntityId: Guid_4,
@@ -41,7 +41,7 @@
         Entity: {
           $type: Entry,
           Id: Guid_4,
-          Value: change1,
+          Value: change 1,
           YText: [],
           YTextBlob: AAAAAAAAAQAAAAAAAA==
         },
@@ -73,15 +73,15 @@
         $type: ChangeEntity,
         Id: Guid_7,
         CommitId: Guid_6,
-        EntityId: Guid_4,
+        EntityId: Guid_8,
         Change: {
           $type: SimpleChange,
           Values: {
             $type: Dictionary<string, object>,
-            Value: change2
+            Value: change 2
           },
           Id: Guid_7,
-          EntityId: Guid_4,
+          EntityId: Guid_8,
           EntityType: Entry
         }
       }
@@ -89,27 +89,20 @@
     Snapshots: [
       {
         $type: ObjectSnapshot,
-        Id: Guid_8,
+        Id: Guid_9,
         TypeName: Entry,
         Entity: {
           $type: Entry,
-          Id: Guid_4,
-          Value: change2,
+          Id: Guid_8,
+          Value: change 2,
           YText: [],
           YTextBlob: AAAAAAAAAQAAAAAAAA==
         },
-        EntityId: Guid_4,
+        EntityId: Guid_8,
         EntityIsDeleted: false,
         CommitId: Guid_6,
-        IsRoot: false
+        IsRoot: true
       }
     ]
-  },
-  {
-    $type: Entry,
-    Id: Guid_4,
-    Value: change2,
-    YText: [],
-    YTextBlob: AAAAAAAAAQAAAAAAAA==
   }
 ]

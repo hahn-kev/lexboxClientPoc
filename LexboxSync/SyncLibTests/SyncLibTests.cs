@@ -27,6 +27,8 @@ public class SyncLibTests : IAsyncLifetime
             .AddLcmCrdtClient(":memory:")
             .BuildServiceProvider();
         _crdtDbContext = _services.GetRequiredService<CrdtDbContext>();
+        _crdtDbContext.Database.OpenConnection();
+        _crdtDbContext.Database.EnsureCreated();
         DataModel = _services.GetRequiredService<DataModel>();
         crdtApi = ActivatorUtilities.CreateInstance<CrdtLexboxApi>(_services);
     }
@@ -34,8 +36,6 @@ public class SyncLibTests : IAsyncLifetime
     public virtual async Task InitializeAsync()
     {
         lcmApi = await LexboxLcmApiFactory.CreateApi("C:\\ProgramData\\SIL\\FieldWorks\\Projects\\sena-3\\sena-3.fwdata", false);
-        await _crdtDbContext.Database.OpenConnectionAsync();
-        await _crdtDbContext.Database.EnsureCreatedAsync();
     }
 
     public async Task DisposeAsync()
