@@ -64,6 +64,8 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
 
     async Task ISyncable.AddRangeFromSync(IEnumerable<Commit> commits)
     {
+        commits = commits.ToArray();
+        timeProvider.TakeLatestTime(commits.Select(c => c.HybridDateTime));
         await AddRange(commits, true);
     }
 

@@ -26,7 +26,7 @@ public class CrdtDbContext(
     {
         var commitEntity = builder.Entity<Commit>();
         commitEntity.HasKey(c => c.Id);
-        commitEntity.OwnsOne(c => c.HybridDateTime,
+        commitEntity.ComplexProperty(c => c.HybridDateTime,
             hybridEntity =>
             {
                 hybridEntity.Property(h => (DateTimeOffset?)h.DateTime)
