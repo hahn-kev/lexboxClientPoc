@@ -114,7 +114,7 @@ public class CommitTests
             HybridDateTime = HybridDateTime.ForTestingNow,
             ChangeEntities =
             {
-                new ChangeEntity(new SetAgeChange(Guid.NewGuid(), 3))
+                new ChangeEntity(new SetWordTextChange(Guid.NewGuid(), "hello"))
             }
         };
         commit.SetParentHash(Convert.ToHexString(XxHash64.Hash(Guid.NewGuid().ToByteArray())));

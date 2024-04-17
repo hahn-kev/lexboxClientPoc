@@ -16,8 +16,8 @@ public class ModelSnapshotTests : DataModelTestBase
     [Fact]
     public async Task CanGetModelSnapshot()
     {
-        await WriteNextChange(NewWord(Guid.NewGuid(), "entity1"));
-        await WriteNextChange(NewWord(Guid.NewGuid(), "entity2"));
+        await WriteNextChange(SetWord(Guid.NewGuid(), "entity1"));
+        await WriteNextChange(SetWord(Guid.NewGuid(), "entity2"));
         var snapshot = await DataModel.GetProjectSnapshot();
         snapshot.Snapshots.Should().HaveCount(2);
     }
@@ -26,13 +26,13 @@ public class ModelSnapshotTests : DataModelTestBase
     public async Task ModelSnapshotShowsMultipleChanges()
     {
         var entityId = Guid.NewGuid();
-        await WriteNextChange(NewWord(entityId, "first"));
-        var secondChange = await WriteNextChange(NewWord(entityId, "second"));
+        await WriteNextChange(SetWord(entityId, "first"));
+        var secondChange = await WriteNextChange(SetWord(entityId, "second"));
         var snapshot = await DataModel.GetProjectSnapshot();
         var simpleSnapshot = snapshot.Snapshots.Values.First();
         var entity = await DataModel.GetBySnapshotId(simpleSnapshot.Id);
-        var entry = entity.Is<Entry>();
-        entry.Value.Should().Be("second");
+        var entry = entity.Is<Word>();
+        entry.Text.Should().Be("second");
         snapshot.LastChange.Should().Be(secondChange.DateTime);
     }
 
@@ -44,13 +44,13 @@ public class ModelSnapshotTests : DataModelTestBase
     public async Task CanGetSnapshotFromEarlier(int changeCount)
     {
         var entityId = Guid.NewGuid();
-        await WriteNextChange(new SetAgeChange(entityId, 24));
+        await WriteNextChange(SetWord(entityId, "first"));
         var changes = new List<Commit>(changeCount);
         var addNew = new List<Commit>(changeCount);
         for (var i = 0; i < changeCount; i++)
         {
-            changes.Add(await WriteNextChange(NewWord(entityId, $"change {i}"), false).AsTask());
-            addNew.Add(await WriteNextChange(NewWord(Guid.NewGuid(), $"add {i}"), false).AsTask());
+            changes.Add(await WriteNextChange(SetWord(entityId, $"change {i}"), false).AsTask());
+            addNew.Add(await WriteNextChange(SetWord(Guid.NewGuid(), $"add {i}"), false).AsTask());
         }
 
         //adding all in one AddRange means there's sparse snapshots
@@ -61,9 +61,8 @@ public class ModelSnapshotTests : DataModelTestBase
         for (int i = 0; i < changeCount; i++)
         {
             var snapshots = await DataModel.GetSnapshotsAt(changes[i].DateTime);
-            var entry = snapshots[entityId].Entity.Is<Entry>();
-            entry.Value.Should().Be($"change {i}");
-            entry.Age.Should().Be(24);
+            var entry = snapshots[entityId].Entity.Is<Word>();
+            entry.Text.Should().Be($"change {i}");
             snapshots.Values.Should().HaveCount(1 + i);
         }
     }
@@ -77,10 +76,10 @@ public class ModelSnapshotTests : DataModelTestBase
     {
         int changeCount = 10_000;
         var entityId = Guid.NewGuid();
-        await WriteNextChange(new SetAgeChange(entityId, 20));
+        await WriteNextChange(SetWord(entityId, "first"));
         //adding all in one AddRange means there's sparse snapshots
         await DataModel.AddRange(Enumerable.Range(0, changeCount)
-            .Select(i => WriteNextChange(NewWord(entityId, $"change {i}"), false).Result));
+            .Select(i => WriteNextChange(SetWord(entityId, $"change {i}"), false).Result));
 
         var latestSnapshot = await DataModel.GetLatestSnapshotByObjectId(entityId);
         //delete snapshots so when we get at then we need to re-apply
@@ -90,9 +89,8 @@ public class ModelSnapshotTests : DataModelTestBase
 
         var entitySnapshot = computedModelSnapshots.Should().ContainSingle().Subject.Value;
         entitySnapshot.Should().BeEquivalentTo(latestSnapshot, options => options.Excluding(snapshot => snapshot.Id));
-        var latestSnapshotEntry = latestSnapshot.Entity.Is<Entry>();
-        var entitySnapshotEntry = entitySnapshot.Entity.Is<Entry>();
-        entitySnapshotEntry.Age.Should().Be(latestSnapshotEntry.Age);
-        entitySnapshotEntry.Value.Should().Be(latestSnapshotEntry.Value);
+        var latestSnapshotEntry = latestSnapshot.Entity.Is<Word>();
+        var entitySnapshotEntry = entitySnapshot.Entity.Is<Word>();
+        entitySnapshotEntry.Text.Should().Be(latestSnapshotEntry.Text);
     }
 }

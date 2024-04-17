@@ -76,9 +76,19 @@ public class DataModelTestBase : IAsyncLifetime
         return commit;
     }
 
-    public IChange NewWord(Guid entityId, string value)
+    public IChange SetWord(Guid entityId, string value)
     {
-        return new NewWordChange(entityId, value);
+        return new SetWordTextChange(entityId, value);
+    }
+
+    public IChange NewDefinition(Guid wordId, string text, string partOfSpeech, Guid? definitionId = default)
+    {
+        return new NewDefinitionChange(definitionId ?? Guid.NewGuid())
+        {
+            WordId = wordId,
+            Text = text,
+            PartOfSpeech = partOfSpeech
+        };
     }
 
     public virtual Task InitializeAsync()
@@ -99,6 +109,6 @@ public class DataModelTestBase : IAsyncLifetime
             .DefaultOrder()
             .ToArray()
             .OfType<object>()
-            .Concat(DbContext.Set<Entry>());
+            .Concat(DbContext.Set<Word>().OrderBy(w => w.Text));
     }
 }

@@ -22,14 +22,11 @@
         CommitId: Guid_1,
         EntityId: Guid_4,
         Change: {
-          $type: SimpleChange,
-          Values: {
-            $type: Dictionary<string, object>,
-            Value: test-value
-          },
+          $type: SetWordTextChange,
+          Text: test-value,
           Id: Guid_3,
           EntityId: Guid_4,
-          EntityType: Entry
+          EntityType: Word
         }
       }
     ],
@@ -37,13 +34,11 @@
       {
         $type: ObjectSnapshot,
         Id: Guid_5,
-        TypeName: Entry,
+        TypeName: Word,
         Entity: {
-          $type: Entry,
-          Id: Guid_4,
-          Value: test-value,
-          YText: [],
-          YTextBlob: AAAAAAAAAQAAAAAAAA==
+          $type: Word,
+          Text: test-value,
+          Id: Guid_4
         },
         EntityId: Guid_4,
         EntityIsDeleted: false,
@@ -53,10 +48,8 @@
     ]
   },
   {
-    $type: Entry,
-    Id: Guid_4,
-    Value: test-value,
-    YText: [],
-    YTextBlob: AAAAAAAAAQAAAAAAAA==
+    $type: Word,
+    Text: test-value,
+    Id: Guid_4
   }
 ]

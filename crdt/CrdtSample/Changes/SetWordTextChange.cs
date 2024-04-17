@@ -11,7 +11,11 @@ public class SetWordTextChange(Guid entityId, string text) : Change<Word>(entity
 
     public override IObjectBase NewEntity(Commit commit)
     {
-        throw new System.NotImplementedException();
+        return new Word()
+        {
+            Id = EntityId,
+            Text = Text
+        };
     }
 
     public override async ValueTask ApplyChange(Word entity, ChangeContext context)

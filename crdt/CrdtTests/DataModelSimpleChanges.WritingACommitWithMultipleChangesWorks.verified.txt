@@ -22,14 +22,11 @@
         CommitId: Guid_1,
         EntityId: Guid_4,
         Change: {
-          $type: SimpleChange,
-          Values: {
-            $type: Dictionary<string, object>,
-            Value: first
-          },
+          $type: SetWordTextChange,
+          Text: first,
           Id: Guid_3,
           EntityId: Guid_4,
-          EntityType: Entry
+          EntityType: Word
         }
       },
       {
@@ -38,14 +35,11 @@
         CommitId: Guid_1,
         EntityId: Guid_6,
         Change: {
-          $type: SimpleChange,
-          Values: {
-            $type: Dictionary<string, object>,
-            Value: second
-          },
+          $type: SetWordTextChange,
+          Text: second,
           Id: Guid_5,
           EntityId: Guid_6,
-          EntityType: Entry
+          EntityType: Word
         }
       }
     ],
@@ -53,13 +47,11 @@
       {
         $type: ObjectSnapshot,
         Id: Guid_7,
-        TypeName: Entry,
+        TypeName: Word,
         Entity: {
-          $type: Entry,
-          Id: Guid_4,
-          Value: first,
-          YText: [],
-          YTextBlob: AAAAAAAAAQAAAAAAAA==
+          $type: Word,
+          Text: first,
+          Id: Guid_4
         },
         EntityId: Guid_4,
         EntityIsDeleted: false,
@@ -69,13 +61,11 @@
       {
         $type: ObjectSnapshot,
         Id: Guid_8,
-        TypeName: Entry,
+        TypeName: Word,
         Entity: {
-          $type: Entry,
-          Id: Guid_6,
-          Value: second,
-          YText: [],
-          YTextBlob: AAAAAAAAAQAAAAAAAA==
+          $type: Word,
+          Text: second,
+          Id: Guid_6
         },
         EntityId: Guid_6,
         EntityIsDeleted: false,
@@ -85,17 +75,13 @@
     ]
   },
   {
-    $type: Entry,
-    Id: Guid_4,
-    Value: first,
-    YText: [],
-    YTextBlob: AAAAAAAAAQAAAAAAAA==
+    $type: Word,
+    Text: first,
+    Id: Guid_4
   },
   {
-    $type: Entry,
-    Id: Guid_6,
-    Value: second,
-    YText: [],
-    YTextBlob: AAAAAAAAAQAAAAAAAA==
+    $type: Word,
+    Text: second,
+    Id: Guid_6
   }
 ]

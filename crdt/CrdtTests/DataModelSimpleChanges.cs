@@ -16,23 +16,33 @@ public class DataModelSimpleChanges : DataModelTestBase
     [Fact]
     public async Task WritingAChangeMakesASnapshot()
     {
-        await WriteNextChange(NewWord(_entity1Id, "test-value"));
+        await WriteNextChange(SetWord(_entity1Id, "test-value"));
         var snapshot = DbContext.Snapshots.Should().ContainSingle().Subject;
-        snapshot.Entity.Is<Entry>().Value.Should().Be("test-value");
+        snapshot.Entity.Is<Word>().Text.Should().Be("test-value");
 
         await Verify(AllData());
+    }
+
+    [Fact]
+    public async Task CanUpdateTheNoteField()
+    {
+        await WriteNextChange(SetWord(_entity1Id, "test-value"));
+        await WriteNextChange(new SetWordNoteChange(_entity1Id, "a word note"));
+        var word = await DataModel.GetLatest<Word>(_entity1Id);
+        word.Text.Should().Be("test-value");
+        word.Note.Should().Be("a word note");
     }
     
     [Fact]
     public async Task WritingA2ndChangeDoesNotEffectTheFirstSnapshot()
     {
-        await WriteNextChange(NewWord(_entity1Id, "change1"));
-        await WriteNextChange(NewWord(_entity1Id, "change2"));
+        await WriteNextChange(SetWord(_entity1Id, "change1"));
+        await WriteNextChange(SetWord(_entity1Id, "change2"));
 
         DbContext.Snapshots.Should()
             .SatisfyRespectively(
-                snap1 => snap1.Entity.Is<Entry>().Value.Should().Be("change1"),
-                snap2 => snap2.Entity.Is<Entry>().Value.Should().Be("change2")
+                snap1 => snap1.Entity.Is<Word>().Text.Should().Be("change1"),
+                snap2 => snap2.Entity.Is<Word>().Text.Should().Be("change2")
             );
 
         await Verify(AllData());
@@ -42,8 +52,8 @@ public class DataModelSimpleChanges : DataModelTestBase
     public async Task WritingACommitWithMultipleChangesWorks()
     {
         await WriteNextChange([
-            NewWord(_entity1Id, "first"),
-            NewWord(_entity2Id, "second")
+            SetWord(_entity1Id, "first"),
+            SetWord(_entity2Id, "second")
         ]);
         await Verify(AllData());
     }
@@ -51,33 +61,33 @@ public class DataModelSimpleChanges : DataModelTestBase
     [Fact]
     public async Task WriteMultipleCommits()
     {
-        await WriteNextChange(NewWord(Guid.NewGuid(), "change 1"));
-        await WriteNextChange(NewWord(Guid.NewGuid(), "change 2"));
+        await WriteNextChange(SetWord(Guid.NewGuid(), "change 1"));
+        await WriteNextChange(SetWord(Guid.NewGuid(), "change 2"));
         DbContext.Snapshots.Should().HaveCount(2);
         await Verify(DbContext.Commits);
 
-        await WriteNextChange(NewWord(Guid.NewGuid(), "change 3"));
+        await WriteNextChange(SetWord(Guid.NewGuid(), "change 3"));
         DbContext.Snapshots.Should().HaveCount(3);
-        DataModel.GetLatestObjects<Entry>().Should().HaveCount(3);
+        DataModel.GetLatestObjects<Word>().Should().HaveCount(3);
     }
 
     [Fact]
     public async Task WritingNoChangesWorks()
     {
-        await WriteNextChange(NewWord(_entity1Id, "test-value"));
+        await WriteNextChange(SetWord(_entity1Id, "test-value"));
         await DataModel.AddRange(Array.Empty<Commit>());
 
         var snapshot = DbContext.Snapshots.Should().ContainSingle().Subject;
-        snapshot.Entity.Is<Entry>().Value.Should().Be("test-value");
+        snapshot.Entity.Is<Word>().Text.Should().Be("test-value");
     }
 
     [Fact]
     public async Task Writing2ChangesSecondOverwritesFirst()
     {
-        await WriteNextChange(NewWord(_entity1Id, "first"));
-        await WriteNextChange(NewWord(_entity1Id, "second"));
+        await WriteNextChange(SetWord(_entity1Id, "first"));
+        await WriteNextChange(SetWord(_entity1Id, "second"));
         var snapshot = await DbContext.Snapshots.DefaultOrder().LastAsync();
-        snapshot.Entity.Is<Entry>().Value.Should().Be("second");
+        snapshot.Entity.Is<Word>().Text.Should().Be("second");
     }
 
     [Fact]
@@ -85,35 +95,37 @@ public class DataModelSimpleChanges : DataModelTestBase
     {
         var firstDate = DateTimeOffset.Now;
         var secondDate = DateTimeOffset.UtcNow.AddSeconds(1);
-        await WriteChange(_localClientId, firstDate, NewWord(_entity1Id, "first"));
-        await WriteChange(_localClientId, secondDate, NewWord(_entity1Id, "second"));
+        await WriteChange(_localClientId, firstDate, SetWord(_entity1Id, "first"));
+        await WriteChange(_localClientId, secondDate, SetWord(_entity1Id, "second"));
         var snapshot = await DbContext.Snapshots.DefaultOrder().LastAsync();
-        snapshot.Entity.Is<Entry>().Value.Should().Be("second");
+        snapshot.Entity.Is<Word>().Text.Should().Be("second");
     }
 
     [Fact]
     public async Task Writing2ChangesSecondOverwritesFirstWithUtcFirst()
     {
-        await WriteChange(_localClientId, DateTimeOffset.UtcNow, NewWord(_entity1Id, "first"));
-        await WriteChange(_localClientId, DateTimeOffset.Now.AddSeconds(1), NewWord(_entity1Id, "second"));
+        var firstDate = DateTimeOffset.UtcNow;
+        var secondDate = DateTimeOffset.Now.AddSeconds(1);
+        await WriteChange(_localClientId, firstDate, SetWord(_entity1Id, "first"));
+        await WriteChange(_localClientId, secondDate, SetWord(_entity1Id, "second"));
         var snapshot = await DbContext.Snapshots.DefaultOrder().LastAsync();
-        snapshot.Entity.Is<Entry>().Value.Should().Be("second");
+        snapshot.Entity.Is<Word>().Text.Should().Be("second");
     }
 
     [Fact]
     public async Task Writing2ChangesAtOnceWithMergedHistory()
     {
-        await WriteNextChange(NewWord(_entity1Id, "first"));
-        var second = await WriteNextChange(NewWord(_entity1Id, "second"));
+        await WriteNextChange(SetWord(_entity1Id, "first"));
+        var second = await WriteNextChange(SetWord(_entity1Id, "second"));
         //add range has some additional logic that depends on proper commit ordering
         await DataModel.AddRange(new[]
         {
-            await WriteChangeBefore(second, new SetAgeChange(_entity1Id, 4), false),
-            await WriteNextChange(NewWord(_entity1Id, "third"), false)
+            await WriteChangeBefore(second, new SetWordNoteChange(_entity1Id, "a word note"), false),
+            await WriteNextChange(SetWord(_entity1Id, "third"), false)
         });
-        var entity = await DataModel.GetLatest<Entry>(_entity1Id);
-        entity.Value.Should().Be("third");
-        entity.Age.Should().Be(4);
+        var word = await DataModel.GetLatest<Word>(_entity1Id);
+        word.Text.Should().Be("third");
+        word.Note.Should().Be("a word note");
 
         await Verify(AllData());
     }
@@ -121,61 +133,49 @@ public class DataModelSimpleChanges : DataModelTestBase
     [Fact]
     public async Task ChangeInsertedInTheMiddleOfHistoryWorks()
     {
-        var first = await WriteNextChange(NewWord(_entity1Id, "first"));
-        await WriteNextChange(NewWord(_entity1Id, "second"));
+        var first = await WriteNextChange(SetWord(_entity1Id, "first"));
+        await WriteNextChange(SetWord(_entity1Id, "second"));
 
-        await WriteChangeAfter(first, new SetAgeChange(_entity1Id, 3));
-        var snapshot = await DbContext.Snapshots.DefaultOrder().LastAsync();
-        var entry = snapshot.Entity.Is<Entry>();
-        entry.Age.Should().Be(3);
-        entry.Value.Should().Be("second");
+        await WriteChangeAfter(first, new SetWordNoteChange(_entity1Id, "a word note"));
+        var word = await DataModel.GetLatest<Word>(_entity1Id);
+        word.Text.Should().Be("second");
+        word.Note.Should().Be("a word note");
     }
 
 
     [Fact]
     public async Task CanTrackMultipleEntries()
     {
-        await WriteNextChange(NewWord(_entity1Id, "entity1"));
-        await WriteNextChange(NewWord(_entity2Id, "entity2"));
+        await WriteNextChange(SetWord(_entity1Id, "entity1"));
+        await WriteNextChange(SetWord(_entity2Id, "entity2"));
 
-        (await DataModel.GetLatest<Entry>(_entity1Id)).Value.Should().Be("entity1");
-        (await DataModel.GetLatest<Entry>(_entity2Id)).Value.Should().Be("entity2");
+        (await DataModel.GetLatest<Word>(_entity1Id)).Text.Should().Be("entity1");
+        (await DataModel.GetLatest<Word>(_entity2Id)).Text.Should().Be("entity2");
     }
 
     [Fact]
     public async Task CanCreate2EntriesOutOfOrder()
     {
-        var commit1 = await WriteNextChange(NewWord(_entity1Id, "entity1"));
-        await WriteChangeBefore(commit1, NewWord(_entity2Id, "entity2"));
+        var commit1 = await WriteNextChange(SetWord(_entity1Id, "entity1"));
+        await WriteChangeBefore(commit1, SetWord(_entity2Id, "entity2"));
     }
 
     [Fact]
     public async Task CanDeleteAnEntry()
     {
-        await WriteNextChange(NewWord(_entity1Id, "test-value"));
-        var deleteCommit = await WriteNextChange(new DeleteChange<Entry>(_entity1Id));
+        await WriteNextChange(SetWord(_entity1Id, "test-value"));
+        var deleteCommit = await WriteNextChange(new DeleteChange<Word>(_entity1Id));
         var snapshot = await DbContext.Snapshots.DefaultOrder().LastAsync();
         snapshot.Entity.DeletedAt.Should().Be(deleteCommit.DateTime);
     }
 
-    [Fact]
-    public async Task CanUseYText()
-    {
-        await WriteNextChange(NewWord(_entity1Id, "test-value"));
-        var entry1 = await DataModel.GetLatest<Entry>(_entity1Id);
-        await WriteNextChange(new ChangeText(entry1, text => text.Insert(0, "Yo Jason")));
-        await WriteNextChange(new ChangeText(entry1, text => text.Insert(3, "What's up ")));
-
-        entry1 = await DataModel.GetLatest<Entry>(_entity1Id);
-        entry1.YText.ToString().Should().Be("Yo What's up Jason");
-    }
 
     [Fact]
     public async Task CanGetEntryLinq2Db()
     {
-        await WriteNextChange(NewWord(_entity1Id, "test-value"));
+        await WriteNextChange(SetWord(_entity1Id, "test-value"));
 
-        var entries = await DataModel.GetLatestObjects<Entry>().ToArrayAsyncLinqToDB();
+        var entries = await DataModel.GetLatestObjects<Word>().ToArrayAsyncLinqToDB();
         entries.Should().ContainSingle();
     }
 }

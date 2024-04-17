@@ -39,27 +39,31 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
         await transaction.CommitAsync();
     }
 
-    public async Task AddChange(Guid clientId, IChange change)
+    public async Task<Commit> AddChange(Guid clientId, IChange change)
     {
         var commitId = Guid.NewGuid();
         change.CommitId = commitId;
-        await Add(new Commit(commitId)
+        var commit = new Commit(commitId)
         {
             ClientId = clientId,
             HybridDateTime = timeProvider.GetDateTime(),
             ChangeEntities = {new ChangeEntity(change)}
-        });
+        };
+        await Add(commit);
+        return commit;
     }
 
-    public async Task AddChanges(Guid clientId, IEnumerable<IChange> change)
+    public async Task<Commit> AddChanges(Guid clientId, IEnumerable<IChange> change)
     {
         var commitId = Guid.NewGuid();
-        await Add(new Commit(commitId)
+        var commit = new Commit(commitId)
         {
             ClientId = clientId,
             HybridDateTime = timeProvider.GetDateTime(),
             ChangeEntities = [..change.Select(c => new ChangeEntity(c))]
-        });
+        };
+        await Add(commit);
+        return commit;
     }
 
     async Task ISyncable.AddRangeFromSync(IEnumerable<Commit> commits)

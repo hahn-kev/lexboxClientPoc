@@ -28,11 +28,13 @@ public static class CrdtSampleKernel
             {
                 config.EnableProjectedTables = enableProjectedTables;
                 config.ChangeTypeListBuilder
-                    .Add<DeleteChange<Entry>>()
                     .Add<NewWordChange>()
                     .Add<NewDefinitionChange>()
                     .Add<NewExampleChange>()
+                    .Add<EditExampleChange>()
                     .Add<SetWordTextChange>()
+                    .Add<SetWordNoteChange>()
+                    .Add<AddAntonymReferenceChange>()
                     .Add<DeleteChange<Word>>()
                     .Add<DeleteChange<Definition>>()
                     .Add<DeleteChange<Example>>()

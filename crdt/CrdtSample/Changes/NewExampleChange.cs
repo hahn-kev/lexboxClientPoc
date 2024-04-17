@@ -9,18 +9,18 @@ namespace CrdtSample.Changes;
 
 public class NewExampleChange : Change<Example>, ISelfNamedType<NewExampleChange>
 {
-    public NewExampleChange FromString(Guid definitionId, string example)
+    public static NewExampleChange FromString(Guid definitionId, string example, Guid? exampleId = default)
     {
-        return FromAction(definitionId, text => text.Insert(0, example));
+        return FromAction(definitionId, exampleId, text => text.Insert(0, example));
     }
 
-    public NewExampleChange FromAction(Guid definitionId, Action<YText> change)
+    public static NewExampleChange FromAction(Guid definitionId, Guid? exampleId, Action<YText> change)
     {
         var doc = new YDoc();
         var stateBefore = doc.EncodeStateVectorV2();
         change(doc.GetText());
         var updateBlob = Convert.ToBase64String(doc.EncodeStateAsUpdateV2(stateBefore));
-        return new NewExampleChange(Guid.NewGuid())
+        return new NewExampleChange(exampleId ?? Guid.NewGuid())
         {
             DefinitionId = definitionId,
             UpdateBlob = updateBlob
@@ -48,5 +48,9 @@ public class NewExampleChange : Change<Example>, ISelfNamedType<NewExampleChange
     public override async ValueTask ApplyChange(Example entity, ChangeContext context)
     {
         entity.YTextBlob = UpdateBlob;
+        if (await context.IsObjectDeleted(DefinitionId))
+        {
+            entity.DeletedAt = context.Commit.DateTime;
+        }
     }
 }

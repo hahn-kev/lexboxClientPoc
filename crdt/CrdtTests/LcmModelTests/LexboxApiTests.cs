@@ -27,14 +27,14 @@ public class BasicApiTests: IAsyncLifetime
             .AddLcmCrdtClient(":memory:")
             .BuildServiceProvider();
         _crdtDbContext = _services.GetRequiredService<CrdtDbContext>();
+        _crdtDbContext.Database.OpenConnection();
+        _crdtDbContext.Database.EnsureCreated();
         DataModel = _services.GetRequiredService<DataModel>();
         _api = ActivatorUtilities.CreateInstance<CrdtLexboxApi>(_services);
     }
 
     public virtual async Task InitializeAsync()
     {
-        await _crdtDbContext.Database.OpenConnectionAsync();
-        await _crdtDbContext.Database.EnsureCreatedAsync();
         await _api.CreateEntry(new Entry
         {
             Id = _entry1Id,

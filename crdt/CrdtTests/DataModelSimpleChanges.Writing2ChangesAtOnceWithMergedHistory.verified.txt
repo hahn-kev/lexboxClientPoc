@@ -22,14 +22,11 @@
         CommitId: Guid_1,
         EntityId: Guid_4,
         Change: {
-          $type: SimpleChange,
-          Values: {
-            $type: Dictionary<string, object>,
-            Value: first
-          },
+          $type: SetWordTextChange,
+          Text: first,
           Id: Guid_3,
           EntityId: Guid_4,
-          EntityType: Entry
+          EntityType: Word
         }
       }
     ],
@@ -37,13 +34,11 @@
       {
         $type: ObjectSnapshot,
         Id: Guid_5,
-        TypeName: Entry,
+        TypeName: Word,
         Entity: {
-          $type: Entry,
-          Id: Guid_4,
-          Value: first,
-          YText: [],
-          YTextBlob: AAAAAAAAAQAAAAAAAA==
+          $type: Word,
+          Text: first,
+          Id: Guid_4
         },
         EntityId: Guid_4,
         EntityIsDeleted: false,
@@ -75,11 +70,11 @@
         CommitId: Guid_6,
         EntityId: Guid_4,
         Change: {
-          $type: SetAgeChange,
-          Age: 4,
+          $type: SetWordNoteChange,
+          Note: a word note,
           Id: Guid_7,
           EntityId: Guid_4,
-          EntityType: Entry
+          EntityType: Word
         }
       }
     ],
@@ -87,14 +82,12 @@
       {
         $type: ObjectSnapshot,
         Id: Guid_8,
-        TypeName: Entry,
+        TypeName: Word,
         Entity: {
-          $type: Entry,
-          Id: Guid_4,
-          Value: first,
-          Age: 4,
-          YText: [],
-          YTextBlob: AAAAAAAAAQAAAAAAAA==
+          $type: Word,
+          Text: first,
+          Note: a word note,
+          Id: Guid_4
         },
         EntityId: Guid_4,
         EntityIsDeleted: false,
@@ -126,14 +119,11 @@
         CommitId: Guid_9,
         EntityId: Guid_4,
         Change: {
-          $type: SimpleChange,
-          Values: {
-            $type: Dictionary<string, object>,
-            Value: second
-          },
+          $type: SetWordTextChange,
+          Text: second,
           Id: Guid_10,
           EntityId: Guid_4,
-          EntityType: Entry
+          EntityType: Word
         }
       }
     ],
@@ -141,13 +131,11 @@
       {
         $type: ObjectSnapshot,
         Id: Guid_11,
-        TypeName: Entry,
+        TypeName: Word,
         Entity: {
-          $type: Entry,
-          Id: Guid_4,
-          Value: second,
-          YText: [],
-          YTextBlob: AAAAAAAAAQAAAAAAAA==
+          $type: Word,
+          Text: second,
+          Id: Guid_4
         },
         EntityId: Guid_4,
         EntityIsDeleted: false,
@@ -179,14 +167,11 @@
         CommitId: Guid_12,
         EntityId: Guid_4,
         Change: {
-          $type: SimpleChange,
-          Values: {
-            $type: Dictionary<string, object>,
-            Value: third
-          },
+          $type: SetWordTextChange,
+          Text: third,
           Id: Guid_13,
           EntityId: Guid_4,
-          EntityType: Entry
+          EntityType: Word
         }
       }
     ],
@@ -194,14 +179,12 @@
       {
         $type: ObjectSnapshot,
         Id: Guid_14,
-        TypeName: Entry,
+        TypeName: Word,
         Entity: {
-          $type: Entry,
-          Id: Guid_4,
-          Value: third,
-          Age: 4,
-          YText: [],
-          YTextBlob: AAAAAAAAAQAAAAAAAA==
+          $type: Word,
+          Text: third,
+          Note: a word note,
+          Id: Guid_4
         },
         EntityId: Guid_4,
         EntityIsDeleted: false,
@@ -211,11 +194,9 @@
     ]
   },
   {
-    $type: Entry,
-    Id: Guid_4,
-    Value: third,
-    Age: 4,
-    YText: [],
-    YTextBlob: AAAAAAAAAQAAAAAAAA==
+    $type: Word,
+    Text: third,
+    Note: a word note,
+    Id: Guid_4
   }
 ]

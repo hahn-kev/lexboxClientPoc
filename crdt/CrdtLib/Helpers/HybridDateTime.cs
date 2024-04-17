@@ -4,6 +4,9 @@ namespace CrdtLib.Helpers;
 
 public record HybridDateTime : IComparable<HybridDateTime>
 {
+    private HybridDateTime()
+    {
+    }
     public HybridDateTime(DateTimeOffset dateTime, long counter)
     {
         DateTime = dateTime;

@@ -27,18 +27,8 @@ await localModel.AddRange(new[]
         HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 1), 0),
         ChangeEntities =
         {
-            new ChangeEntity(new SimpleChange(entry1Id)
-                {
-                    Values =
-                    {
-                        { nameof(Entry.Value), "Hello" },
-                        { nameof(Entry.FirstUsed), new DateTime(2021, 1, 1) }
-                    }
-                }
-            ),
-            new ChangeEntity(
-                new SetAgeChange(entry2Id, 4)
-            )
+            new ChangeEntity(new NewWordChange(entry1Id, "hello", "a note")),
+            new ChangeEntity(new SetWordTextChange(entry2Id, "word2"))
         }
     },
     new Commit
@@ -47,14 +37,7 @@ await localModel.AddRange(new[]
         HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 15), 0),
         ChangeEntities =
         {
-            new ChangeEntity(
-                new SimpleChange(entry1Id)
-                {
-                    Values =
-                    {
-                        { nameof(Entry.Age), 20 }
-                    }
-                })
+            new ChangeEntity(new SetWordNoteChange(entry1Id, "updated note"))
         }
     },
     new Commit
@@ -63,20 +46,8 @@ await localModel.AddRange(new[]
         HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 30), 0),
         ChangeEntities =
         {
-            new ChangeEntity(new DeleteChange<Entry>(entry1Id))
+            new ChangeEntity(new DeleteChange<Word>(entry1Id))
         }
-    }
-});
-var entry1 = await localModel.GetLatest<Entry>(entry1Id);
-await localModel.Add(new Commit()
-{
-    ClientId = client1Id,
-    HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 16), 0),
-    ChangeEntities =
-    {
-        new ChangeEntity(
-            new ChangeText(entry1, text => text.Insert(0, "Yo Jason"))
-        )
     }
 });
 await localModel.PrintSnapshots();
@@ -97,14 +68,7 @@ await remoteModel.AddRange(new[]
         HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 5), 0),
         ChangeEntities =
         {
-            new ChangeEntity(
-            new SimpleChange(entry1Id)
-            {
-                Values =
-                {
-                    { nameof(Entry.Value), "offline change 1" },
-                }
-            })
+            new ChangeEntity(new SetWordTextChange(entry1Id, "offline change 1"))
         }
     },
     new Commit
@@ -113,14 +77,7 @@ await remoteModel.AddRange(new[]
         HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 7), 0),
         ChangeEntities =
         {
-            new ChangeEntity(
-            new SimpleChange(entry1Id)
-            {
-                Values =
-                {
-                    { nameof(Entry.Value), "offline change two" },
-                }
-            })
+            new ChangeEntity(new SetWordTextChange(entry1Id, "offline change two"))
         }
     }
 });
@@ -139,17 +96,3 @@ var dateTime = new DateTime(2000, 1, 8);
 Console.WriteLine($"Snapshot at {dateTime}");
 var snapshotAtTime = await localModel.GetEntitySnapshotAtTime(dateTime, entry1Id);
 if (snapshotAtTime is not null) DataModel.PrintSnapshot(snapshotAtTime);
-
-Console.WriteLine("Insert text");
-await localModel.Add(new Commit
-{
-    ClientId = client1Id,
-    HybridDateTime = new HybridDateTime(new DateTime(2000, 1, 17), 0),
-    ChangeEntities =
-    {
-        new ChangeEntity(
-            new ChangeText(await localModel.GetLatest<Entry>(entry1Id), text => text.Insert(3, "What's up "))
-        )
-    }
-});
-await localModel.PrintSnapshots();
