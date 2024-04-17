@@ -4,6 +4,7 @@ using CrdtLib;
 using CrdtLib.Changes;
 using CrdtLib.Db;
 using CrdtLib.Entities;
+using CrdtLib.Helpers;
 using LcmCrdtModel.Changes;
 using lexboxClientContracts;
 using LinqToDB;
@@ -33,6 +34,10 @@ public static class LcmCrdtKernel
             builder => builder.UseSqlite($"Data Source={dbPath}").UseLinqToDB(optionsBuilder =>
             {
                 var mappingSchema = new MappingSchema();
+                new FluentMappingBuilder(mappingSchema)
+                    .HasAttribute<Commit>(new ColumnAttribute("DateTime", nameof(Commit.HybridDateTime) + "." + nameof(HybridDateTime.DateTime)))
+                    .HasAttribute<Commit>(new ColumnAttribute(nameof(HybridDateTime.Counter), nameof(Commit.HybridDateTime) + "." + nameof(HybridDateTime.Counter)))
+                    .Build();
                 mappingSchema.SetConvertExpression((WritingSystemId id) => new DataParameter
                 {
                     Value = id.Code,
