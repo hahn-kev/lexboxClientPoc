@@ -137,7 +137,12 @@ public class DataModel(CrdtRepository crdtRepository, JsonSerializerOptions seri
 
     public IQueryable<T> GetLatestObjects<T>() where T : class, IObjectBase
     {
-        return crdtRepository.GetCurrentObjects<T>();
+        var q = crdtRepository.GetCurrentObjects<T>();
+        if (q is IQueryable<IOrderableCrdt>)
+        {
+            q = q.OrderBy(o => EF.Property<double>(o, nameof(IOrderableCrdt.Order))).ThenBy(o => o.Id);
+        }
+        return q;
     }
 
     public async Task<IObjectBase> GetBySnapshotId(Guid snapshotId)

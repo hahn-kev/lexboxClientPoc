@@ -81,13 +81,18 @@ public class DataModelTestBase : IAsyncLifetime
         return new SetWordTextChange(entityId, value);
     }
 
-    public IChange NewDefinition(Guid wordId, string text, string partOfSpeech, Guid? definitionId = default)
+    public IChange NewDefinition(Guid wordId,
+        string text,
+        string partOfSpeech,
+        double order = 0,
+        Guid? definitionId = default)
     {
         return new NewDefinitionChange(definitionId ?? Guid.NewGuid())
         {
             WordId = wordId,
             Text = text,
-            PartOfSpeech = partOfSpeech
+            PartOfSpeech = partOfSpeech,
+            Order = order
         };
     }
 

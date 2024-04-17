@@ -10,6 +10,7 @@ public class NewDefinitionChange(Guid entityId) : Change<Definition>(entityId), 
     public required string Text { get; init; }
     public string? OneWordDefinition { get; init; }
     public required string PartOfSpeech { get; init; }
+    public required double Order { get; set; }
     public required Guid WordId { get; init; }
 
     public override IObjectBase NewEntity(Commit commit)
@@ -18,6 +19,7 @@ public class NewDefinitionChange(Guid entityId) : Change<Definition>(entityId), 
         {
             Id = EntityId,
             Text = Text,
+            Order = Order,
             OneWordDefinition = OneWordDefinition,
             PartOfSpeech = PartOfSpeech,
             WordId = WordId
@@ -29,6 +31,7 @@ public class NewDefinitionChange(Guid entityId) : Change<Definition>(entityId), 
         definition.Text = Text;
         definition.OneWordDefinition = OneWordDefinition;
         definition.PartOfSpeech = PartOfSpeech;
+        definition.Order = Order;
         if (await context.IsObjectDeleted(WordId))
         {
             definition.DeletedAt = context.Commit.DateTime;

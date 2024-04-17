@@ -1,12 +1,14 @@
-﻿using CrdtLib.Db;
+﻿using CrdtLib.Changes;
+using CrdtLib.Db;
 using CrdtLib.Entities;
 
 namespace CrdtSample.Models;
 
-public class Definition : IObjectBase<Definition>
+public class Definition : IObjectBase<Definition>, IOrderableCrdt
 {
     public Guid Id { get; init; }
     public required string Text { get; set; }
+    public required double Order { get; set; }
     public string? OneWordDefinition { get; set; }
     public required string PartOfSpeech { get; set; }
     public required Guid WordId { get; init; }
@@ -31,6 +33,7 @@ public class Definition : IObjectBase<Definition>
         {
             Id = Id,
             Text = Text,
+            Order = Order,
             OneWordDefinition = OneWordDefinition,
             PartOfSpeech = PartOfSpeech,
             WordId = WordId,

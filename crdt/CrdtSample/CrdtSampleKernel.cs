@@ -35,6 +35,7 @@ public static class CrdtSampleKernel
                     .Add<SetWordTextChange>()
                     .Add<SetWordNoteChange>()
                     .Add<AddAntonymReferenceChange>()
+                    .Add<SetOrderChange<Definition>>()
                     .Add<DeleteChange<Word>>()
                     .Add<DeleteChange<Definition>>()
                     .Add<DeleteChange<Example>>()

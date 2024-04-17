@@ -17,7 +17,7 @@ public class ExampleSentenceTests : DataModelTestBase
         var wordId = Guid.NewGuid();
         var definitionId = Guid.NewGuid();
         await WriteNextChange(SetWord(wordId, "hello"));
-        await WriteNextChange(NewDefinition(wordId, "a greeting", "verb", definitionId));
+        await WriteNextChange(NewDefinition(wordId, "a greeting", "verb", 0, definitionId));
         await WriteNextChange(NewExampleSentence(definitionId, "Hello, world!"));
         var snapshot = await DataModel.GetProjectSnapshot();
         var exampleSentenceSnapshot = snapshot.Snapshots.Values.Single(s => s.IsType<Example>());
@@ -32,7 +32,7 @@ public class ExampleSentenceTests : DataModelTestBase
         var wordId = Guid.NewGuid();
         var definitionId = Guid.NewGuid();
         await WriteNextChange(SetWord(wordId, "hello"));
-        await WriteNextChange(NewDefinition(wordId, "a greeting", "verb", definitionId));
+        await WriteNextChange(NewDefinition(wordId, "a greeting", "verb", 0, definitionId));
         await WriteNextChange(NewExampleSentence(definitionId, "Hello, world!"));
         await WriteNextChange(new DeleteChange<Word>(wordId));
         var snapshot = await DataModel.GetProjectSnapshot();
@@ -45,7 +45,7 @@ public class ExampleSentenceTests : DataModelTestBase
         var wordId = Guid.NewGuid();
         var definitionId = Guid.NewGuid();
         await WriteNextChange(SetWord(wordId, "hello"));
-        await WriteNextChange(NewDefinition(wordId, "a greeting", "verb", definitionId));
+        await WriteNextChange(NewDefinition(wordId, "a greeting", "verb", 0, definitionId));
         await WriteNextChange(new DeleteChange<Word>(wordId));
         await WriteNextChange(NewExampleSentence(definitionId, "Hello, world!"));
         var snapshot = await DataModel.GetProjectSnapshot();
@@ -59,7 +59,7 @@ public class ExampleSentenceTests : DataModelTestBase
         var definitionId = Guid.NewGuid();
         var exampleId = Guid.NewGuid();
         await WriteNextChange(SetWord(wordId, "hello"));
-        await WriteNextChange(NewDefinition(wordId, "a greeting", "verb", definitionId));
+        await WriteNextChange(NewDefinition(wordId, "a greeting", "verb", 0, definitionId));
         await WriteNextChange(NewExampleSentence(definitionId, "Yo Bob", exampleId));
         var example = await DataModel.GetLatest<Example>(exampleId);
         example.Should().NotBeNull();
